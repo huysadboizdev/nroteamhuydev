@@ -1,0 +1,35 @@
+{
+  "jar_sha256": "1AC383513E7866BB16838E42EE16DA078DE510F50B6119FE2316AA51E1F5FF75",
+  "template": [
+    {
+      "id": "1869",
+      "TYPE": "32",
+      "gender": "3",
+      "NAME": "Giáp tập luyện cấp 5",
+      "description": "Mặc giảm 50% sức đánh, tháo ra tăng 50% sức đánh",
+      "level": "0",
+      "icon_id": "16897",
+      "part": "-1",
+      "is_up_to_up": "0",
+      "power_require": "1500000",
+      "gold": "0",
+      "gem": "0",
+      "head": "-1",
+      "body": "-1",
+      "leg": "-1"
+    }
+  ],
+  "shop_options": [],
+  "player_hits": [],
+  "giftcode_hits": [],
+  "source_effect_1869": {
+    "getPercentTrainArmor": 0,
+    "isTrainArmor": false
+  },
+  "option9": [
+    {
+      "id": "9",
+      "NAME": "Hiệu lực trong # phút"
+    }
+  ]
+}

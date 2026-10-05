@@ -1,0 +1,972 @@
+{
+  "checked_date": "2026-10-04",
+  "timezone": "Asia/Bangkok",
+  "sources": [
+    "MySQL team2026",
+    "team2026.sql",
+    "SRC/sql/nro1.sql",
+    "SRC/sql/migrations"
+  ],
+  "option_status": "applied_and_verified_in_sql_and_running_jar",
+  "dump_templates": {
+    "team2026.sql": [
+      {
+        "id": "678",
+        "TYPE": "5",
+        "gender": "3",
+        "NAME": "Cải trang",
+        "description": "Cải trang thành Android 21",
+        "level": "4",
+        "icon_id": "6400",
+        "part": "-1",
+        "is_up_to_up": "0",
+        "power_require": "0",
+        "gold": "0",
+        "gem": "0",
+        "head": "687",
+        "body": "688",
+        "leg": "689",
+        "_line": 5418
+      },
+      {
+        "id": "710",
+        "TYPE": "5",
+        "gender": "3",
+        "NAME": "Cải trang",
+        "description": "Cải trang thành Quy lão Kamê",
+        "level": "1",
+        "icon_id": "5175",
+        "part": "-1",
+        "is_up_to_up": "0",
+        "power_require": "0",
+        "gold": "0",
+        "gem": "0",
+        "head": "554",
+        "body": "555",
+        "leg": "556",
+        "_line": 5450
+      },
+      {
+        "id": "711",
+        "TYPE": "5",
+        "gender": "3",
+        "NAME": "Cải trang",
+        "description": "Cải trang thành Jacky Chun",
+        "level": "1",
+        "icon_id": "3527",
+        "part": "-1",
+        "is_up_to_up": "0",
+        "power_require": "0",
+        "gold": "0",
+        "gem": "0",
+        "head": "356",
+        "body": "357",
+        "leg": "358",
+        "_line": 5451
+      },
+      {
+        "id": "976",
+        "TYPE": "5",
+        "gender": "3",
+        "NAME": "Số 9 Quy lão Kamê",
+        "description": "VPSK",
+        "level": "1",
+        "icon_id": "9395",
+        "part": "-1",
+        "is_up_to_up": "0",
+        "power_require": "0",
+        "gold": "0",
+        "gem": "0",
+        "head": "1043",
+        "body": "1044",
+        "leg": "1045",
+        "_line": 5716
+      },
+      {
+        "id": "1385",
+        "TYPE": "5",
+        "gender": "3",
+        "NAME": "Cải trang Thầy giáo Quy Lão",
+        "description": "VPSK",
+        "level": "0",
+        "icon_id": "11844",
+        "part": "-1",
+        "is_up_to_up": "0",
+        "power_require": "0",
+        "gold": "0",
+        "gem": "0",
+        "head": "1314",
+        "body": "1315",
+        "leg": "1316",
+        "_line": 6125
+      },
+      {
+        "id": "1602",
+        "TYPE": "5",
+        "gender": "3",
+        "NAME": "CT Android 21 kid",
+        "description": "VPSK",
+        "level": "0",
+        "icon_id": "13430",
+        "part": "1485",
+        "is_up_to_up": "0",
+        "power_require": "0",
+        "gold": "0",
+        "gem": "0",
+        "head": "1485",
+        "body": "1486",
+        "leg": "1487",
+        "_line": 6342
+      },
+      {
+        "id": "1708",
+        "TYPE": "5",
+        "gender": "3",
+        "NAME": "CT Android 21 Thân Thiện",
+        "description": "Đi cùng Android  21 Evil+5% giảm sát thương",
+        "level": "0",
+        "icon_id": "14186",
+        "part": "-1",
+        "is_up_to_up": "0",
+        "power_require": "0",
+        "gold": "0",
+        "gem": "0",
+        "head": "-1",
+        "body": "-1",
+        "leg": "-1",
+        "_line": 6448
+      },
+      {
+        "id": "1709",
+        "TYPE": "5",
+        "gender": "3",
+        "NAME": "CT Android 21 Evil",
+        "description": "Đi Cùng Android  21 Thân Thiện +10% chí mạng",
+        "level": "0",
+        "icon_id": "14194",
+        "part": "-1",
+        "is_up_to_up": "0",
+        "power_require": "0",
+        "gold": "0",
+        "gem": "0",
+        "head": "-1",
+        "body": "-1",
+        "leg": "-1",
+        "_line": 6449
+      },
+      {
+        "id": "1710",
+        "TYPE": "5",
+        "gender": "3",
+        "NAME": "CT Android 21 Tiến Sĩ",
+        "description": "VPSK",
+        "level": "0",
+        "icon_id": "14241",
+        "part": "-1",
+        "is_up_to_up": "0",
+        "power_require": "0",
+        "gold": "0",
+        "gem": "0",
+        "head": "-1",
+        "body": "-1",
+        "leg": "-1",
+        "_line": 6450
+      }
+    ],
+    "SRC/sql/nro1.sql": [
+      {
+        "id": "678",
+        "TYPE": "5",
+        "gender": "3",
+        "NAME": "Cải trang",
+        "description": "Cải trang thành Android 21",
+        "level": "4",
+        "icon_id": "6400",
+        "part": "-1",
+        "is_up_to_up": "0",
+        "power_require": "0",
+        "gold": "0",
+        "gem": "0",
+        "head": "687",
+        "body": "688",
+        "leg": "689",
+        "_line": 5385
+      },
+      {
+        "id": "710",
+        "TYPE": "5",
+        "gender": "3",
+        "NAME": "Cải trang",
+        "description": "Cải trang thành Quy lão Kamê",
+        "level": "1",
+        "icon_id": "5175",
+        "part": "-1",
+        "is_up_to_up": "0",
+        "power_require": "0",
+        "gold": "0",
+        "gem": "0",
+        "head": "554",
+        "body": "555",
+        "leg": "556",
+        "_line": 5417
+      },
+      {
+        "id": "711",
+        "TYPE": "5",
+        "gender": "3",
+        "NAME": "Cải trang",
+        "description": "Cải trang thành Jacky Chun",
+        "level": "1",
+        "icon_id": "3527",
+        "part": "-1",
+        "is_up_to_up": "0",
+        "power_require": "0",
+        "gold": "0",
+        "gem": "0",
+        "head": "356",
+        "body": "357",
+        "leg": "358",
+        "_line": 5418
+      },
+      {
+        "id": "976",
+        "TYPE": "5",
+        "gender": "3",
+        "NAME": "Số 9 Quy lão Kamê",
+        "description": "VPSK",
+        "level": "1",
+        "icon_id": "9395",
+        "part": "-1",
+        "is_up_to_up": "0",
+        "power_require": "0",
+        "gold": "0",
+        "gem": "0",
+        "head": "1043",
+        "body": "1044",
+        "leg": "1045",
+        "_line": 5683
+      },
+      {
+        "id": "1385",
+        "TYPE": "5",
+        "gender": "3",
+        "NAME": "Cải trang Thầy giáo Quy Lão",
+        "description": "VPSK",
+        "level": "0",
+        "icon_id": "11844",
+        "part": "-1",
+        "is_up_to_up": "0",
+        "power_require": "0",
+        "gold": "0",
+        "gem": "0",
+        "head": "1314",
+        "body": "1315",
+        "leg": "1316",
+        "_line": 6092
+      },
+      {
+        "id": "1602",
+        "TYPE": "5",
+        "gender": "3",
+        "NAME": "CT Android 21 kid",
+        "description": "VPSK",
+        "level": "0",
+        "icon_id": "13430",
+        "part": "1485",
+        "is_up_to_up": "0",
+        "power_require": "0",
+        "gold": "0",
+        "gem": "0",
+        "head": "1485",
+        "body": "1486",
+        "leg": "1487",
+        "_line": 6309
+      },
+      {
+        "id": "1708",
+        "TYPE": "5",
+        "gender": "3",
+        "NAME": "CT Android 21 Thân Thiện",
+        "description": "Đi cùng Android  21 Evil+5% giảm sát thương",
+        "level": "0",
+        "icon_id": "14186",
+        "part": "-1",
+        "is_up_to_up": "0",
+        "power_require": "0",
+        "gold": "0",
+        "gem": "0",
+        "head": "-1",
+        "body": "-1",
+        "leg": "-1",
+        "_line": 6415
+      },
+      {
+        "id": "1709",
+        "TYPE": "5",
+        "gender": "3",
+        "NAME": "CT Android 21 Evil",
+        "description": "Đi Cùng Android  21 Thân Thiện +10% chí mạng",
+        "level": "0",
+        "icon_id": "14194",
+        "part": "-1",
+        "is_up_to_up": "0",
+        "power_require": "0",
+        "gold": "0",
+        "gem": "0",
+        "head": "-1",
+        "body": "-1",
+        "leg": "-1",
+        "_line": 6416
+      },
+      {
+        "id": "1710",
+        "TYPE": "5",
+        "gender": "3",
+        "NAME": "CT Android 21 Tiến Sĩ",
+        "description": "VPSK",
+        "level": "0",
+        "icon_id": "14241",
+        "part": "-1",
+        "is_up_to_up": "0",
+        "power_require": "0",
+        "gold": "0",
+        "gem": "0",
+        "head": "-1",
+        "body": "-1",
+        "leg": "-1",
+        "_line": 6417
+      }
+    ]
+  },
+  "requested_costume_ids": [
+    711,
+    710,
+    1710
+  ],
+  "user_requested_options": {
+    "711": {
+      "50": 23,
+      "77": 21,
+      "103": 21,
+      "159": 4,
+      "160": 50
+    },
+    "710": {
+      "50": 22,
+      "77": 20,
+      "103": 20,
+      "159": 3,
+      "160": 35
+    },
+    "1710": {
+      "50": 24,
+      "77": 22,
+      "103": 22,
+      "159": 5,
+      "160": 60
+    },
+    "1869": {
+      "77": 15,
+      "103": 15,
+      "94": 5,
+      "47": 50000,
+      "9": 1000,
+      "251": 0
+    }
+  },
+  "user_options_application_status": "deployed_running_verified",
+  "training_armor_requested_effect": {
+    "wear_damage_reduction_percent": 40,
+    "unequip_damage_bonus_percent": 50,
+    "new_display_option_param": 0,
+    "status": "applied_verified",
+    "new_display_option_id": 251,
+    "initial_minutes": 1000,
+    "max_accumulated_minutes": 10000,
+    "active_training_recharge_minutes": 1,
+    "recharge_interval_seconds": 60
+  },
+  "requested_beam_effect_scope": {
+    "costume_ids": [
+      710,
+      711,
+      1710
+    ],
+    "target": "real_player_only",
+    "excluded_targets": [
+      "boss",
+      "mob",
+      "pet",
+      "bot",
+      "npc"
+    ],
+    "excluded_targets_consume_charge": false,
+    "status": "implemented_and_combat_tests_pass"
+  },
+  "historical_live_sql_before_deployment": {
+    "database": "team2026",
+    "templates": [
+      {
+        "id": "678",
+        "TYPE": "5",
+        "gender": "3",
+        "NAME": "Cải trang",
+        "description": "Cải trang thành Android 21",
+        "level": "4",
+        "icon_id": "6400",
+        "part": "-1",
+        "is_up_to_up": "0",
+        "power_require": "0",
+        "gold": "0",
+        "gem": "0",
+        "head": "687",
+        "body": "688",
+        "leg": "689"
+      },
+      {
+        "id": "710",
+        "TYPE": "5",
+        "gender": "3",
+        "NAME": "Cải trang",
+        "description": "Cải trang thành Quy lão Kamê",
+        "level": "1",
+        "icon_id": "5175",
+        "part": "-1",
+        "is_up_to_up": "0",
+        "power_require": "0",
+        "gold": "0",
+        "gem": "0",
+        "head": "554",
+        "body": "555",
+        "leg": "556"
+      },
+      {
+        "id": "711",
+        "TYPE": "5",
+        "gender": "3",
+        "NAME": "Cải trang",
+        "description": "Cải trang thành Jacky Chun",
+        "level": "1",
+        "icon_id": "3527",
+        "part": "-1",
+        "is_up_to_up": "0",
+        "power_require": "0",
+        "gold": "0",
+        "gem": "0",
+        "head": "356",
+        "body": "357",
+        "leg": "358"
+      },
+      {
+        "id": "976",
+        "TYPE": "5",
+        "gender": "3",
+        "NAME": "Số 9 Quy lão Kamê",
+        "description": "VPSK",
+        "level": "1",
+        "icon_id": "9395",
+        "part": "-1",
+        "is_up_to_up": "0",
+        "power_require": "0",
+        "gold": "0",
+        "gem": "0",
+        "head": "1043",
+        "body": "1044",
+        "leg": "1045"
+      },
+      {
+        "id": "1385",
+        "TYPE": "5",
+        "gender": "3",
+        "NAME": "Cải trang Thầy giáo Quy Lão",
+        "description": "VPSK",
+        "level": "0",
+        "icon_id": "11844",
+        "part": "-1",
+        "is_up_to_up": "0",
+        "power_require": "0",
+        "gold": "0",
+        "gem": "0",
+        "head": "1314",
+        "body": "1315",
+        "leg": "1316"
+      },
+      {
+        "id": "1602",
+        "TYPE": "5",
+        "gender": "3",
+        "NAME": "CT Android 21 kid",
+        "description": "VPSK",
+        "level": "0",
+        "icon_id": "13430",
+        "part": "1485",
+        "is_up_to_up": "0",
+        "power_require": "0",
+        "gold": "0",
+        "gem": "0",
+        "head": "1485",
+        "body": "1486",
+        "leg": "1487"
+      },
+      {
+        "id": "1708",
+        "TYPE": "5",
+        "gender": "3",
+        "NAME": "CT Android 21 Thân Thiện",
+        "description": "Đi cùng Android  21 Evil+5% giảm sát thương",
+        "level": "0",
+        "icon_id": "14186",
+        "part": "-1",
+        "is_up_to_up": "0",
+        "power_require": "0",
+        "gold": "0",
+        "gem": "0",
+        "head": "-1",
+        "body": "-1",
+        "leg": "-1"
+      },
+      {
+        "id": "1709",
+        "TYPE": "5",
+        "gender": "3",
+        "NAME": "CT Android 21 Evil",
+        "description": "Đi Cùng Android  21 Thân Thiện +10% chí mạng",
+        "level": "0",
+        "icon_id": "14194",
+        "part": "-1",
+        "is_up_to_up": "0",
+        "power_require": "0",
+        "gold": "0",
+        "gem": "0",
+        "head": "-1",
+        "body": "-1",
+        "leg": "-1"
+      },
+      {
+        "id": "1710",
+        "TYPE": "5",
+        "gender": "3",
+        "NAME": "CT Android 21 Tiến Sĩ",
+        "description": "VPSK",
+        "level": "0",
+        "icon_id": "14241",
+        "part": "-1",
+        "is_up_to_up": "0",
+        "power_require": "0",
+        "gold": "0",
+        "gem": "0",
+        "head": "-1",
+        "body": "-1",
+        "leg": "-1"
+      }
+    ],
+    "shop_rows": [],
+    "consignment_rows": [],
+    "badges_rows": [],
+    "instance_matches": [],
+    "scanned_counts": {
+      "player": 2,
+      "giftcode": 1
+    },
+    "parts": [
+      {
+        "id": "356",
+        "TYPE": "0",
+        "DATA": "[[3527,4,-2],[3528,4,-2],[3000,0,0]]"
+      },
+      {
+        "id": "357",
+        "TYPE": "1",
+        "DATA": "[[3531,0,0],[3532,-4,0],[3538,0,-1],[3544,1,-1],[3530,0,0],[3536,-1,-1],[3537,0,-1],[3539,0,1],[3529,0,1],[3541,0,0],[3543,0,-1],[3542,-1,-1],[3540,0,-1],[3533,2,-1],[3535,-2,-1],[3534,-3,-2],[3001,0,0]]"
+      },
+      {
+        "id": "358",
+        "TYPE": "2",
+        "DATA": "[[3546,2,0],[3545,-2,-1],[3554,0,0],[3553,0,0],[3552,0,0],[3555,0,0],[3551,0,0],[3557,0,0],[3556,-4,0],[3550,0,-3],[3547,1,1],[3549,-1,1],[3548,0,0],[3002,0,0]]"
+      },
+      {
+        "id": "554",
+        "TYPE": "0",
+        "DATA": "[[5175,5,2],[5176,4,1],[3000,0,0]]"
+      },
+      {
+        "id": "555",
+        "TYPE": "1",
+        "DATA": "[[5205,-2,1],[5177,-6,-6],[5178,-2,-8],[5183,-6,-5],[5182,-1,-7],[5180,0,-9],[5179,-2,-6],[5185,-4,-9],[5186,1,-6],[5406,-12,-1],[5202,-2,-3],[5184,-2,-2],[5200,-4,-12],[5187,-8,-6],[5203,0,-2],[5204,-3,-2],[3001,0,0]]"
+      },
+      {
+        "id": "556",
+        "TYPE": "2",
+        "DATA": "[[5188,1,3],[5199,-1,1],[5201,0,0],[5189,1,-1],[5191,0,1],[5190,1,0],[5192,1,1],[5198,0,2],[5197,-1,4],[5196,-1,0],[5194,0,0],[5193,0,4],[5195,0,2],[3002,0,0]]"
+      },
+      {
+        "id": "687",
+        "TYPE": "0",
+        "DATA": "[[6400,-1,-4],[6401,-3,-4],[3000,0,0]]"
+      },
+      {
+        "id": "688",
+        "TYPE": "1",
+        "DATA": "[[6402,1,0],[6403,0,-2],[6404,0,-4],[6405,0,-3],[6406,0,-3],[6407,2,-2],[6408,0,-2],[6410,1,-2],[6411,-1,-2],[6430,1,-5],[6416,1,0],[6415,1,0],[6412,2,-3],[6409,1,-2],[6413,2,0],[6414,1,-2],[3001,0,0]]"
+      },
+      {
+        "id": "689",
+        "TYPE": "2",
+        "DATA": "[[6428,-1,0],[6429,0,-1],[6420,1,-1],[6417,1,-1],[6419,-2,0],[6418,-1,-1],[6421,-1,0],[6423,0,-1],[6427,2,0],[6426,0,-1],[6424,0,0],[6422,0,1],[6425,0,-1],[3002,0,0]]"
+      },
+      {
+        "id": "1043",
+        "TYPE": "0",
+        "DATA": "[[9394,4,2],[9395,4,1],[2955,0,0]]"
+      },
+      {
+        "id": "1044",
+        "TYPE": "1",
+        "DATA": "[[9297,-1,-2],[9298,-7,-6],[9299,-2,-8],[9300,-6,-5],[9301,-1,-7],[9302,0,-9],[9303,-2,-6],[9304,-3,-10],[9305,0,-7],[9306,-13,-3],[9307,-2,-5],[9308,-3,-4],[9309,-3,-14],[9310,-8,-7],[9311,0,-1],[9312,-2,-2],[2955,0,0]]"
+      },
+      {
+        "id": "1045",
+        "TYPE": "2",
+        "DATA": "[[9313,4,4],[9314,-3,1],[9315,0,0],[9316,0,-1],[9317,0,1],[9318,1,0],[9319,1,1],[9320,0,1],[9321,-2,2],[9322,0,0],[9323,0,0],[9324,0,3],[9325,0,0],[2955,0,0]]"
+      },
+      {
+        "id": "1314",
+        "TYPE": "0",
+        "DATA": "[[11812,1,-3],[11813,0,-5],[2955,0,0]]"
+      },
+      {
+        "id": "1315",
+        "TYPE": "1",
+        "DATA": "[[11815,-1,-1],[11814,-3,-3],[11816,-2,-4],[11817,-2,-4],[11818,0,-3],[11819,-3,-3],[11820,0,-4],[11821,0,-1],[11822,1,-1],[11823,1,0],[11824,0,-1],[11825,-4,-2],[11826,0,0],[11827,1,-2],[11828,0,0],[11829,-1,-1],[2955,0,0]]"
+      },
+      {
+        "id": "1316",
+        "TYPE": "2",
+        "DATA": "[[11840,1,2],[11830,-1,-2],[11831,0,0],[11832,1,-1],[11833,0,-2],[11834,-2,-1],[11835,0,-2],[11841,-1,1],[11839,-2,-2],[11836,-2,-3],[11842,1,-1],[11838,0,0],[11837,0,-1],[2955,0,0]]"
+      },
+      {
+        "id": "1485",
+        "TYPE": "0",
+        "DATA": "[[13398,-3,2],[13399,-3,-1],[2955,0,0]]"
+      },
+      {
+        "id": "1486",
+        "TYPE": "1",
+        "DATA": "[[13400,5,8],[13401,1,5],[13402,3,2],[13403,5,2],[13404,5,3],[13405,8,1],[13406,5,3],[13407,2,6],[13408,4,8],[13409,-1,7],[13410,4,3],[13411,1,3],[13412,2,3],[13413,5,1],[13414,4,5],[13415,3,4],[2955,0,0]]"
+      },
+      {
+        "id": "1487",
+        "TYPE": "2",
+        "DATA": "[[13416,9,11],[13417,2,3],[13418,7,3],[13419,7,1],[13420,5,2],[13421,6,2],[13422,5,3],[13423,4,9],[13424,1,4],[13425,2,1],[13426,2,6],[13427,-1,7],[13428,0,7],[2955,0,0]]"
+      }
+    ],
+    "avatars": [
+      {
+        "head_id": "356",
+        "avatar_id": "4687"
+      },
+      {
+        "head_id": "554",
+        "avatar_id": "564"
+      },
+      {
+        "head_id": "687",
+        "avatar_id": "6503"
+      },
+      {
+        "head_id": "1043",
+        "avatar_id": "9364"
+      },
+      {
+        "head_id": "1314",
+        "avatar_id": "11843"
+      },
+      {
+        "head_id": "1485",
+        "avatar_id": "13429"
+      }
+    ]
+  },
+  "live": {
+    "database": "team2026",
+    "templates": [
+      {
+        "id": 710,
+        "name": "Cải trang",
+        "description": "Cải trang thành Quy lão Kame",
+        "head": 554,
+        "body": 555,
+        "leg": 556,
+        "icon_id": 5175
+      },
+      {
+        "id": 711,
+        "name": "Cải trang",
+        "description": "Cải trang thành Jacky Chun",
+        "head": 356,
+        "body": 357,
+        "leg": 358,
+        "icon_id": 3527
+      },
+      {
+        "id": 1710,
+        "name": "CT Android 21 Tiến Sĩ",
+        "description": "Cải trang thành Android 21 Tiến Sĩ",
+        "head": 1603,
+        "body": 1606,
+        "leg": 1607,
+        "icon_id": 14241
+      },
+      {
+        "id": 1869,
+        "name": "Giáp tập luyện cấp 5",
+        "description": "Khi mặc vào sẽ đánh yếu hơn bình thường 40%, khi cởi ra sẽ tăng sức đánh 50%",
+        "head": -1,
+        "body": -1,
+        "leg": -1,
+        "icon_id": 16897
+      }
+    ],
+    "default_options": {
+      "710": [
+        [
+          50,
+          22
+        ],
+        [
+          77,
+          20
+        ],
+        [
+          103,
+          20
+        ],
+        [
+          159,
+          3
+        ],
+        [
+          160,
+          35
+        ]
+      ],
+      "711": [
+        [
+          50,
+          23
+        ],
+        [
+          77,
+          21
+        ],
+        [
+          103,
+          21
+        ],
+        [
+          159,
+          4
+        ],
+        [
+          160,
+          50
+        ]
+      ],
+      "1710": [
+        [
+          50,
+          24
+        ],
+        [
+          77,
+          22
+        ],
+        [
+          103,
+          22
+        ],
+        [
+          159,
+          5
+        ],
+        [
+          160,
+          60
+        ]
+      ],
+      "1869": [
+        [
+          77,
+          15
+        ],
+        [
+          103,
+          15
+        ],
+        [
+          94,
+          5
+        ],
+        [
+          47,
+          50000
+        ],
+        [
+          9,
+          1000
+        ],
+        [
+          251,
+          0
+        ]
+      ]
+    },
+    "santa_shop": [
+      "710:1000:3:7743:5",
+      "711:1500:3:7743:5",
+      "1710:2000:3:7743:5",
+      "1869:2500:3:7743:6"
+    ]
+  },
+  "deployment": {
+    "candidate": "C:\\Users\\Admin\\Downloads\\nroteam\\Teamobi2026\\SRC\\20.jar",
+    "old_sha256": "63c018179b6a7f78aa2ce88b879e4e5c86666ea468af4900553e776d73d9b6f0",
+    "new_sha256": "beed6156faa02d3a6ba89586e55bb544d61a8a5fdbda1c66abdf38524cc20655",
+    "tests": 46,
+    "source_count": 579,
+    "build_candidate_original": "C:\\Users\\Admin\\Downloads\\nroteam\\Teamobi2026\\.analysis\\armor-cap-10000-20261004\\20-candidate.jar",
+    "installed_jar": "C:\\Users\\Admin\\Downloads\\nroteam\\Teamobi2026\\SRC\\20.jar",
+    "status": "running_verified",
+    "installed_at": "20261005-080648",
+    "backup_jar": "C:\\Users\\Admin\\Downloads\\nroteam\\Teamobi2026\\SRC\\jar-backup\\20-before-armor-cap-10000-20261005-080648.jar",
+    "server_started": true,
+    "server_was_stopped": true,
+    "graceful_maintenance_sent": false,
+    "extra_jars_archived": [],
+    "maintenance_method": "application Maintenance.startSeconds(5) via Java Attach; restart batch held and restored unchanged",
+    "client_gameplay_tested": false,
+    "live_player_db_save_tested": false,
+    "sql_changed": false,
+    "change": "Training armor 5 starts at 1000 minutes and recharges during active training up to 10000; other armor caps unchanged",
+    "launcher_pid": 27264,
+    "server_pid": 25312,
+    "port": 14445,
+    "runtime_armor_cap_verified": true,
+    "training_armor_initial_minutes": 1000,
+    "training_armor_max_minutes": 10000
+  },
+  "validation_limits": {
+    "authenticated_live_gameplay": false,
+    "client_ui_screenshot": false,
+    "live_player_save_load": false
+  },
+  "historical_android21_doctor_recheck": {
+    "template": {
+      "id": "1710",
+      "TYPE": "5",
+      "gender": "3",
+      "NAME": "CT Android 21 Tiến Sĩ",
+      "description": "VPSK",
+      "level": "0",
+      "icon_id": "14241",
+      "part": "-1",
+      "is_up_to_up": "0",
+      "power_require": "0",
+      "gold": "0",
+      "gem": "0",
+      "head": "-1",
+      "body": "-1",
+      "leg": "-1"
+    },
+    "player_hits": [],
+    "giftcode_hits": [],
+    "option_status": "not_found_in_checked_sql_and_current_source"
+  },
+  "android21_doctor_recheck": {
+    "template": {
+      "id": 1710,
+      "name": "CT Android 21 Tiến Sĩ",
+      "description": "Cải trang thành Android 21 Tiến Sĩ",
+      "head": 1603,
+      "body": 1606,
+      "leg": 1607,
+      "icon_id": 14241
+    },
+    "option_status": "applied_verified",
+    "parts_visually_verified": true,
+    "avatar_id": 14241
+  },
+  "santa_ruby_shop": {
+    "tag": "SANTA_HONG_NGOC",
+    "npc_id": 39,
+    "currency": "ruby",
+    "prices": {
+      "710": 1000,
+      "711": 1500,
+      "1710": 2000,
+      "1869": 2500
+    },
+    "prerequisites": {
+      "711": 710,
+      "1710": 711
+    },
+    "consume_prerequisite": false,
+    "status": "applied_verified",
+    "tab_count": 1,
+    "tab_name": "Cải trang",
+    "armor_in_costume_tab": true
+  },
+  "armor_compact_followup": {
+    "status": "running",
+    "installed_at": "2026-10-04T22:07:00.749705+07:00",
+    "change": "Compact armor tooltip and same costume tab",
+    "jar_changed": false,
+    "jar_sha256": "63c018179b6a7f78aa2ce88b879e4e5c86666ea468af4900553e776d73d9b6f0",
+    "graceful_maintenance": true,
+    "shop_before": [
+      "710:64:1000:3",
+      "711:64:1500:3",
+      "1710:64:2000:3",
+      "1869:65:2500:3"
+    ],
+    "shop_after": [
+      "710:64:1000:3",
+      "711:64:1500:3",
+      "1710:64:2000:3",
+      "1869:64:2500:3"
+    ],
+    "shop_backup_sha256": "1d0b4ee7e1cb7afded649570d2e06003a0d4323c4df857549f460f76eaf06d43",
+    "unity_checks": 16,
+    "sql_integration": "PASS",
+    "launcher_pid": 45468,
+    "server_pid": 34512,
+    "runtime_shop_verified": true
+  },
+  "armor_cap_followup": {
+    "candidate": "C:\\Users\\Admin\\Downloads\\nroteam\\Teamobi2026\\SRC\\20.jar",
+    "old_sha256": "63c018179b6a7f78aa2ce88b879e4e5c86666ea468af4900553e776d73d9b6f0",
+    "new_sha256": "beed6156faa02d3a6ba89586e55bb544d61a8a5fdbda1c66abdf38524cc20655",
+    "tests": 46,
+    "source_count": 579,
+    "build_candidate_original": "C:\\Users\\Admin\\Downloads\\nroteam\\Teamobi2026\\.analysis\\armor-cap-10000-20261004\\20-candidate.jar",
+    "installed_jar": "C:\\Users\\Admin\\Downloads\\nroteam\\Teamobi2026\\SRC\\20.jar",
+    "status": "running_verified",
+    "installed_at": "20261005-080648",
+    "backup_jar": "C:\\Users\\Admin\\Downloads\\nroteam\\Teamobi2026\\SRC\\jar-backup\\20-before-armor-cap-10000-20261005-080648.jar",
+    "server_started": true,
+    "server_was_stopped": true,
+    "graceful_maintenance_sent": false,
+    "extra_jars_archived": [],
+    "maintenance_method": "application Maintenance.startSeconds(5) via Java Attach; restart batch held and restored unchanged",
+    "client_gameplay_tested": false,
+    "live_player_db_save_tested": false,
+    "sql_changed": false,
+    "change": "Training armor 5 starts at 1000 minutes and recharges during active training up to 10000; other armor caps unchanged",
+    "launcher_pid": 27264,
+    "server_pid": 25312,
+    "port": 14445,
+    "runtime_armor_cap_verified": true,
+    "training_armor_initial_minutes": 1000,
+    "training_armor_max_minutes": 10000
+  }
+}

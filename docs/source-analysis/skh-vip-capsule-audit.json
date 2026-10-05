@@ -1,0 +1,5021 @@
+{
+  "source": "team2026.sql and ItemService.OpenSKH",
+  "capsule_id": 1655,
+  "capsule_slots": [
+    {
+      "gender": 0,
+      "type": 0,
+      "item_ids": [
+        0,
+        3,
+        33,
+        34,
+        136,
+        137,
+        138,
+        139,
+        230,
+        231,
+        232,
+        233
+      ]
+    },
+    {
+      "gender": 0,
+      "type": 1,
+      "item_ids": [
+        6,
+        9,
+        35,
+        36,
+        140,
+        141,
+        142,
+        143,
+        242,
+        243,
+        244,
+        245
+      ]
+    },
+    {
+      "gender": 0,
+      "type": 2,
+      "item_ids": [
+        21,
+        24,
+        37,
+        38,
+        144,
+        145,
+        146,
+        147,
+        254,
+        256,
+        257
+      ]
+    },
+    {
+      "gender": 0,
+      "type": 3,
+      "item_ids": [
+        27,
+        30,
+        39,
+        40,
+        148,
+        149,
+        150,
+        151,
+        266,
+        267,
+        268,
+        269
+      ]
+    },
+    {
+      "gender": 0,
+      "type": 4,
+      "item_ids": [
+        12,
+        57,
+        58,
+        59,
+        184,
+        185,
+        186,
+        187,
+        278,
+        279,
+        280,
+        281
+      ]
+    },
+    {
+      "gender": 1,
+      "type": 0,
+      "item_ids": [
+        1,
+        4,
+        41,
+        42,
+        152,
+        153,
+        154,
+        155,
+        235,
+        236,
+        237
+      ]
+    },
+    {
+      "gender": 1,
+      "type": 1,
+      "item_ids": [
+        7,
+        10,
+        43,
+        44,
+        156,
+        157,
+        158,
+        159,
+        246,
+        247,
+        248,
+        249
+      ]
+    },
+    {
+      "gender": 1,
+      "type": 2,
+      "item_ids": [
+        22,
+        25,
+        45,
+        46,
+        160,
+        161,
+        162,
+        163,
+        259,
+        260,
+        261
+      ]
+    },
+    {
+      "gender": 1,
+      "type": 3,
+      "item_ids": [
+        28,
+        31,
+        47,
+        48,
+        164,
+        165,
+        166,
+        167,
+        270,
+        271,
+        272,
+        273
+      ]
+    },
+    {
+      "gender": 1,
+      "type": 4,
+      "item_ids": [
+        12,
+        57,
+        58,
+        59,
+        184,
+        185,
+        186,
+        187,
+        278,
+        279,
+        280,
+        281
+      ]
+    },
+    {
+      "gender": 2,
+      "type": 0,
+      "item_ids": [
+        2,
+        5,
+        49,
+        50,
+        168,
+        169,
+        170,
+        171,
+        238,
+        239,
+        240,
+        241
+      ]
+    },
+    {
+      "gender": 2,
+      "type": 1,
+      "item_ids": [
+        8,
+        11,
+        51,
+        52,
+        172,
+        173,
+        174,
+        174,
+        250,
+        251,
+        252,
+        253
+      ]
+    },
+    {
+      "gender": 2,
+      "type": 2,
+      "item_ids": [
+        23,
+        26,
+        53,
+        54,
+        176,
+        177,
+        178,
+        179,
+        262,
+        263,
+        264,
+        265
+      ]
+    },
+    {
+      "gender": 2,
+      "type": 3,
+      "item_ids": [
+        29,
+        32,
+        55,
+        56,
+        180,
+        181,
+        182,
+        183,
+        274,
+        275,
+        276,
+        277
+      ]
+    },
+    {
+      "gender": 2,
+      "type": 4,
+      "item_ids": [
+        12,
+        57,
+        58,
+        59,
+        184,
+        185,
+        186,
+        187,
+        278,
+        279,
+        280,
+        281
+      ]
+    }
+  ],
+  "proposed_vip_catalog": [
+    {
+      "gender": 0,
+      "type": 0,
+      "items": [
+        {
+          "id": 0,
+          "type": 0,
+          "gender": 0,
+          "name": "Áo vải 3 lỗ",
+          "level": 1,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 1,
+              "options": [
+                {
+                  "id": 47,
+                  "param": 2
+                }
+              ],
+              "item_shop_id": 1
+            }
+          ]
+        },
+        {
+          "id": 33,
+          "type": 0,
+          "gender": 0,
+          "name": "Áo thun 3 lỗ",
+          "level": 2,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 1,
+              "options": [
+                {
+                  "id": 47,
+                  "param": 4
+                }
+              ],
+              "item_shop_id": 2
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "type": 0,
+          "gender": 0,
+          "name": "Áo vải dày",
+          "level": 3,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 1,
+              "options": [
+                {
+                  "id": 47,
+                  "param": 8
+                }
+              ],
+              "item_shop_id": 3
+            }
+          ]
+        },
+        {
+          "id": 34,
+          "type": 0,
+          "gender": 0,
+          "name": "Áo thun dày",
+          "level": 4,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 1,
+              "options": [
+                {
+                  "id": 47,
+                  "param": 16
+                }
+              ],
+              "item_shop_id": 4
+            }
+          ]
+        },
+        {
+          "id": 136,
+          "type": 0,
+          "gender": 0,
+          "name": "Áo vải Kame",
+          "level": 5,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 1,
+              "options": [
+                {
+                  "id": 47,
+                  "param": 24
+                }
+              ],
+              "item_shop_id": 5
+            }
+          ]
+        },
+        {
+          "id": 137,
+          "type": 0,
+          "gender": 0,
+          "name": "Áo thun Kame",
+          "level": 6,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 1,
+              "options": [
+                {
+                  "id": 47,
+                  "param": 40
+                }
+              ],
+              "item_shop_id": 6
+            }
+          ]
+        },
+        {
+          "id": 138,
+          "type": 0,
+          "gender": 0,
+          "name": "Áo võ Kame",
+          "level": 7,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 1,
+              "options": [
+                {
+                  "id": 47,
+                  "param": 60
+                }
+              ],
+              "item_shop_id": 7
+            }
+          ]
+        },
+        {
+          "id": 139,
+          "type": 0,
+          "gender": 0,
+          "name": "Áo võ Goku",
+          "level": 8,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 1,
+              "options": [
+                {
+                  "id": 47,
+                  "param": 90
+                }
+              ],
+              "item_shop_id": 8
+            }
+          ]
+        },
+        {
+          "id": 230,
+          "type": 0,
+          "gender": 0,
+          "name": "Áo bạc Goku",
+          "level": 9,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 1,
+              "options": [
+                {
+                  "id": 47,
+                  "param": 200
+                }
+              ],
+              "item_shop_id": 9
+            }
+          ]
+        },
+        {
+          "id": 231,
+          "type": 0,
+          "gender": 0,
+          "name": "Áo vàng Goku",
+          "level": 10,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 1,
+              "options": [
+                {
+                  "id": 47,
+                  "param": 250
+                }
+              ],
+              "item_shop_id": 10
+            }
+          ]
+        },
+        {
+          "id": 232,
+          "type": 0,
+          "gender": 0,
+          "name": "Áo da Calic",
+          "level": 11,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 1,
+              "options": [
+                {
+                  "id": 47,
+                  "param": 300
+                }
+              ],
+              "item_shop_id": 11
+            }
+          ]
+        },
+        {
+          "id": 233,
+          "type": 0,
+          "gender": 0,
+          "name": "Áo jean Calic",
+          "level": 12,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 1,
+              "options": [
+                {
+                  "id": 47,
+                  "param": 400
+                }
+              ],
+              "item_shop_id": 12
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "gender": 0,
+      "type": 1,
+      "items": [
+        {
+          "id": 6,
+          "type": 1,
+          "gender": 0,
+          "name": "Quần vải đen",
+          "level": 1,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 1,
+              "options": [
+                {
+                  "id": 6,
+                  "param": 30
+                }
+              ],
+              "item_shop_id": 13
+            }
+          ]
+        },
+        {
+          "id": 35,
+          "type": 1,
+          "gender": 0,
+          "name": "Quần thun đen",
+          "level": 2,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 1,
+              "options": [
+                {
+                  "id": 6,
+                  "param": 150
+                },
+                {
+                  "id": 27,
+                  "param": 12
+                }
+              ],
+              "item_shop_id": 14
+            }
+          ]
+        },
+        {
+          "id": 9,
+          "type": 1,
+          "gender": 0,
+          "name": "Quần vải dày",
+          "level": 3,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 1,
+              "options": [
+                {
+                  "id": 6,
+                  "param": 300
+                },
+                {
+                  "id": 27,
+                  "param": 40
+                }
+              ],
+              "item_shop_id": 15
+            }
+          ]
+        },
+        {
+          "id": 36,
+          "type": 1,
+          "gender": 0,
+          "name": "Quần thun dày",
+          "level": 4,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 1,
+              "options": [
+                {
+                  "id": 6,
+                  "param": 600
+                },
+                {
+                  "id": 27,
+                  "param": 120
+                }
+              ],
+              "item_shop_id": 16
+            }
+          ]
+        },
+        {
+          "id": 140,
+          "type": 1,
+          "gender": 0,
+          "name": "Quần vải Kame",
+          "level": 5,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 1,
+              "options": [
+                {
+                  "id": 6,
+                  "param": 1400
+                },
+                {
+                  "id": 27,
+                  "param": 280
+                }
+              ],
+              "item_shop_id": 17
+            }
+          ]
+        },
+        {
+          "id": 141,
+          "type": 1,
+          "gender": 0,
+          "name": "Quần thun Kame",
+          "level": 6,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 1,
+              "options": [
+                {
+                  "id": 6,
+                  "param": 3000
+                },
+                {
+                  "id": 27,
+                  "param": 600
+                }
+              ],
+              "item_shop_id": 18
+            }
+          ]
+        },
+        {
+          "id": 142,
+          "type": 1,
+          "gender": 0,
+          "name": "Quần võ Kame",
+          "level": 7,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 1,
+              "options": [
+                {
+                  "id": 6,
+                  "param": 6000
+                },
+                {
+                  "id": 27,
+                  "param": 1200
+                }
+              ],
+              "item_shop_id": 19
+            }
+          ]
+        },
+        {
+          "id": 143,
+          "type": 1,
+          "gender": 0,
+          "name": "Quần võ goku",
+          "level": 8,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 1,
+              "options": [
+                {
+                  "id": 6,
+                  "param": 10000
+                },
+                {
+                  "id": 27,
+                  "param": 2000
+                }
+              ],
+              "item_shop_id": 20
+            }
+          ]
+        },
+        {
+          "id": 242,
+          "type": 1,
+          "gender": 0,
+          "name": "Quần bạc Goku",
+          "level": 9,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 1,
+              "options": [
+                {
+                  "id": 6,
+                  "param": 14000
+                },
+                {
+                  "id": 27,
+                  "param": 2500
+                }
+              ],
+              "item_shop_id": 21
+            }
+          ]
+        },
+        {
+          "id": 243,
+          "type": 1,
+          "gender": 0,
+          "name": "Quần vàng Goku",
+          "level": 10,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 1,
+              "options": [
+                {
+                  "id": 6,
+                  "param": 18000
+                },
+                {
+                  "id": 27,
+                  "param": 3000
+                }
+              ],
+              "item_shop_id": 22
+            }
+          ]
+        },
+        {
+          "id": 244,
+          "type": 1,
+          "gender": 0,
+          "name": "Quần da Calic",
+          "level": 11,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 1,
+              "options": [
+                {
+                  "id": 6,
+                  "param": 22000
+                },
+                {
+                  "id": 27,
+                  "param": 3500
+                }
+              ],
+              "item_shop_id": 23
+            }
+          ]
+        },
+        {
+          "id": 245,
+          "type": 1,
+          "gender": 0,
+          "name": "Quần jean Calic",
+          "level": 12,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 1,
+              "options": [
+                {
+                  "id": 6,
+                  "param": 26000
+                },
+                {
+                  "id": 27,
+                  "param": 4000
+                }
+              ],
+              "item_shop_id": 24
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "gender": 0,
+      "type": 2,
+      "items": [
+        {
+          "id": 21,
+          "type": 2,
+          "gender": 0,
+          "name": "Găng vải đen",
+          "level": 1,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 2,
+              "options": [
+                {
+                  "id": 0,
+                  "param": 4
+                }
+              ],
+              "item_shop_id": 25
+            }
+          ]
+        },
+        {
+          "id": 24,
+          "type": 2,
+          "gender": 0,
+          "name": "Găng thun đen",
+          "level": 2,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 2,
+              "options": [
+                {
+                  "id": 0,
+                  "param": 7
+                }
+              ],
+              "item_shop_id": 26
+            }
+          ]
+        },
+        {
+          "id": 37,
+          "type": 2,
+          "gender": 0,
+          "name": "Găng vải dày",
+          "level": 3,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 2,
+              "options": [
+                {
+                  "id": 0,
+                  "param": 14
+                }
+              ],
+              "item_shop_id": 27
+            }
+          ]
+        },
+        {
+          "id": 38,
+          "type": 2,
+          "gender": 0,
+          "name": "Găng thun dày",
+          "level": 4,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 2,
+              "options": [
+                {
+                  "id": 0,
+                  "param": 28
+                }
+              ],
+              "item_shop_id": 28
+            }
+          ]
+        },
+        {
+          "id": 144,
+          "type": 2,
+          "gender": 0,
+          "name": "Găng vải Kame",
+          "level": 5,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 2,
+              "options": [
+                {
+                  "id": 0,
+                  "param": 55
+                }
+              ],
+              "item_shop_id": 29
+            }
+          ]
+        },
+        {
+          "id": 145,
+          "type": 2,
+          "gender": 0,
+          "name": "Găng thun Kame",
+          "level": 6,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 2,
+              "options": [
+                {
+                  "id": 0,
+                  "param": 110
+                }
+              ],
+              "item_shop_id": 30
+            }
+          ]
+        },
+        {
+          "id": 146,
+          "type": 2,
+          "gender": 0,
+          "name": "Găng võ Kame",
+          "level": 7,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 2,
+              "options": [
+                {
+                  "id": 0,
+                  "param": 220
+                }
+              ],
+              "item_shop_id": 31
+            }
+          ]
+        },
+        {
+          "id": 147,
+          "type": 2,
+          "gender": 0,
+          "name": "Găng võ goku",
+          "level": 8,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 2,
+              "options": [
+                {
+                  "id": 0,
+                  "param": 530
+                }
+              ],
+              "item_shop_id": 32
+            }
+          ]
+        },
+        {
+          "id": 254,
+          "type": 2,
+          "gender": 0,
+          "name": "Găng bạc Goku",
+          "level": 9,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 2,
+              "options": [
+                {
+                  "id": 0,
+                  "param": 680
+                }
+              ],
+              "item_shop_id": 33
+            }
+          ]
+        },
+        {
+          "id": 255,
+          "type": 2,
+          "gender": 0,
+          "name": "Găng vàng Goku",
+          "level": 10,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 2,
+              "options": [
+                {
+                  "id": 0,
+                  "param": 1000
+                }
+              ],
+              "item_shop_id": 34
+            }
+          ]
+        },
+        {
+          "id": 256,
+          "type": 2,
+          "gender": 0,
+          "name": "Găng da Calic",
+          "level": 11,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 2,
+              "options": [
+                {
+                  "id": 0,
+                  "param": 1500
+                }
+              ],
+              "item_shop_id": 35
+            }
+          ]
+        },
+        {
+          "id": 257,
+          "type": 2,
+          "gender": 0,
+          "name": "Găng jean Calic",
+          "level": 12,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 2,
+              "options": [
+                {
+                  "id": 0,
+                  "param": 2200
+                }
+              ],
+              "item_shop_id": 36
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "gender": 0,
+      "type": 3,
+      "items": [
+        {
+          "id": 27,
+          "type": 3,
+          "gender": 0,
+          "name": "Giầy nhựa",
+          "level": 1,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 2,
+              "options": [
+                {
+                  "id": 7,
+                  "param": 10
+                }
+              ],
+              "item_shop_id": 37
+            }
+          ]
+        },
+        {
+          "id": 30,
+          "type": 3,
+          "gender": 0,
+          "name": "Giầy cao su",
+          "level": 2,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 2,
+              "options": [
+                {
+                  "id": 7,
+                  "param": 25
+                },
+                {
+                  "id": 28,
+                  "param": 5
+                }
+              ],
+              "item_shop_id": 38
+            }
+          ]
+        },
+        {
+          "id": 39,
+          "type": 3,
+          "gender": 0,
+          "name": "Giày nhựa đế dày",
+          "level": 3,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 2,
+              "options": [
+                {
+                  "id": 7,
+                  "param": 120
+                },
+                {
+                  "id": 28,
+                  "param": 24
+                }
+              ],
+              "item_shop_id": 39
+            }
+          ]
+        },
+        {
+          "id": 40,
+          "type": 3,
+          "gender": 0,
+          "name": "Giày cao su đế dày",
+          "level": 4,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 2,
+              "options": [
+                {
+                  "id": 7,
+                  "param": 250
+                },
+                {
+                  "id": 28,
+                  "param": 50
+                }
+              ],
+              "item_shop_id": 40
+            }
+          ]
+        },
+        {
+          "id": 148,
+          "type": 3,
+          "gender": 0,
+          "name": "Giày nhựa Kame",
+          "level": 5,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 2,
+              "options": [
+                {
+                  "id": 7,
+                  "param": 500
+                },
+                {
+                  "id": 28,
+                  "param": 100
+                }
+              ],
+              "item_shop_id": 41
+            }
+          ]
+        },
+        {
+          "id": 149,
+          "type": 3,
+          "gender": 0,
+          "name": "Giày cao su Kame",
+          "level": 6,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 2,
+              "options": [
+                {
+                  "id": 7,
+                  "param": 1200
+                },
+                {
+                  "id": 28,
+                  "param": 240
+                }
+              ],
+              "item_shop_id": 42
+            }
+          ]
+        },
+        {
+          "id": 150,
+          "type": 3,
+          "gender": 0,
+          "name": "Giày võ kame",
+          "level": 7,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 2,
+              "options": [
+                {
+                  "id": 7,
+                  "param": 2400
+                },
+                {
+                  "id": 28,
+                  "param": 480
+                }
+              ],
+              "item_shop_id": 43
+            }
+          ]
+        },
+        {
+          "id": 151,
+          "type": 3,
+          "gender": 0,
+          "name": "Giày võ goku",
+          "level": 8,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 2,
+              "options": [
+                {
+                  "id": 7,
+                  "param": 5000
+                },
+                {
+                  "id": 28,
+                  "param": 1000
+                }
+              ],
+              "item_shop_id": 44
+            }
+          ]
+        },
+        {
+          "id": 266,
+          "type": 3,
+          "gender": 0,
+          "name": "Giày bạc Goku",
+          "level": 9,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 2,
+              "options": [
+                {
+                  "id": 7,
+                  "param": 9000
+                },
+                {
+                  "id": 28,
+                  "param": 1500
+                }
+              ],
+              "item_shop_id": 45
+            }
+          ]
+        },
+        {
+          "id": 267,
+          "type": 3,
+          "gender": 0,
+          "name": "Giày vàng Goku",
+          "level": 10,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 2,
+              "options": [
+                {
+                  "id": 7,
+                  "param": 14000
+                },
+                {
+                  "id": 28,
+                  "param": 2000
+                }
+              ],
+              "item_shop_id": 46
+            }
+          ]
+        },
+        {
+          "id": 268,
+          "type": 3,
+          "gender": 0,
+          "name": "Giày da Calic",
+          "level": 11,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 2,
+              "options": [
+                {
+                  "id": 7,
+                  "param": 19000
+                },
+                {
+                  "id": 28,
+                  "param": 2500
+                }
+              ],
+              "item_shop_id": 47
+            }
+          ]
+        },
+        {
+          "id": 269,
+          "type": 3,
+          "gender": 0,
+          "name": "Giày jean Calic",
+          "level": 12,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 2,
+              "options": [
+                {
+                  "id": 7,
+                  "param": 24000
+                },
+                {
+                  "id": 28,
+                  "param": 3000
+                }
+              ],
+              "item_shop_id": 48
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "gender": 0,
+      "type": 4,
+      "items": [
+        {
+          "id": 12,
+          "type": 4,
+          "gender": 3,
+          "name": "Rada cấp 1",
+          "level": 1,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 2,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 1
+                }
+              ],
+              "item_shop_id": 49
+            },
+            {
+              "shop_id": 2,
+              "tab_id": 5,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 1
+                }
+              ],
+              "item_shop_id": 121
+            },
+            {
+              "shop_id": 3,
+              "tab_id": 8,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 1
+                }
+              ],
+              "item_shop_id": 193
+            }
+          ]
+        },
+        {
+          "id": 57,
+          "type": 4,
+          "gender": 3,
+          "name": "Rada cấp 2",
+          "level": 2,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 2,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 2
+                }
+              ],
+              "item_shop_id": 50
+            },
+            {
+              "shop_id": 2,
+              "tab_id": 5,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 2
+                }
+              ],
+              "item_shop_id": 122
+            },
+            {
+              "shop_id": 3,
+              "tab_id": 8,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 2
+                }
+              ],
+              "item_shop_id": 194
+            }
+          ]
+        },
+        {
+          "id": 58,
+          "type": 4,
+          "gender": 3,
+          "name": "Rada cấp 3",
+          "level": 3,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 2,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 3
+                }
+              ],
+              "item_shop_id": 51
+            },
+            {
+              "shop_id": 2,
+              "tab_id": 5,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 3
+                }
+              ],
+              "item_shop_id": 123
+            },
+            {
+              "shop_id": 3,
+              "tab_id": 8,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 3
+                }
+              ],
+              "item_shop_id": 195
+            }
+          ]
+        },
+        {
+          "id": 59,
+          "type": 4,
+          "gender": 3,
+          "name": "Rada cấp 4",
+          "level": 4,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 2,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 4
+                }
+              ],
+              "item_shop_id": 52
+            },
+            {
+              "shop_id": 2,
+              "tab_id": 5,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 4
+                }
+              ],
+              "item_shop_id": 124
+            },
+            {
+              "shop_id": 3,
+              "tab_id": 8,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 4
+                }
+              ],
+              "item_shop_id": 196
+            }
+          ]
+        },
+        {
+          "id": 184,
+          "type": 4,
+          "gender": 3,
+          "name": "Rada cấp 5",
+          "level": 5,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 2,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 5
+                }
+              ],
+              "item_shop_id": 53
+            },
+            {
+              "shop_id": 2,
+              "tab_id": 5,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 5
+                }
+              ],
+              "item_shop_id": 125
+            },
+            {
+              "shop_id": 3,
+              "tab_id": 8,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 5
+                }
+              ],
+              "item_shop_id": 197
+            }
+          ]
+        },
+        {
+          "id": 185,
+          "type": 4,
+          "gender": 3,
+          "name": "Rada cấp 6",
+          "level": 6,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 2,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 6
+                }
+              ],
+              "item_shop_id": 54
+            },
+            {
+              "shop_id": 2,
+              "tab_id": 5,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 6
+                }
+              ],
+              "item_shop_id": 126
+            },
+            {
+              "shop_id": 3,
+              "tab_id": 8,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 6
+                }
+              ],
+              "item_shop_id": 198
+            }
+          ]
+        },
+        {
+          "id": 186,
+          "type": 4,
+          "gender": 3,
+          "name": "Rada cấp 7",
+          "level": 7,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 2,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 7
+                }
+              ],
+              "item_shop_id": 55
+            },
+            {
+              "shop_id": 2,
+              "tab_id": 5,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 7
+                }
+              ],
+              "item_shop_id": 127
+            },
+            {
+              "shop_id": 3,
+              "tab_id": 8,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 7
+                }
+              ],
+              "item_shop_id": 199
+            }
+          ]
+        },
+        {
+          "id": 187,
+          "type": 4,
+          "gender": 3,
+          "name": "Rada cấp 8",
+          "level": 8,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 2,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 8
+                }
+              ],
+              "item_shop_id": 56
+            },
+            {
+              "shop_id": 2,
+              "tab_id": 5,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 8
+                }
+              ],
+              "item_shop_id": 128
+            },
+            {
+              "shop_id": 3,
+              "tab_id": 8,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 8
+                }
+              ],
+              "item_shop_id": 200
+            }
+          ]
+        },
+        {
+          "id": 278,
+          "type": 4,
+          "gender": 3,
+          "name": "Rada cấp 9",
+          "level": 9,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 2,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 9
+                }
+              ],
+              "item_shop_id": 57
+            },
+            {
+              "shop_id": 2,
+              "tab_id": 5,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 9
+                }
+              ],
+              "item_shop_id": 129
+            },
+            {
+              "shop_id": 3,
+              "tab_id": 8,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 9
+                }
+              ],
+              "item_shop_id": 201
+            }
+          ]
+        },
+        {
+          "id": 279,
+          "type": 4,
+          "gender": 3,
+          "name": "Rada cấp 10",
+          "level": 10,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 2,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 10
+                }
+              ],
+              "item_shop_id": 58
+            },
+            {
+              "shop_id": 2,
+              "tab_id": 5,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 10
+                }
+              ],
+              "item_shop_id": 130
+            },
+            {
+              "shop_id": 3,
+              "tab_id": 8,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 10
+                }
+              ],
+              "item_shop_id": 202
+            }
+          ]
+        },
+        {
+          "id": 280,
+          "type": 4,
+          "gender": 3,
+          "name": "Rada cấp 11",
+          "level": 11,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 2,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 11
+                }
+              ],
+              "item_shop_id": 59
+            },
+            {
+              "shop_id": 2,
+              "tab_id": 5,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 11
+                }
+              ],
+              "item_shop_id": 131
+            },
+            {
+              "shop_id": 3,
+              "tab_id": 8,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 11
+                }
+              ],
+              "item_shop_id": 203
+            }
+          ]
+        },
+        {
+          "id": 281,
+          "type": 4,
+          "gender": 3,
+          "name": "Rada cấp 12",
+          "level": 12,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 2,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 12
+                }
+              ],
+              "item_shop_id": 60
+            },
+            {
+              "shop_id": 2,
+              "tab_id": 5,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 12
+                }
+              ],
+              "item_shop_id": 132
+            },
+            {
+              "shop_id": 3,
+              "tab_id": 8,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 12
+                }
+              ],
+              "item_shop_id": 204
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "gender": 1,
+      "type": 0,
+      "items": [
+        {
+          "id": 1,
+          "type": 0,
+          "gender": 1,
+          "name": "Áo sợi len",
+          "level": 1,
+          "shop_definitions": [
+            {
+              "shop_id": 2,
+              "tab_id": 4,
+              "options": [
+                {
+                  "id": 47,
+                  "param": 2
+                }
+              ],
+              "item_shop_id": 73
+            }
+          ]
+        },
+        {
+          "id": 41,
+          "type": 0,
+          "gender": 1,
+          "name": "Áo sợi gai",
+          "level": 2,
+          "shop_definitions": [
+            {
+              "shop_id": 2,
+              "tab_id": 4,
+              "options": [
+                {
+                  "id": 47,
+                  "param": 4
+                }
+              ],
+              "item_shop_id": 74
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "type": 0,
+          "gender": 1,
+          "name": "Áo len Pico",
+          "level": 3,
+          "shop_definitions": [
+            {
+              "shop_id": 2,
+              "tab_id": 4,
+              "options": [
+                {
+                  "id": 47,
+                  "param": 8
+                }
+              ],
+              "item_shop_id": 75
+            }
+          ]
+        },
+        {
+          "id": 42,
+          "type": 0,
+          "gender": 1,
+          "name": "Áo thun Pico",
+          "level": 4,
+          "shop_definitions": [
+            {
+              "shop_id": 2,
+              "tab_id": 4,
+              "options": [
+                {
+                  "id": 47,
+                  "param": 16
+                }
+              ],
+              "item_shop_id": 76
+            }
+          ]
+        },
+        {
+          "id": 152,
+          "type": 0,
+          "gender": 1,
+          "name": "Áo choàng len",
+          "level": 5,
+          "shop_definitions": [
+            {
+              "shop_id": 2,
+              "tab_id": 4,
+              "options": [
+                {
+                  "id": 47,
+                  "param": 24
+                }
+              ],
+              "item_shop_id": 77
+            }
+          ]
+        },
+        {
+          "id": 153,
+          "type": 0,
+          "gender": 1,
+          "name": "Áo choàng thun",
+          "level": 6,
+          "shop_definitions": [
+            {
+              "shop_id": 2,
+              "tab_id": 4,
+              "options": [
+                {
+                  "id": 47,
+                  "param": 40
+                }
+              ],
+              "item_shop_id": 78
+            }
+          ]
+        },
+        {
+          "id": 154,
+          "type": 0,
+          "gender": 1,
+          "name": "Áo vải Pico",
+          "level": 7,
+          "shop_definitions": [
+            {
+              "shop_id": 2,
+              "tab_id": 4,
+              "options": [
+                {
+                  "id": 47,
+                  "param": 60
+                }
+              ],
+              "item_shop_id": 79
+            }
+          ]
+        },
+        {
+          "id": 155,
+          "type": 0,
+          "gender": 1,
+          "name": "Áo da Pico",
+          "level": 8,
+          "shop_definitions": [
+            {
+              "shop_id": 2,
+              "tab_id": 4,
+              "options": [
+                {
+                  "id": 47,
+                  "param": 90
+                }
+              ],
+              "item_shop_id": 80
+            }
+          ]
+        },
+        {
+          "id": 234,
+          "type": 0,
+          "gender": 1,
+          "name": "Áo sắt Tron",
+          "level": 9,
+          "shop_definitions": [
+            {
+              "shop_id": 2,
+              "tab_id": 4,
+              "options": [
+                {
+                  "id": 47,
+                  "param": 200
+                }
+              ],
+              "item_shop_id": 81
+            }
+          ]
+        },
+        {
+          "id": 235,
+          "type": 0,
+          "gender": 1,
+          "name": "Áo đồng Tron",
+          "level": 10,
+          "shop_definitions": [
+            {
+              "shop_id": 2,
+              "tab_id": 4,
+              "options": [
+                {
+                  "id": 47,
+                  "param": 250
+                }
+              ],
+              "item_shop_id": 82
+            }
+          ]
+        },
+        {
+          "id": 236,
+          "type": 0,
+          "gender": 1,
+          "name": "Áo bạc Zealot",
+          "level": 11,
+          "shop_definitions": [
+            {
+              "shop_id": 2,
+              "tab_id": 4,
+              "options": [
+                {
+                  "id": 47,
+                  "param": 300
+                }
+              ],
+              "item_shop_id": 83
+            }
+          ]
+        },
+        {
+          "id": 237,
+          "type": 0,
+          "gender": 1,
+          "name": "Áo vàng Zealot",
+          "level": 12,
+          "shop_definitions": [
+            {
+              "shop_id": 2,
+              "tab_id": 4,
+              "options": [
+                {
+                  "id": 47,
+                  "param": 400
+                }
+              ],
+              "item_shop_id": 84
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "gender": 1,
+      "type": 1,
+      "items": [
+        {
+          "id": 7,
+          "type": 1,
+          "gender": 1,
+          "name": "Quần sợi len",
+          "level": 1,
+          "shop_definitions": [
+            {
+              "shop_id": 2,
+              "tab_id": 4,
+              "options": [
+                {
+                  "id": 6,
+                  "param": 20
+                }
+              ],
+              "item_shop_id": 85
+            }
+          ]
+        },
+        {
+          "id": 43,
+          "type": 1,
+          "gender": 1,
+          "name": "Quần sợi gai",
+          "level": 2,
+          "shop_definitions": [
+            {
+              "shop_id": 2,
+              "tab_id": 4,
+              "options": [
+                {
+                  "id": 6,
+                  "param": 25
+                },
+                {
+                  "id": 27,
+                  "param": 10
+                }
+              ],
+              "item_shop_id": 86
+            }
+          ]
+        },
+        {
+          "id": 10,
+          "type": 1,
+          "gender": 1,
+          "name": "Quần vải thô Pico",
+          "level": 3,
+          "shop_definitions": [
+            {
+              "shop_id": 2,
+              "tab_id": 4,
+              "options": [
+                {
+                  "id": 6,
+                  "param": 120
+                },
+                {
+                  "id": 27,
+                  "param": 28
+                }
+              ],
+              "item_shop_id": 87
+            }
+          ]
+        },
+        {
+          "id": 44,
+          "type": 1,
+          "gender": 1,
+          "name": "Quần thun Pico",
+          "level": 4,
+          "shop_definitions": [
+            {
+              "shop_id": 2,
+              "tab_id": 4,
+              "options": [
+                {
+                  "id": 6,
+                  "param": 250
+                },
+                {
+                  "id": 27,
+                  "param": 100
+                }
+              ],
+              "item_shop_id": 88
+            }
+          ]
+        },
+        {
+          "id": 156,
+          "type": 1,
+          "gender": 1,
+          "name": "Quần len cứng",
+          "level": 5,
+          "shop_definitions": [
+            {
+              "shop_id": 2,
+              "tab_id": 4,
+              "options": [
+                {
+                  "id": 6,
+                  "param": 600
+                },
+                {
+                  "id": 27,
+                  "param": 240
+                }
+              ],
+              "item_shop_id": 89
+            }
+          ]
+        },
+        {
+          "id": 157,
+          "type": 1,
+          "gender": 1,
+          "name": "Quần thun cứng",
+          "level": 6,
+          "shop_definitions": [
+            {
+              "shop_id": 2,
+              "tab_id": 4,
+              "options": [
+                {
+                  "id": 6,
+                  "param": 1200
+                },
+                {
+                  "id": 27,
+                  "param": 480
+                }
+              ],
+              "item_shop_id": 90
+            }
+          ]
+        },
+        {
+          "id": 158,
+          "type": 1,
+          "gender": 1,
+          "name": "Quần vải cứng Pico",
+          "level": 7,
+          "shop_definitions": [
+            {
+              "shop_id": 2,
+              "tab_id": 4,
+              "options": [
+                {
+                  "id": 6,
+                  "param": 2400
+                },
+                {
+                  "id": 27,
+                  "param": 960
+                }
+              ],
+              "item_shop_id": 91
+            }
+          ]
+        },
+        {
+          "id": 159,
+          "type": 1,
+          "gender": 1,
+          "name": "Quần vải mềm Pico",
+          "level": 8,
+          "shop_definitions": [
+            {
+              "shop_id": 2,
+              "tab_id": 4,
+              "options": [
+                {
+                  "id": 6,
+                  "param": 4800
+                },
+                {
+                  "id": 27,
+                  "param": 1800
+                }
+              ],
+              "item_shop_id": 92
+            }
+          ]
+        },
+        {
+          "id": 246,
+          "type": 1,
+          "gender": 1,
+          "name": "Quần sắt Tron",
+          "level": 9,
+          "shop_definitions": [
+            {
+              "shop_id": 2,
+              "tab_id": 4,
+              "options": [
+                {
+                  "id": 6,
+                  "param": 13000
+                },
+                {
+                  "id": 27,
+                  "param": 2200
+                }
+              ],
+              "item_shop_id": 93
+            }
+          ]
+        },
+        {
+          "id": 247,
+          "type": 1,
+          "gender": 1,
+          "name": "Quần đồng Tron",
+          "level": 10,
+          "shop_definitions": [
+            {
+              "shop_id": 2,
+              "tab_id": 4,
+              "options": [
+                {
+                  "id": 6,
+                  "param": 17000
+                },
+                {
+                  "id": 27,
+                  "param": 2700
+                }
+              ],
+              "item_shop_id": 94
+            }
+          ]
+        },
+        {
+          "id": 248,
+          "type": 1,
+          "gender": 1,
+          "name": "Quần bạc Zealot",
+          "level": 11,
+          "shop_definitions": [
+            {
+              "shop_id": 2,
+              "tab_id": 4,
+              "options": [
+                {
+                  "id": 6,
+                  "param": 21000
+                },
+                {
+                  "id": 27,
+                  "param": 3200
+                }
+              ],
+              "item_shop_id": 95
+            }
+          ]
+        },
+        {
+          "id": 249,
+          "type": 1,
+          "gender": 1,
+          "name": "Quần vàng Zealot",
+          "level": 12,
+          "shop_definitions": [
+            {
+              "shop_id": 2,
+              "tab_id": 4,
+              "options": [
+                {
+                  "id": 6,
+                  "param": 25000
+                },
+                {
+                  "id": 27,
+                  "param": 3700
+                }
+              ],
+              "item_shop_id": 96
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "gender": 1,
+      "type": 2,
+      "items": [
+        {
+          "id": 22,
+          "type": 2,
+          "gender": 1,
+          "name": "Găng sợi len",
+          "level": 1,
+          "shop_definitions": [
+            {
+              "shop_id": 2,
+              "tab_id": 5,
+              "options": [
+                {
+                  "id": 0,
+                  "param": 3
+                }
+              ],
+              "item_shop_id": 97
+            }
+          ]
+        },
+        {
+          "id": 46,
+          "type": 2,
+          "gender": 1,
+          "name": "Găng sợi gai",
+          "level": 2,
+          "shop_definitions": [
+            {
+              "shop_id": 2,
+              "tab_id": 5,
+              "options": [
+                {
+                  "id": 0,
+                  "param": 6
+                }
+              ],
+              "item_shop_id": 98
+            }
+          ]
+        },
+        {
+          "id": 25,
+          "type": 2,
+          "gender": 1,
+          "name": "Găng len Pico",
+          "level": 3,
+          "shop_definitions": [
+            {
+              "shop_id": 2,
+              "tab_id": 5,
+              "options": [
+                {
+                  "id": 0,
+                  "param": 12
+                }
+              ],
+              "item_shop_id": 99
+            }
+          ]
+        },
+        {
+          "id": 45,
+          "type": 2,
+          "gender": 1,
+          "name": "Găng thun Pico",
+          "level": 4,
+          "shop_definitions": [
+            {
+              "shop_id": 2,
+              "tab_id": 5,
+              "options": [
+                {
+                  "id": 0,
+                  "param": 24
+                }
+              ],
+              "item_shop_id": 100
+            }
+          ]
+        },
+        {
+          "id": 160,
+          "type": 2,
+          "gender": 1,
+          "name": "Găng len cứng",
+          "level": 5,
+          "shop_definitions": [
+            {
+              "shop_id": 2,
+              "tab_id": 5,
+              "options": [
+                {
+                  "id": 0,
+                  "param": 50
+                }
+              ],
+              "item_shop_id": 101
+            }
+          ]
+        },
+        {
+          "id": 161,
+          "type": 2,
+          "gender": 1,
+          "name": "Găng thun cứng",
+          "level": 6,
+          "shop_definitions": [
+            {
+              "shop_id": 2,
+              "tab_id": 5,
+              "options": [
+                {
+                  "id": 0,
+                  "param": 100
+                }
+              ],
+              "item_shop_id": 102
+            }
+          ]
+        },
+        {
+          "id": 162,
+          "type": 2,
+          "gender": 1,
+          "name": "Găng vải Pico",
+          "level": 7,
+          "shop_definitions": [
+            {
+              "shop_id": 2,
+              "tab_id": 5,
+              "options": [
+                {
+                  "id": 0,
+                  "param": 200
+                }
+              ],
+              "item_shop_id": 103
+            }
+          ]
+        },
+        {
+          "id": 163,
+          "type": 2,
+          "gender": 1,
+          "name": "Găng da Pico",
+          "level": 8,
+          "shop_definitions": [
+            {
+              "shop_id": 2,
+              "tab_id": 5,
+              "options": [
+                {
+                  "id": 0,
+                  "param": 500
+                }
+              ],
+              "item_shop_id": 104
+            }
+          ]
+        },
+        {
+          "id": 258,
+          "type": 2,
+          "gender": 1,
+          "name": "Găng sắt Tron",
+          "level": 9,
+          "shop_definitions": [
+            {
+              "shop_id": 2,
+              "tab_id": 5,
+              "options": [
+                {
+                  "id": 0,
+                  "param": 630
+                }
+              ],
+              "item_shop_id": 105
+            }
+          ]
+        },
+        {
+          "id": 259,
+          "type": 2,
+          "gender": 1,
+          "name": "Găng đồng Tron",
+          "level": 10,
+          "shop_definitions": [
+            {
+              "shop_id": 2,
+              "tab_id": 5,
+              "options": [
+                {
+                  "id": 0,
+                  "param": 950
+                }
+              ],
+              "item_shop_id": 106
+            }
+          ]
+        },
+        {
+          "id": 260,
+          "type": 2,
+          "gender": 1,
+          "name": "Găng bạc Zealot",
+          "level": 11,
+          "shop_definitions": [
+            {
+              "shop_id": 2,
+              "tab_id": 5,
+              "options": [
+                {
+                  "id": 0,
+                  "param": 1450
+                }
+              ],
+              "item_shop_id": 107
+            }
+          ]
+        },
+        {
+          "id": 261,
+          "type": 2,
+          "gender": 1,
+          "name": "Găng vàng Zealot",
+          "level": 12,
+          "shop_definitions": [
+            {
+              "shop_id": 2,
+              "tab_id": 5,
+              "options": [
+                {
+                  "id": 0,
+                  "param": 2150
+                }
+              ],
+              "item_shop_id": 108
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "gender": 1,
+      "type": 3,
+      "items": [
+        {
+          "id": 28,
+          "type": 3,
+          "gender": 1,
+          "name": "Giầy sợi len",
+          "level": 1,
+          "shop_definitions": [
+            {
+              "shop_id": 2,
+              "tab_id": 5,
+              "options": [
+                {
+                  "id": 7,
+                  "param": 15
+                }
+              ],
+              "item_shop_id": 109
+            }
+          ]
+        },
+        {
+          "id": 47,
+          "type": 3,
+          "gender": 1,
+          "name": "Giầy sợi gai",
+          "level": 2,
+          "shop_definitions": [
+            {
+              "shop_id": 2,
+              "tab_id": 5,
+              "options": [
+                {
+                  "id": 7,
+                  "param": 30
+                },
+                {
+                  "id": 28,
+                  "param": 6
+                }
+              ],
+              "item_shop_id": 110
+            }
+          ]
+        },
+        {
+          "id": 31,
+          "type": 3,
+          "gender": 1,
+          "name": "Giầy nhựa Pico",
+          "level": 3,
+          "shop_definitions": [
+            {
+              "shop_id": 2,
+              "tab_id": 5,
+              "options": [
+                {
+                  "id": 7,
+                  "param": 150
+                },
+                {
+                  "id": 28,
+                  "param": 30
+                }
+              ],
+              "item_shop_id": 111
+            }
+          ]
+        },
+        {
+          "id": 48,
+          "type": 3,
+          "gender": 1,
+          "name": "Giầy cao su Pico",
+          "level": 4,
+          "shop_definitions": [
+            {
+              "shop_id": 2,
+              "tab_id": 5,
+              "options": [
+                {
+                  "id": 7,
+                  "param": 300
+                },
+                {
+                  "id": 28,
+                  "param": 60
+                }
+              ],
+              "item_shop_id": 112
+            }
+          ]
+        },
+        {
+          "id": 164,
+          "type": 3,
+          "gender": 1,
+          "name": "Giày nhựa cứng",
+          "level": 5,
+          "shop_definitions": [
+            {
+              "shop_id": 2,
+              "tab_id": 5,
+              "options": [
+                {
+                  "id": 7,
+                  "param": 600
+                },
+                {
+                  "id": 28,
+                  "param": 120
+                }
+              ],
+              "item_shop_id": 113
+            }
+          ]
+        },
+        {
+          "id": 165,
+          "type": 3,
+          "gender": 1,
+          "name": "Giày cao su cứng",
+          "level": 6,
+          "shop_definitions": [
+            {
+              "shop_id": 2,
+              "tab_id": 5,
+              "options": [
+                {
+                  "id": 7,
+                  "param": 1500
+                },
+                {
+                  "id": 28,
+                  "param": 300
+                }
+              ],
+              "item_shop_id": 114
+            }
+          ]
+        },
+        {
+          "id": 166,
+          "type": 3,
+          "gender": 1,
+          "name": "Giày da Pico",
+          "level": 7,
+          "shop_definitions": [
+            {
+              "shop_id": 2,
+              "tab_id": 5,
+              "options": [
+                {
+                  "id": 7,
+                  "param": 3000
+                },
+                {
+                  "id": 28,
+                  "param": 600
+                }
+              ],
+              "item_shop_id": 115
+            }
+          ]
+        },
+        {
+          "id": 167,
+          "type": 3,
+          "gender": 1,
+          "name": "Giày sắt Pico",
+          "level": 8,
+          "shop_definitions": [
+            {
+              "shop_id": 2,
+              "tab_id": 5,
+              "options": [
+                {
+                  "id": 7,
+                  "param": 6000
+                },
+                {
+                  "id": 28,
+                  "param": 1200
+                }
+              ],
+              "item_shop_id": 116
+            }
+          ]
+        },
+        {
+          "id": 270,
+          "type": 3,
+          "gender": 1,
+          "name": "Giày sắt Tron",
+          "level": 9,
+          "shop_definitions": [
+            {
+              "shop_id": 2,
+              "tab_id": 5,
+              "options": [
+                {
+                  "id": 7,
+                  "param": 10000
+                },
+                {
+                  "id": 28,
+                  "param": 1700
+                }
+              ],
+              "item_shop_id": 117
+            }
+          ]
+        },
+        {
+          "id": 271,
+          "type": 3,
+          "gender": 1,
+          "name": "Giày đồng Tron",
+          "level": 10,
+          "shop_definitions": [
+            {
+              "shop_id": 2,
+              "tab_id": 5,
+              "options": [
+                {
+                  "id": 7,
+                  "param": 15000
+                },
+                {
+                  "id": 28,
+                  "param": 2200
+                }
+              ],
+              "item_shop_id": 118
+            }
+          ]
+        },
+        {
+          "id": 272,
+          "type": 3,
+          "gender": 1,
+          "name": "Giày bạc Zealot",
+          "level": 11,
+          "shop_definitions": [
+            {
+              "shop_id": 2,
+              "tab_id": 5,
+              "options": [
+                {
+                  "id": 7,
+                  "param": 20000
+                },
+                {
+                  "id": 28,
+                  "param": 2700
+                }
+              ],
+              "item_shop_id": 119
+            }
+          ]
+        },
+        {
+          "id": 273,
+          "type": 3,
+          "gender": 1,
+          "name": "Giày vàng Zealot",
+          "level": 12,
+          "shop_definitions": [
+            {
+              "shop_id": 2,
+              "tab_id": 5,
+              "options": [
+                {
+                  "id": 7,
+                  "param": 25000
+                },
+                {
+                  "id": 28,
+                  "param": 3200
+                }
+              ],
+              "item_shop_id": 120
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "gender": 1,
+      "type": 4,
+      "items": [
+        {
+          "id": 12,
+          "type": 4,
+          "gender": 3,
+          "name": "Rada cấp 1",
+          "level": 1,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 2,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 1
+                }
+              ],
+              "item_shop_id": 49
+            },
+            {
+              "shop_id": 2,
+              "tab_id": 5,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 1
+                }
+              ],
+              "item_shop_id": 121
+            },
+            {
+              "shop_id": 3,
+              "tab_id": 8,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 1
+                }
+              ],
+              "item_shop_id": 193
+            }
+          ]
+        },
+        {
+          "id": 57,
+          "type": 4,
+          "gender": 3,
+          "name": "Rada cấp 2",
+          "level": 2,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 2,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 2
+                }
+              ],
+              "item_shop_id": 50
+            },
+            {
+              "shop_id": 2,
+              "tab_id": 5,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 2
+                }
+              ],
+              "item_shop_id": 122
+            },
+            {
+              "shop_id": 3,
+              "tab_id": 8,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 2
+                }
+              ],
+              "item_shop_id": 194
+            }
+          ]
+        },
+        {
+          "id": 58,
+          "type": 4,
+          "gender": 3,
+          "name": "Rada cấp 3",
+          "level": 3,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 2,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 3
+                }
+              ],
+              "item_shop_id": 51
+            },
+            {
+              "shop_id": 2,
+              "tab_id": 5,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 3
+                }
+              ],
+              "item_shop_id": 123
+            },
+            {
+              "shop_id": 3,
+              "tab_id": 8,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 3
+                }
+              ],
+              "item_shop_id": 195
+            }
+          ]
+        },
+        {
+          "id": 59,
+          "type": 4,
+          "gender": 3,
+          "name": "Rada cấp 4",
+          "level": 4,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 2,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 4
+                }
+              ],
+              "item_shop_id": 52
+            },
+            {
+              "shop_id": 2,
+              "tab_id": 5,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 4
+                }
+              ],
+              "item_shop_id": 124
+            },
+            {
+              "shop_id": 3,
+              "tab_id": 8,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 4
+                }
+              ],
+              "item_shop_id": 196
+            }
+          ]
+        },
+        {
+          "id": 184,
+          "type": 4,
+          "gender": 3,
+          "name": "Rada cấp 5",
+          "level": 5,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 2,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 5
+                }
+              ],
+              "item_shop_id": 53
+            },
+            {
+              "shop_id": 2,
+              "tab_id": 5,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 5
+                }
+              ],
+              "item_shop_id": 125
+            },
+            {
+              "shop_id": 3,
+              "tab_id": 8,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 5
+                }
+              ],
+              "item_shop_id": 197
+            }
+          ]
+        },
+        {
+          "id": 185,
+          "type": 4,
+          "gender": 3,
+          "name": "Rada cấp 6",
+          "level": 6,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 2,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 6
+                }
+              ],
+              "item_shop_id": 54
+            },
+            {
+              "shop_id": 2,
+              "tab_id": 5,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 6
+                }
+              ],
+              "item_shop_id": 126
+            },
+            {
+              "shop_id": 3,
+              "tab_id": 8,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 6
+                }
+              ],
+              "item_shop_id": 198
+            }
+          ]
+        },
+        {
+          "id": 186,
+          "type": 4,
+          "gender": 3,
+          "name": "Rada cấp 7",
+          "level": 7,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 2,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 7
+                }
+              ],
+              "item_shop_id": 55
+            },
+            {
+              "shop_id": 2,
+              "tab_id": 5,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 7
+                }
+              ],
+              "item_shop_id": 127
+            },
+            {
+              "shop_id": 3,
+              "tab_id": 8,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 7
+                }
+              ],
+              "item_shop_id": 199
+            }
+          ]
+        },
+        {
+          "id": 187,
+          "type": 4,
+          "gender": 3,
+          "name": "Rada cấp 8",
+          "level": 8,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 2,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 8
+                }
+              ],
+              "item_shop_id": 56
+            },
+            {
+              "shop_id": 2,
+              "tab_id": 5,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 8
+                }
+              ],
+              "item_shop_id": 128
+            },
+            {
+              "shop_id": 3,
+              "tab_id": 8,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 8
+                }
+              ],
+              "item_shop_id": 200
+            }
+          ]
+        },
+        {
+          "id": 278,
+          "type": 4,
+          "gender": 3,
+          "name": "Rada cấp 9",
+          "level": 9,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 2,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 9
+                }
+              ],
+              "item_shop_id": 57
+            },
+            {
+              "shop_id": 2,
+              "tab_id": 5,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 9
+                }
+              ],
+              "item_shop_id": 129
+            },
+            {
+              "shop_id": 3,
+              "tab_id": 8,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 9
+                }
+              ],
+              "item_shop_id": 201
+            }
+          ]
+        },
+        {
+          "id": 279,
+          "type": 4,
+          "gender": 3,
+          "name": "Rada cấp 10",
+          "level": 10,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 2,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 10
+                }
+              ],
+              "item_shop_id": 58
+            },
+            {
+              "shop_id": 2,
+              "tab_id": 5,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 10
+                }
+              ],
+              "item_shop_id": 130
+            },
+            {
+              "shop_id": 3,
+              "tab_id": 8,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 10
+                }
+              ],
+              "item_shop_id": 202
+            }
+          ]
+        },
+        {
+          "id": 280,
+          "type": 4,
+          "gender": 3,
+          "name": "Rada cấp 11",
+          "level": 11,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 2,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 11
+                }
+              ],
+              "item_shop_id": 59
+            },
+            {
+              "shop_id": 2,
+              "tab_id": 5,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 11
+                }
+              ],
+              "item_shop_id": 131
+            },
+            {
+              "shop_id": 3,
+              "tab_id": 8,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 11
+                }
+              ],
+              "item_shop_id": 203
+            }
+          ]
+        },
+        {
+          "id": 281,
+          "type": 4,
+          "gender": 3,
+          "name": "Rada cấp 12",
+          "level": 12,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 2,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 12
+                }
+              ],
+              "item_shop_id": 60
+            },
+            {
+              "shop_id": 2,
+              "tab_id": 5,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 12
+                }
+              ],
+              "item_shop_id": 132
+            },
+            {
+              "shop_id": 3,
+              "tab_id": 8,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 12
+                }
+              ],
+              "item_shop_id": 204
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "gender": 2,
+      "type": 0,
+      "items": [
+        {
+          "id": 2,
+          "type": 0,
+          "gender": 2,
+          "name": "Áo vải thô",
+          "level": 1,
+          "shop_definitions": [
+            {
+              "shop_id": 3,
+              "tab_id": 7,
+              "options": [
+                {
+                  "id": 47,
+                  "param": 3
+                }
+              ],
+              "item_shop_id": 145
+            }
+          ]
+        },
+        {
+          "id": 49,
+          "type": 0,
+          "gender": 2,
+          "name": "Áo thun thô",
+          "level": 2,
+          "shop_definitions": [
+            {
+              "shop_id": 3,
+              "tab_id": 7,
+              "options": [
+                {
+                  "id": 47,
+                  "param": 5
+                }
+              ],
+              "item_shop_id": 146
+            }
+          ]
+        },
+        {
+          "id": 5,
+          "type": 0,
+          "gender": 2,
+          "name": "Áo giáp sắt",
+          "level": 3,
+          "shop_definitions": [
+            {
+              "shop_id": 3,
+              "tab_id": 7,
+              "options": [
+                {
+                  "id": 47,
+                  "param": 10
+                }
+              ],
+              "item_shop_id": 147
+            }
+          ]
+        },
+        {
+          "id": 50,
+          "type": 0,
+          "gender": 2,
+          "name": "Áo giáp đồng",
+          "level": 4,
+          "shop_definitions": [
+            {
+              "shop_id": 3,
+              "tab_id": 7,
+              "options": [
+                {
+                  "id": 47,
+                  "param": 20
+                }
+              ],
+              "item_shop_id": 148
+            }
+          ]
+        },
+        {
+          "id": 168,
+          "type": 0,
+          "gender": 2,
+          "name": "Áo giáp bạc",
+          "level": 5,
+          "shop_definitions": [
+            {
+              "shop_id": 3,
+              "tab_id": 7,
+              "options": [
+                {
+                  "id": 47,
+                  "param": 30
+                }
+              ],
+              "item_shop_id": 149
+            }
+          ]
+        },
+        {
+          "id": 169,
+          "type": 0,
+          "gender": 2,
+          "name": "Áo giáp vàng",
+          "level": 6,
+          "shop_definitions": [
+            {
+              "shop_id": 3,
+              "tab_id": 7,
+              "options": [
+                {
+                  "id": 47,
+                  "param": 50
+                }
+              ],
+              "item_shop_id": 150
+            }
+          ]
+        },
+        {
+          "id": 170,
+          "type": 0,
+          "gender": 2,
+          "name": "Áo lông Xayda",
+          "level": 7,
+          "shop_definitions": [
+            {
+              "shop_id": 3,
+              "tab_id": 7,
+              "options": [
+                {
+                  "id": 47,
+                  "param": 70
+                }
+              ],
+              "item_shop_id": 151
+            }
+          ]
+        },
+        {
+          "id": 171,
+          "type": 0,
+          "gender": 2,
+          "name": "Áo khoác Xayda",
+          "level": 8,
+          "shop_definitions": [
+            {
+              "shop_id": 3,
+              "tab_id": 7,
+              "options": [
+                {
+                  "id": 47,
+                  "param": 100
+                }
+              ],
+              "item_shop_id": 152
+            }
+          ]
+        },
+        {
+          "id": 238,
+          "type": 0,
+          "gender": 2,
+          "name": "Áo lông đỏ",
+          "level": 9,
+          "shop_definitions": [
+            {
+              "shop_id": 3,
+              "tab_id": 7,
+              "options": [
+                {
+                  "id": 47,
+                  "param": 230
+                }
+              ],
+              "item_shop_id": 153
+            }
+          ]
+        },
+        {
+          "id": 239,
+          "type": 0,
+          "gender": 2,
+          "name": "Áo siêu xayda",
+          "level": 10,
+          "shop_definitions": [
+            {
+              "shop_id": 3,
+              "tab_id": 7,
+              "options": [
+                {
+                  "id": 47,
+                  "param": 280
+                }
+              ],
+              "item_shop_id": 154
+            }
+          ]
+        },
+        {
+          "id": 240,
+          "type": 0,
+          "gender": 2,
+          "name": "Áo Kaio",
+          "level": 11,
+          "shop_definitions": [
+            {
+              "shop_id": 3,
+              "tab_id": 7,
+              "options": [
+                {
+                  "id": 47,
+                  "param": 330
+                }
+              ],
+              "item_shop_id": 155
+            }
+          ]
+        },
+        {
+          "id": 241,
+          "type": 0,
+          "gender": 2,
+          "name": "Áo lưỡng long",
+          "level": 12,
+          "shop_definitions": [
+            {
+              "shop_id": 3,
+              "tab_id": 7,
+              "options": [
+                {
+                  "id": 47,
+                  "param": 450
+                }
+              ],
+              "item_shop_id": 156
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "gender": 2,
+      "type": 1,
+      "items": [
+        {
+          "id": 8,
+          "type": 1,
+          "gender": 2,
+          "name": "Quần vải thô",
+          "level": 1,
+          "shop_definitions": [
+            {
+              "shop_id": 3,
+              "tab_id": 7,
+              "options": [
+                {
+                  "id": 6,
+                  "param": 20
+                }
+              ],
+              "item_shop_id": 157
+            }
+          ]
+        },
+        {
+          "id": 51,
+          "type": 1,
+          "gender": 2,
+          "name": "Quần thun thô",
+          "level": 2,
+          "shop_definitions": [
+            {
+              "shop_id": 3,
+              "tab_id": 7,
+              "options": [
+                {
+                  "id": 6,
+                  "param": 20
+                },
+                {
+                  "id": 27,
+                  "param": 8
+                }
+              ],
+              "item_shop_id": 158
+            }
+          ]
+        },
+        {
+          "id": 11,
+          "type": 1,
+          "gender": 2,
+          "name": "Quần giáp sắt",
+          "level": 3,
+          "shop_definitions": [
+            {
+              "shop_id": 3,
+              "tab_id": 7,
+              "options": [
+                {
+                  "id": 6,
+                  "param": 100
+                },
+                {
+                  "id": 27,
+                  "param": 20
+                }
+              ],
+              "item_shop_id": 159
+            }
+          ]
+        },
+        {
+          "id": 52,
+          "type": 1,
+          "gender": 2,
+          "name": "Quần giáp đồng",
+          "level": 4,
+          "shop_definitions": [
+            {
+              "shop_id": 3,
+              "tab_id": 7,
+              "options": [
+                {
+                  "id": 6,
+                  "param": 200
+                },
+                {
+                  "id": 27,
+                  "param": 80
+                }
+              ],
+              "item_shop_id": 160
+            }
+          ]
+        },
+        {
+          "id": 172,
+          "type": 1,
+          "gender": 2,
+          "name": "Quần giáp bạc",
+          "level": 5,
+          "shop_definitions": [
+            {
+              "shop_id": 3,
+              "tab_id": 7,
+              "options": [
+                {
+                  "id": 6,
+                  "param": 500
+                },
+                {
+                  "id": 27,
+                  "param": 200
+                }
+              ],
+              "item_shop_id": 161
+            }
+          ]
+        },
+        {
+          "id": 173,
+          "type": 1,
+          "gender": 2,
+          "name": "Quần giáp vàng",
+          "level": 6,
+          "shop_definitions": [
+            {
+              "shop_id": 3,
+              "tab_id": 7,
+              "options": [
+                {
+                  "id": 6,
+                  "param": 1000
+                },
+                {
+                  "id": 27,
+                  "param": 400
+                }
+              ],
+              "item_shop_id": 162
+            }
+          ]
+        },
+        {
+          "id": 174,
+          "type": 1,
+          "gender": 2,
+          "name": "Quần lông Xayda",
+          "level": 7,
+          "shop_definitions": [
+            {
+              "shop_id": 3,
+              "tab_id": 7,
+              "options": [
+                {
+                  "id": 6,
+                  "param": 2000
+                },
+                {
+                  "id": 27,
+                  "param": 800
+                }
+              ],
+              "item_shop_id": 163
+            }
+          ]
+        },
+        {
+          "id": 175,
+          "type": 1,
+          "gender": 2,
+          "name": "Quần da Xayda",
+          "level": 8,
+          "shop_definitions": [
+            {
+              "shop_id": 3,
+              "tab_id": 7,
+              "options": [
+                {
+                  "id": 6,
+                  "param": 4000
+                },
+                {
+                  "id": 27,
+                  "param": 1600
+                }
+              ],
+              "item_shop_id": 164
+            }
+          ]
+        },
+        {
+          "id": 250,
+          "type": 1,
+          "gender": 2,
+          "name": "Quần lông đỏ",
+          "level": 9,
+          "shop_definitions": [
+            {
+              "shop_id": 3,
+              "tab_id": 7,
+              "options": [
+                {
+                  "id": 6,
+                  "param": 12000
+                },
+                {
+                  "id": 27,
+                  "param": 2100
+                }
+              ],
+              "item_shop_id": 165
+            }
+          ]
+        },
+        {
+          "id": 251,
+          "type": 1,
+          "gender": 2,
+          "name": "Quần siêu Xayda",
+          "level": 10,
+          "shop_definitions": [
+            {
+              "shop_id": 3,
+              "tab_id": 7,
+              "options": [
+                {
+                  "id": 6,
+                  "param": 16000
+                },
+                {
+                  "id": 27,
+                  "param": 2600
+                }
+              ],
+              "item_shop_id": 166
+            }
+          ]
+        },
+        {
+          "id": 252,
+          "type": 1,
+          "gender": 2,
+          "name": "Quần Kaio",
+          "level": 11,
+          "shop_definitions": [
+            {
+              "shop_id": 3,
+              "tab_id": 7,
+              "options": [
+                {
+                  "id": 6,
+                  "param": 20000
+                },
+                {
+                  "id": 27,
+                  "param": 3100
+                }
+              ],
+              "item_shop_id": 167
+            }
+          ]
+        },
+        {
+          "id": 253,
+          "type": 1,
+          "gender": 2,
+          "name": "Quần lưỡng long",
+          "level": 12,
+          "shop_definitions": [
+            {
+              "shop_id": 3,
+              "tab_id": 7,
+              "options": [
+                {
+                  "id": 6,
+                  "param": 24000
+                },
+                {
+                  "id": 27,
+                  "param": 3600
+                }
+              ],
+              "item_shop_id": 168
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "gender": 2,
+      "type": 2,
+      "items": [
+        {
+          "id": 23,
+          "type": 2,
+          "gender": 2,
+          "name": "Găng vải thô",
+          "level": 1,
+          "shop_definitions": [
+            {
+              "shop_id": 3,
+              "tab_id": 8,
+              "options": [
+                {
+                  "id": 0,
+                  "param": 5
+                }
+              ],
+              "item_shop_id": 169
+            }
+          ]
+        },
+        {
+          "id": 53,
+          "type": 2,
+          "gender": 2,
+          "name": "Găng thun thô",
+          "level": 2,
+          "shop_definitions": [
+            {
+              "shop_id": 3,
+              "tab_id": 8,
+              "options": [
+                {
+                  "id": 0,
+                  "param": 8
+                }
+              ],
+              "item_shop_id": 170
+            }
+          ]
+        },
+        {
+          "id": 26,
+          "type": 2,
+          "gender": 2,
+          "name": "Găng sắt",
+          "level": 3,
+          "shop_definitions": [
+            {
+              "shop_id": 3,
+              "tab_id": 8,
+              "options": [
+                {
+                  "id": 0,
+                  "param": 16
+                }
+              ],
+              "item_shop_id": 171
+            }
+          ]
+        },
+        {
+          "id": 54,
+          "type": 2,
+          "gender": 2,
+          "name": "Găng đồng",
+          "level": 4,
+          "shop_definitions": [
+            {
+              "shop_id": 3,
+              "tab_id": 8,
+              "options": [
+                {
+                  "id": 0,
+                  "param": 32
+                }
+              ],
+              "item_shop_id": 172
+            }
+          ]
+        },
+        {
+          "id": 176,
+          "type": 2,
+          "gender": 2,
+          "name": "Găng bạc",
+          "level": 5,
+          "shop_definitions": [
+            {
+              "shop_id": 3,
+              "tab_id": 8,
+              "options": [
+                {
+                  "id": 0,
+                  "param": 60
+                }
+              ],
+              "item_shop_id": 173
+            }
+          ]
+        },
+        {
+          "id": 177,
+          "type": 2,
+          "gender": 2,
+          "name": "Găng vàng",
+          "level": 6,
+          "shop_definitions": [
+            {
+              "shop_id": 3,
+              "tab_id": 8,
+              "options": [
+                {
+                  "id": 0,
+                  "param": 120
+                }
+              ],
+              "item_shop_id": 174
+            }
+          ]
+        },
+        {
+          "id": 178,
+          "type": 2,
+          "gender": 2,
+          "name": "Găng lông Xayda",
+          "level": 7,
+          "shop_definitions": [
+            {
+              "shop_id": 3,
+              "tab_id": 8,
+              "options": [
+                {
+                  "id": 0,
+                  "param": 240
+                }
+              ],
+              "item_shop_id": 175
+            }
+          ]
+        },
+        {
+          "id": 179,
+          "type": 2,
+          "gender": 2,
+          "name": "Găng da Xayda",
+          "level": 8,
+          "shop_definitions": [
+            {
+              "shop_id": 3,
+              "tab_id": 8,
+              "options": [
+                {
+                  "id": 0,
+                  "param": 560
+                }
+              ],
+              "item_shop_id": 176
+            }
+          ]
+        },
+        {
+          "id": 262,
+          "type": 2,
+          "gender": 2,
+          "name": "Găng lông đỏ",
+          "level": 9,
+          "shop_definitions": [
+            {
+              "shop_id": 3,
+              "tab_id": 8,
+              "options": [
+                {
+                  "id": 0,
+                  "param": 700
+                }
+              ],
+              "item_shop_id": 177
+            }
+          ]
+        },
+        {
+          "id": 263,
+          "type": 2,
+          "gender": 2,
+          "name": "Găng siêu Xayda",
+          "level": 10,
+          "shop_definitions": [
+            {
+              "shop_id": 3,
+              "tab_id": 8,
+              "options": [
+                {
+                  "id": 0,
+                  "param": 1050
+                }
+              ],
+              "item_shop_id": 178
+            }
+          ]
+        },
+        {
+          "id": 264,
+          "type": 2,
+          "gender": 2,
+          "name": "Găng Kaio",
+          "level": 11,
+          "shop_definitions": [
+            {
+              "shop_id": 3,
+              "tab_id": 8,
+              "options": [
+                {
+                  "id": 0,
+                  "param": 1550
+                }
+              ],
+              "item_shop_id": 179
+            }
+          ]
+        },
+        {
+          "id": 265,
+          "type": 2,
+          "gender": 2,
+          "name": "Găng lưỡng long",
+          "level": 12,
+          "shop_definitions": [
+            {
+              "shop_id": 3,
+              "tab_id": 8,
+              "options": [
+                {
+                  "id": 0,
+                  "param": 2250
+                }
+              ],
+              "item_shop_id": 180
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "gender": 2,
+      "type": 3,
+      "items": [
+        {
+          "id": 29,
+          "type": 3,
+          "gender": 2,
+          "name": "Giầy vải thô",
+          "level": 1,
+          "shop_definitions": [
+            {
+              "shop_id": 3,
+              "tab_id": 8,
+              "options": [
+                {
+                  "id": 7,
+                  "param": 10
+                }
+              ],
+              "item_shop_id": 181
+            }
+          ]
+        },
+        {
+          "id": 55,
+          "type": 3,
+          "gender": 2,
+          "name": "Giầy cao su thô",
+          "level": 2,
+          "shop_definitions": [
+            {
+              "shop_id": 3,
+              "tab_id": 8,
+              "options": [
+                {
+                  "id": 7,
+                  "param": 20
+                },
+                {
+                  "id": 28,
+                  "param": 4
+                }
+              ],
+              "item_shop_id": 182
+            }
+          ]
+        },
+        {
+          "id": 32,
+          "type": 3,
+          "gender": 2,
+          "name": "Giầy sắt",
+          "level": 3,
+          "shop_definitions": [
+            {
+              "shop_id": 3,
+              "tab_id": 8,
+              "options": [
+                {
+                  "id": 7,
+                  "param": 100
+                },
+                {
+                  "id": 28,
+                  "param": 20
+                }
+              ],
+              "item_shop_id": 183
+            }
+          ]
+        },
+        {
+          "id": 56,
+          "type": 3,
+          "gender": 2,
+          "name": "Giầy đồng",
+          "level": 4,
+          "shop_definitions": [
+            {
+              "shop_id": 3,
+              "tab_id": 8,
+              "options": [
+                {
+                  "id": 7,
+                  "param": 200
+                },
+                {
+                  "id": 28,
+                  "param": 40
+                }
+              ],
+              "item_shop_id": 184
+            }
+          ]
+        },
+        {
+          "id": 180,
+          "type": 3,
+          "gender": 2,
+          "name": "Giày bạc",
+          "level": 5,
+          "shop_definitions": [
+            {
+              "shop_id": 3,
+              "tab_id": 8,
+              "options": [
+                {
+                  "id": 7,
+                  "param": 400
+                },
+                {
+                  "id": 28,
+                  "param": 80
+                }
+              ],
+              "item_shop_id": 185
+            }
+          ]
+        },
+        {
+          "id": 181,
+          "type": 3,
+          "gender": 2,
+          "name": "Giày vàng",
+          "level": 6,
+          "shop_definitions": [
+            {
+              "shop_id": 3,
+              "tab_id": 8,
+              "options": [
+                {
+                  "id": 7,
+                  "param": 1000
+                },
+                {
+                  "id": 28,
+                  "param": 200
+                }
+              ],
+              "item_shop_id": 186
+            }
+          ]
+        },
+        {
+          "id": 182,
+          "type": 3,
+          "gender": 2,
+          "name": "Giày lông Xayda",
+          "level": 7,
+          "shop_definitions": [
+            {
+              "shop_id": 3,
+              "tab_id": 8,
+              "options": [
+                {
+                  "id": 7,
+                  "param": 2000
+                },
+                {
+                  "id": 28,
+                  "param": 400
+                }
+              ],
+              "item_shop_id": 187
+            }
+          ]
+        },
+        {
+          "id": 183,
+          "type": 3,
+          "gender": 2,
+          "name": "Giày da Xayda",
+          "level": 8,
+          "shop_definitions": [
+            {
+              "shop_id": 3,
+              "tab_id": 8,
+              "options": [
+                {
+                  "id": 7,
+                  "param": 4000
+                },
+                {
+                  "id": 28,
+                  "param": 800
+                }
+              ],
+              "item_shop_id": 188
+            }
+          ]
+        },
+        {
+          "id": 274,
+          "type": 3,
+          "gender": 2,
+          "name": "Giày lông đỏ",
+          "level": 9,
+          "shop_definitions": [
+            {
+              "shop_id": 3,
+              "tab_id": 8,
+              "options": [
+                {
+                  "id": 7,
+                  "param": 8000
+                },
+                {
+                  "id": 28,
+                  "param": 1300
+                }
+              ],
+              "item_shop_id": 189
+            }
+          ]
+        },
+        {
+          "id": 275,
+          "type": 3,
+          "gender": 2,
+          "name": "Giày siêu Xayda",
+          "level": 10,
+          "shop_definitions": [
+            {
+              "shop_id": 3,
+              "tab_id": 8,
+              "options": [
+                {
+                  "id": 7,
+                  "param": 13000
+                },
+                {
+                  "id": 28,
+                  "param": 1800
+                }
+              ],
+              "item_shop_id": 190
+            }
+          ]
+        },
+        {
+          "id": 276,
+          "type": 3,
+          "gender": 2,
+          "name": "Giày Kaio",
+          "level": 11,
+          "shop_definitions": [
+            {
+              "shop_id": 3,
+              "tab_id": 8,
+              "options": [
+                {
+                  "id": 7,
+                  "param": 18000
+                },
+                {
+                  "id": 28,
+                  "param": 2300
+                }
+              ],
+              "item_shop_id": 191
+            }
+          ]
+        },
+        {
+          "id": 277,
+          "type": 3,
+          "gender": 2,
+          "name": "Giày lưỡng long",
+          "level": 12,
+          "shop_definitions": [
+            {
+              "shop_id": 3,
+              "tab_id": 8,
+              "options": [
+                {
+                  "id": 7,
+                  "param": 23000
+                },
+                {
+                  "id": 28,
+                  "param": 2800
+                }
+              ],
+              "item_shop_id": 192
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "gender": 2,
+      "type": 4,
+      "items": [
+        {
+          "id": 12,
+          "type": 4,
+          "gender": 3,
+          "name": "Rada cấp 1",
+          "level": 1,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 2,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 1
+                }
+              ],
+              "item_shop_id": 49
+            },
+            {
+              "shop_id": 2,
+              "tab_id": 5,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 1
+                }
+              ],
+              "item_shop_id": 121
+            },
+            {
+              "shop_id": 3,
+              "tab_id": 8,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 1
+                }
+              ],
+              "item_shop_id": 193
+            }
+          ]
+        },
+        {
+          "id": 57,
+          "type": 4,
+          "gender": 3,
+          "name": "Rada cấp 2",
+          "level": 2,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 2,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 2
+                }
+              ],
+              "item_shop_id": 50
+            },
+            {
+              "shop_id": 2,
+              "tab_id": 5,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 2
+                }
+              ],
+              "item_shop_id": 122
+            },
+            {
+              "shop_id": 3,
+              "tab_id": 8,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 2
+                }
+              ],
+              "item_shop_id": 194
+            }
+          ]
+        },
+        {
+          "id": 58,
+          "type": 4,
+          "gender": 3,
+          "name": "Rada cấp 3",
+          "level": 3,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 2,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 3
+                }
+              ],
+              "item_shop_id": 51
+            },
+            {
+              "shop_id": 2,
+              "tab_id": 5,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 3
+                }
+              ],
+              "item_shop_id": 123
+            },
+            {
+              "shop_id": 3,
+              "tab_id": 8,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 3
+                }
+              ],
+              "item_shop_id": 195
+            }
+          ]
+        },
+        {
+          "id": 59,
+          "type": 4,
+          "gender": 3,
+          "name": "Rada cấp 4",
+          "level": 4,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 2,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 4
+                }
+              ],
+              "item_shop_id": 52
+            },
+            {
+              "shop_id": 2,
+              "tab_id": 5,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 4
+                }
+              ],
+              "item_shop_id": 124
+            },
+            {
+              "shop_id": 3,
+              "tab_id": 8,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 4
+                }
+              ],
+              "item_shop_id": 196
+            }
+          ]
+        },
+        {
+          "id": 184,
+          "type": 4,
+          "gender": 3,
+          "name": "Rada cấp 5",
+          "level": 5,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 2,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 5
+                }
+              ],
+              "item_shop_id": 53
+            },
+            {
+              "shop_id": 2,
+              "tab_id": 5,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 5
+                }
+              ],
+              "item_shop_id": 125
+            },
+            {
+              "shop_id": 3,
+              "tab_id": 8,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 5
+                }
+              ],
+              "item_shop_id": 197
+            }
+          ]
+        },
+        {
+          "id": 185,
+          "type": 4,
+          "gender": 3,
+          "name": "Rada cấp 6",
+          "level": 6,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 2,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 6
+                }
+              ],
+              "item_shop_id": 54
+            },
+            {
+              "shop_id": 2,
+              "tab_id": 5,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 6
+                }
+              ],
+              "item_shop_id": 126
+            },
+            {
+              "shop_id": 3,
+              "tab_id": 8,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 6
+                }
+              ],
+              "item_shop_id": 198
+            }
+          ]
+        },
+        {
+          "id": 186,
+          "type": 4,
+          "gender": 3,
+          "name": "Rada cấp 7",
+          "level": 7,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 2,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 7
+                }
+              ],
+              "item_shop_id": 55
+            },
+            {
+              "shop_id": 2,
+              "tab_id": 5,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 7
+                }
+              ],
+              "item_shop_id": 127
+            },
+            {
+              "shop_id": 3,
+              "tab_id": 8,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 7
+                }
+              ],
+              "item_shop_id": 199
+            }
+          ]
+        },
+        {
+          "id": 187,
+          "type": 4,
+          "gender": 3,
+          "name": "Rada cấp 8",
+          "level": 8,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 2,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 8
+                }
+              ],
+              "item_shop_id": 56
+            },
+            {
+              "shop_id": 2,
+              "tab_id": 5,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 8
+                }
+              ],
+              "item_shop_id": 128
+            },
+            {
+              "shop_id": 3,
+              "tab_id": 8,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 8
+                }
+              ],
+              "item_shop_id": 200
+            }
+          ]
+        },
+        {
+          "id": 278,
+          "type": 4,
+          "gender": 3,
+          "name": "Rada cấp 9",
+          "level": 9,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 2,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 9
+                }
+              ],
+              "item_shop_id": 57
+            },
+            {
+              "shop_id": 2,
+              "tab_id": 5,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 9
+                }
+              ],
+              "item_shop_id": 129
+            },
+            {
+              "shop_id": 3,
+              "tab_id": 8,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 9
+                }
+              ],
+              "item_shop_id": 201
+            }
+          ]
+        },
+        {
+          "id": 279,
+          "type": 4,
+          "gender": 3,
+          "name": "Rada cấp 10",
+          "level": 10,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 2,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 10
+                }
+              ],
+              "item_shop_id": 58
+            },
+            {
+              "shop_id": 2,
+              "tab_id": 5,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 10
+                }
+              ],
+              "item_shop_id": 130
+            },
+            {
+              "shop_id": 3,
+              "tab_id": 8,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 10
+                }
+              ],
+              "item_shop_id": 202
+            }
+          ]
+        },
+        {
+          "id": 280,
+          "type": 4,
+          "gender": 3,
+          "name": "Rada cấp 11",
+          "level": 11,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 2,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 11
+                }
+              ],
+              "item_shop_id": 59
+            },
+            {
+              "shop_id": 2,
+              "tab_id": 5,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 11
+                }
+              ],
+              "item_shop_id": 131
+            },
+            {
+              "shop_id": 3,
+              "tab_id": 8,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 11
+                }
+              ],
+              "item_shop_id": 203
+            }
+          ]
+        },
+        {
+          "id": 281,
+          "type": 4,
+          "gender": 3,
+          "name": "Rada cấp 12",
+          "level": 12,
+          "shop_definitions": [
+            {
+              "shop_id": 1,
+              "tab_id": 2,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 12
+                }
+              ],
+              "item_shop_id": 60
+            },
+            {
+              "shop_id": 2,
+              "tab_id": 5,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 12
+                }
+              ],
+              "item_shop_id": 132
+            },
+            {
+              "shop_id": 3,
+              "tab_id": 8,
+              "options": [
+                {
+                  "id": 14,
+                  "param": 12
+                }
+              ],
+              "item_shop_id": 204
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

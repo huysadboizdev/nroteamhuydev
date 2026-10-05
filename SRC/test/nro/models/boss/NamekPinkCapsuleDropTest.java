@@ -1,0 +1,18 @@
+package nro.models.boss;
+import java.lang.reflect.*;
+import java.util.*;
+import nro.models.map.*;
+import nro.models.player.*;
+import nro.models.boss.tieu_doi_sat_thu_namek.*;
+import static nro.models.services.PinkFixture.*;
+public final class NamekPinkCapsuleDropTest {
+    static final Class<?>[] TYPES={SO1_NM.class,SO2_NM.class,SO3_NM.class,SO4_NM.class,TDT_NM.class};
+    static final int[] IDS={-314,-313,-312,-311,-315},COSTUMES={432,431,430,429,433};
+    static Boss boss(int index)throws Exception{Boss b=(Boss)blank(TYPES[index]);b.id=IDS[index];b.zone=zone();b.location=blank(Location.class);b.location.x=2;b.location.y=200;return b;}
+    static long count(Zone z,int id){return z.items.stream().filter(i->i.itemTemplate.id==id).count();}
+    static void drops()throws Exception{install();for(int n=0;n<TYPES.length;n++){Boss b=boss(n);var killer=player(777);b.reward(killer);check(count(b.zone,722)==5,"each Namek boss drops exactly five separate capsules: "+TYPES[n].getSimpleName());for(ItemMap d:b.zone.items)if(d.itemTemplate.id==722){check(d.quantity==1&&d.playerId==-1,"shared quantity one public capsules");check(d.x>=0&&d.x<240&&d.y==100+d.x,"capsule terrain calculated at clamped x");}check(count(b.zone,77)==0,"Namek bosses must not drop green gems");check(count(b.zone,COSTUMES[n])==1&&count(b.zone,19)==1&&count(b.zone,20)==1,"original costume and dragonballs remain");ItemMap costume=null;for(ItemMap d:b.zone.items){if(d.itemTemplate.id==COSTUMES[n]||d.itemTemplate.id==19||d.itemTemplate.id==20)check(d.playerId==777&&kept(d),"private until expiry");if(d.itemTemplate.id==COSTUMES[n])costume=d;}check(costume.options.equals(OPTIONS),"shop costume options retained");check(killer.event.getEventPoint()==(n==4?5:1),"event points preserved");}}
+    static void duplicate()throws Exception{install();for(int n=0;n<TYPES.length;n++){Boss b=boss(n);var killer=player(777);b.reward(killer);int all=b.zone.items.size(),points=killer.event.getEventPoint();b.reward(killer);check(b.zone.items.size()==all&&killer.event.getEventPoint()==points,"repeat reward grants nothing");Method reset=TYPES[n].getDeclaredMethod("resetBase");reset.setAccessible(true);reset.invoke(b);b.reward(killer);check(count(b.zone,722)==10&&killer.event.getEventPoint()==points*2,"respawn resets every reward guard");}}
+    static void pickup()throws Exception{install();Boss b=boss(0);var killer=player(777);b.reward(killer);var newcomer=player(778);newcomer.zone=b.zone;List<ItemMap> shared=b.zone.items.stream().filter(i->i.itemTemplate.id==722).toList();for(ItemMap i:shared)b.zone.pickItem(newcomer,i.itemMapId);check(count(b.zone,722)==0&&newcomer.kolQuestState.pinkCapsulesPicked==5&&killer.kolQuestState.pinkCapsulesPicked==0,"late nonkiller can collect five shared capsules and KOL counts each");for(ItemMap i:shared)b.zone.pickItem(newcomer,i.itemMapId);check(newcomer.kolQuestState.pinkCapsulesPicked==5,"pickup replay excluded");}
+    static void invalid()throws Exception{install();for(int n=0;n<TYPES.length;n++){Boss b=boss(n);var killer=player(777);Zone valid=b.zone;try{b.reward(null);}catch(NullPointerException old){}check(valid.items.isEmpty(),"null killer cannot grant or burn reward guard");b.zone=null;b.reward(killer);b.zone=valid;var map=valid.map;valid.map=null;b.reward(killer);valid.map=map;b.reward(killer);check(count(valid,722)==5,"invalid zone/map must not consume per-life reward guard");}}
+    public static void main(String[] a)throws Exception{try{switch(a[0]){case "drops"->drops();case "duplicate"->duplicate();case "pickup"->pickup();case "invalid"->invalid();default->throw new AssertionError(a[0]);}System.out.println("PASS NamekDrops "+a[0]);System.exit(0);}catch(Throwable failure){failure.printStackTrace();System.exit(1);}}
+}

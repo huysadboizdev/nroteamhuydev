@@ -1,0 +1,15 @@
+{
+  "original": {
+    "count": 2099,
+    "decoded": 2000,
+    "bad_type": 236,
+    "offset": 83538
+  },
+  "in_memory_one_frame_added": {
+    "count": 2099,
+    "decoded": 2099,
+    "remaining_bytes": 0
+  },
+  "insertion_offset": 83534,
+  "production_changed": false
+}

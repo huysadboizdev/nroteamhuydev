@@ -1,0 +1,114 @@
+[
+  {
+    "path": "SRC\\data\\res\\x2\\37$21",
+    "size": [
+      48,
+      48
+    ],
+    "pixels_readable": true
+  },
+  {
+    "path": "SRC\\data\\res\\x2\\37$6",
+    "size": [
+      48,
+      48
+    ],
+    "pixels_readable": true
+  },
+  {
+    "path": "SRC\\data\\res\\x4\\4bgItem358",
+    "size": [
+      539,
+      600
+    ],
+    "pixels_readable": true
+  },
+  {
+    "path": "SRC\\data\\res\\x4\\b240",
+    "size": [
+      832,
+      536
+    ],
+    "pixels_readable": true
+  },
+  {
+    "path": "SRC\\data\\res\\x4\\b241",
+    "size": [
+      1664,
+      292
+    ],
+    "pixels_readable": true
+  },
+  {
+    "path": "SRC\\data\\res\\x4\\b242",
+    "size": [
+      832,
+      308
+    ],
+    "pixels_readable": true
+  },
+  {
+    "path": "SRC\\data\\img_by_name\\x4\\aura_20_0.png",
+    "size": [
+      280,
+      1440
+    ],
+    "pixels_readable": true
+  },
+  {
+    "path": "SRC\\data\\img_by_name\\x4\\aura_22_0.png",
+    "size": [
+      280,
+      1440
+    ],
+    "pixels_readable": true
+  },
+  {
+    "path": "SRC\\data\\img_by_name\\x4\\aura_23_0.png",
+    "size": [
+      280,
+      1440
+    ],
+    "pixels_readable": true
+  },
+  {
+    "path": "SRC\\data\\img_by_name\\x4\\aura_25_0.png",
+    "size": [
+      400,
+      1600
+    ],
+    "pixels_readable": true
+  },
+  {
+    "path": "SRC\\data\\icon\\x1\\11120.png",
+    "size": [
+      16,
+      64
+    ],
+    "pixels_readable": true
+  },
+  {
+    "path": "SRC\\data\\icon\\x2\\11120.png",
+    "size": [
+      32,
+      128
+    ],
+    "pixels_readable": true
+  },
+  {
+    "path": "SRC\\data\\icon\\x3\\11120.png",
+    "size": [
+      48,
+      192
+    ],
+    "pixels_readable": true
+  },
+  {
+    "path": "SRC\\data\\icon\\x4\\11120.png",
+    "size": [
+      64,
+      256
+    ],
+    "pixels_readable": true
+  }
+]

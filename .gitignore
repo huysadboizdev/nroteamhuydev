@@ -1,0 +1,32 @@
+# Local analysis, generated builds and runtime files
+.analysis/
+SRC/.analysis/
+SRC/build/
+SRC/dist/
+SRC/jar-backup/
+SRC/20.jar
+log/
+SRC/log/
+SRC/data/boss-notice-outbox/
+*.class
+*.log
+*.pid
+hs_err_pid*
+replay_pid*
+
+# Machine configuration and private database dumps
+SRC/Config.properties
+SRC/nbproject/private/
+/team2026.sql
+SRC/sql/nro1.sql
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Editor and OS files
+.idea/
+.vscode/
+Thumbs.db
+.DS_Store
