@@ -1,22 +1,14 @@
 package nro.models.boss.luyen_tap_tu_dong;
 
 import nro.models.boss.BossesData;
-import nro.models.consts.ConstPlayer;
 import nro.models.consts.ConstTask;
-import nro.models.network.Message;
 import nro.models.player.Player;
-import nro.models.services.Service;
 import nro.models.services.TaskService;
-import nro.models.utils.Logger;
 import nro.models.utils.Util;
-
-import java.io.IOException;
-
 import nro.models.boss.BossID;
 import nro.models.consts.BossStatus;
 import static nro.models.consts.BossType.PHOBAN;
 import nro.models.map.service.ChangeMapService;
-import nro.models.map.service.MapService;
 
 public class TauPayPay extends TrainingBoss {
 
@@ -70,17 +62,14 @@ public class TauPayPay extends TrainingBoss {
     }
 
     @Override
-    public void leaveMap() {
-        ChangeMapService.gI().spaceShipArrive(this, (byte) 2, ChangeMapService.DEFAULT_SPACE_SHIP);
-        Message msg;
+    public synchronized void leaveMap() {
+        if (this.zone == null && this.bossStatus == BossStatus.REST) {
+            return;
+        }
         try {
-            msg = new Message(-6);
-            msg.writer().writeInt((int) this.id);
-            playerAtt.sendMessage(msg);
-            msg.cleanup();
-            this.zone = null;
-        } catch (IOException e) {
-            Logger.logException(MapService.class, e);
+            ChangeMapService.gI().spaceShipArrive(this, (byte) 2, ChangeMapService.DEFAULT_SPACE_SHIP);
+        } finally {
+            super.leaveMap();
         }
     }
 
@@ -115,7 +104,7 @@ public class TauPayPay extends TrainingBoss {
                 die(plAtt);
             }
 
-            return (int) damage;
+            return (int) Math.min(Integer.MAX_VALUE, Math.max(0L, damage));
         } else {
             return 0;
         }

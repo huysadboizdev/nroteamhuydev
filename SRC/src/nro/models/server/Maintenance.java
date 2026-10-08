@@ -25,6 +25,12 @@ public class Maintenance extends Thread {
         return instance;
     }
 
+    /** A failed data drain keeps the JVM alive and allows a later maintenance retry. */
+    public static synchronized void cancelFailedMaintenance() {
+        isRunning=false;
+        instance=null;
+    }
+
     public void startCountdown() {
         if (!isRunning) {
             isRunning = true;

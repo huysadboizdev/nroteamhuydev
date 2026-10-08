@@ -20,6 +20,7 @@ public class Android13 extends Boss {
     }
     @Override
     public void reward(Player plKill) {
+        if (questSupportReward(plKill)) return;
         int diem = 5;
         plKill.event.addEventPoint(diem);
         Service.gI().sendThongBao(plKill, "+5 Point");
@@ -44,7 +45,7 @@ public class Android13 extends Boss {
         }
         for (Boss boss : this.parentBoss.getCompanionBosses()) {
             if(boss==null)continue;
-            if (boss.id == BossID.ANDROID_15 && !boss.isDie()) {
+            if (boss.questBossId() == BossID.ANDROID_15 && !boss.isDie()) {
                 boss.changeToTypePK();
                 break;
             }
@@ -54,13 +55,14 @@ public class Android13 extends Boss {
 
     @Override
     public synchronized int injured(Player plAtt, long damage, boolean piercing, boolean isMobAttack) {
+        if (isQuestSupportRetired()) return 0;
         if (damage >= this.nPoint.hp) {
             boolean flag = true;
             if (this.parentBoss != null) {
                 if (this.parentBoss.hasCompanionGroup()) {
                     for (Boss boss : this.parentBoss.getCompanionBosses()) {
             if(boss==null)continue;
-                        if (boss.id == BossID.ANDROID_15 && !boss.isDie()) {
+                        if (boss.questBossId() == BossID.ANDROID_15 && !boss.isDie()) {
                             flag = false;
                             break;
                         }

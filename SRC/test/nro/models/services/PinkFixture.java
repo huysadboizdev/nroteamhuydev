@@ -2,6 +2,12 @@ package nro.models.services;
 
 import java.lang.reflect.*;
 import java.util.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.sql.SQLException;
+import nro.models.boss.notice.BossNoticeTracker;
+import nro.models.boss.notice.BossNoticeOutbox;
+import nro.models.database.BossNoticeDAO;
 import sun.misc.Unsafe;
 import nro.models.player.*;
 import nro.models.item.Item;
@@ -24,7 +30,25 @@ public final class PinkFixture {
     public static void owner(ItemMap i,boolean keep)throws Exception{try{ItemMap.class.getField("keepOwnerUntilDespawn").setBoolean(i,keep);}catch(NoSuchFieldException oldVersion){}}
     public static boolean kept(ItemMap i)throws Exception{return ItemMap.class.getField("keepOwnerUntilDespawn").getBoolean(i);}
     public static final List<Item.ItemOption> OPTIONS=List.of(new Item.ItemOption(new Template.ItemOptionTemplate(),37));
+    private static boolean noticesIsolated;
+    /** Test callbacks must never reach the server's durable outbox or production SQL connection. */
+    public static synchronized void isolateBossNotices()throws Exception {
+        if(noticesIsolated)return;
+        Path isolated=Files.createTempDirectory("pink-fixture-notices-");
+        BossNoticeService notices=BossNoticeService.gI();
+        Field run=BossNoticeService.class.getDeclaredField("run");run.setAccessible(true);
+        for(var replacement:java.util.Map.of(
+                "tracker",new BossNoticeTracker((String)run.get(notices),System::currentTimeMillis,row->{}),
+                "outbox",new BossNoticeOutbox(isolated),
+                "dao",new BossNoticeDAO(()->{throw new SQLException("Boss notices are isolated by PinkFixture");})).entrySet()) {
+            Field f=BossNoticeService.class.getDeclaredField(replacement.getKey());
+            U.putObjectVolatile(notices,U.objectFieldOffset(f),replacement.getValue());
+        }
+        Field log=BossNoticeService.class.getDeclaredField("lastLog");U.putLongVolatile(notices,U.objectFieldOffset(log),Long.MAX_VALUE);
+        noticesIsolated=true;
+    }
     public static void install()throws Exception{
+        isolateBossNotices();
         replace(ItemService.class,"i",new ItemService(){@Override public Template.ItemTemplate getTemplate(int id){return template(id);}@Override public Template.ItemOptionTemplate getItemOptionTemplate(int id){var t=new Template.ItemOptionTemplate();t.id=id;t.name="fixture #";return t;}@Override public List<Item.ItemOption> getListOptionItemShop(short id){return OPTIONS;}@Override public Item createItemFromItemMap(ItemMap m){Item i=item(m.itemTemplate.id,m.quantity);return i;}});
         replace(Service.class,"instance",new Service(){@Override public void dropItemMap(Zone z,ItemMap m){}@Override public void sendThongBao(Player p,String s){}@Override public void sendMoney(Player p){}@Override public void sendToAntherMePickItem(Player p,int id){}@Override public void updatePlayerTotalDamage(Player p){}@Override public void sendMessAllPlayerInMap(Zone z,Message m){}});
         replace(InventoryService.class,"I",new InventoryService(){@Override public void sendItemBags(Player p){}@Override public boolean addItemBag(Player p,Item i){p.inventory.itemsBag.add(i);i.quantity=0;return true;}});

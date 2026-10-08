@@ -10,7 +10,7 @@ import nro.models.services.InventoryService;
 public class GiftCodeManager {
 
     public String name;
-    public final ArrayList<GiftCode> listGiftCode = new ArrayList<>();
+    public volatile ArrayList<GiftCode> listGiftCode = new ArrayList<>();
 
     private static GiftCodeManager instance;
 
@@ -21,35 +21,18 @@ public class GiftCodeManager {
         return instance;
     }
 
-    public GiftCode checkUseGiftCode(Player player, String code) {
-        for (GiftCode giftCode : listGiftCode) {
-            if (giftCode.code.equals(code)) {
-                if (giftCode.countLeft <= 0) {
-                    Service.gI().sendThongBaoOK(player, "Giftcode đã hết");
-                    return null;
-                } else if (giftCode.isUsedGiftCode(player)) {
-                    Service.gI().sendThongBaoOK(player, "Tham lam!");
-                    return null;
-                }
-                if (InventoryService.gI().getCountEmptyBag(player) < giftCode.detail.size()) {
-                    Service.gI().sendThongBaoOK(player, "Cần tối thiểu " + giftCode.detail.size() + " ô hành trang trống");
-                    return null;
-                }
-                giftCode.countLeft -= 1;
-                player.giftCode.add(code);
-                updateGiftCode(giftCode);
-                return giftCode;
-            }
-        }
+    /** Preview only. Redemption must go through GiftCodeService's transaction. */
+    public synchronized GiftCode checkUseGiftCode(Player player,String raw) {
+        String code=nro.models.player.GiftCode.canonical(raw);
+        for(GiftCode gift:listGiftCode)if(nro.models.player.GiftCode.canonical(gift.code).equals(code))return gift;
         return null;
     }
-
-    public void updateGiftCode(GiftCode giftcode) {
-        try {
-            LocalManager.executeUpdate("update giftcode set count_left = ? where id = ?", giftcode.countLeft, giftcode.id);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    /** Legacy callers may not write a cached quota back over authoritative SQL. */
+    @Deprecated public synchronized void updateGiftCode(GiftCode gift) {}
+    public synchronized void publishClaim(String code,int catalogId,int remaining) {
+        // An older uncertain commit may resolve after a newer claim/reload. Never refill its cache.
+        for(GiftCode gift:listGiftCode)if(gift.id==catalogId&&nro.models.player.GiftCode.canonical(gift.code).equals(code)
+                &&gift.countLeft>=0&&remaining>=0)gift.countLeft=Math.min(gift.countLeft,remaining);
     }
 
     public void checkInfomationGiftCode(Player p) {
@@ -60,7 +43,7 @@ public class GiftCodeManager {
                     .append(giftCode.datecreate).append(", Ngày hết hạn: ").append(giftCode.dateexpired)
                     .append("\n");
         }
-        sb.deleteCharAt(sb.length() - 1);
+        if(sb.length()>0)sb.deleteCharAt(sb.length() - 1);
         NpcService.gI().createTutorial(p, 5073, sb.toString());
     }
 

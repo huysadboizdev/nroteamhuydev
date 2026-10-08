@@ -18,14 +18,14 @@ public class RewardBlackBall {
     public static final int R1S_2 = 21;
     public static final int R2S_1 = 35;
     public static final int R2S_2 = 20;
-    public static final int R3S_1 = 35;
+    public static final int R3S_1 = 35; // KI tối đa
     public static final int R3S_2 = 10;
     public static final int R4S_1 = 10;
     public static final int R4S_2 = 35;
-    public static final int R5S_1 = 35;
+    public static final int R5S_1 = 35; // Hút HP theo sát thương
     public static final int R5S_2 = 20;
     public static final int R5S_3 = 20;
-    public static final int R6S_1 = 40;
+    public static final int R6S_1 = 20; // Giáp phần trăm, theo cơ chế xuyên giáp hiện có
     public static final int R6S_2 = 20;
     public static final int R7S_1 = 14;
     public static final int R7S_2 = 15;

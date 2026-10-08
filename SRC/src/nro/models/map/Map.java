@@ -55,6 +55,7 @@ public class Map implements Runnable {
     public static final byte T_TOP = 2;
     private static final int SIZE = 24;
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+    private ScheduledExecutorService hirudegarnScheduler;
     public final List<BotAttackplayer> bots = new ArrayList<>();
     public List<Player> players = new ArrayList<>();
 
@@ -129,8 +130,10 @@ public class Map implements Runnable {
         switch (this.type) {
             case ConstMap.MAP_OFFLINE ->
                 nZone = 1;
-            case ConstMap.MAP_BLACK_BALL_WAR ->
-                nZone = BlackBallWar.AVAILABLE;
+            case ConstMap.MAP_BLACK_BALL_WAR -> {
+                nZone = BlackBallWar.zonesForMap(this.mapId);
+                maxPlayer = BlackBallWar.MAX_PLAYERS_PER_ZONE;
+            }
             case ConstMap.MAP_MA_BU ->
                 nZone = MajinBuuService.AVAILABLE;
             case ConstMap.MAP_MABU_14H ->
@@ -145,6 +148,7 @@ public class Map implements Runnable {
                 nZone = DestronGas.AVAILABLE;
         }
 
+        if (this.mapId == 126) nZone = nro.models.services.HirudegarnEventService.ZONES;
         for (int i = 0; i < nZone; i++) {
             Zone zone = new Zone(this, i, maxPlayer);
             this.zones.add(zone);
@@ -182,7 +186,19 @@ public class Map implements Runnable {
         this.npcs.add(npc);
     }
 
+    /** Registered by Manager after content initialization; repeated startup calls are harmless. */
+    public synchronized void startHirudegarnEvent() {
+        if (mapId != 126 || hirudegarnScheduler != null) return;
+        hirudegarnScheduler = Executors.newSingleThreadScheduledExecutor(task ->
+                new Thread(task, "hirudegarn-event-126"));
+        hirudegarnScheduler.scheduleAtFixedRate(() -> {
+            try { nro.models.services.HirudegarnEventService.gI().tick(this); }
+            catch (Exception e) { Logger.logException(Map.class, e, "Hirudegarn event tick"); }
+        }, 0, 100, TimeUnit.MILLISECONDS);
+    }
+
     public void run() {
+        startHirudegarnEvent();
         scheduler.scheduleAtFixedRate(() -> {
             try {
                 for (Zone zone : this.zones) {

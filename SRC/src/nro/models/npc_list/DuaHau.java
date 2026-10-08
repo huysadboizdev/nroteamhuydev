@@ -27,6 +27,11 @@ public class DuaHau extends Npc {
 
     @Override
     public void openBaseMenu(Player player) {
+        synchronized(player) {
+        try(var eventPermit=nro.models.event.EventItemPolicy.admit()) {
+        if(player.beforeDispose||nro.models.services.LiveSyncMutationGate.blocked(player))return;
+
+        if(!nro.models.event.EventItemPolicy.isEnabled("hung_vuong")||player.DuaHauEgg==null)return;
         if (player.DuaHauEgg.getSecondDone() <= 0) {
             this.createOtherMenu(player, ConstNpc.CO_THE_THU_HOACH, "Dưa hấu đã chín, bạn có thể thu hoạch!", "Thu hoạch", "Từ chối");
         } else {
@@ -38,10 +43,17 @@ public class DuaHau extends Npc {
             this.createOtherMenu(player, ConstNpc.CHUA_THE_THU_HOACH,
                     "Dưa hấu đang lớn.\nCòn khoảng " + timeFormatted + " nữa sẽ chín.", "Đóng");
         }
-    }
+    
+        }}
+}
 
     @Override
     public void confirmMenu(Player player, int select) {
+        synchronized(player) {
+        try(var eventPermit=nro.models.event.EventItemPolicy.admit()) {
+        if(player.beforeDispose||nro.models.services.LiveSyncMutationGate.blocked(player))return;
+
+        if(!nro.models.event.EventItemPolicy.isEnabled("hung_vuong")||player.DuaHauEgg==null)return;
         switch (player.idMark.getIndexMenu()) {
             case ConstNpc.CO_THE_THU:
                 if (select == 0) {
@@ -49,5 +61,7 @@ public class DuaHau extends Npc {
                 }
                 break;
         }
-    }
+    
+        }}
+}
 }

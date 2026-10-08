@@ -76,32 +76,32 @@ public class ToriBot extends Npc {
             case 0 -> {
                 switch (select) {
                     case 0 ->
-                        createOtherMenu(pl, 1, "Nâng cấp VIP 1 bạn sẽ nhận được\n200 thỏi vàng, 10 phiếu giảm giá 80%\nX3 Kinh nghiệm toàn mùa\nThú cưỡi ve sầu xên hsd 30 ngày\n5 viên đá bảo vệ\nBúa hắc hường hsd 30 ngày",
+                        createOtherMenu(pl, 1, nro.models.services.VipRewardCatalog.description(1),
                                 "50.000\nđiểm mùa [" + pl.getSession().vnd + "]",
                                 "Đóng");
                     case 1 ->
-                        createOtherMenu(pl, 2, "Nâng cấp VIP 2 bạn sẽ nhận được\n500 thỏi vàng, 10 phiếu giảm giá 80%\nX3 Kinh nghiệm toàn mùa\nThú cưỡi ve sầu xên hsd 30 ngày\n10 viên đá bảo vệ\nBúa hắc hường hsd 30 ngày\nCải trang thỏ buma hsd 30 ngày",
+                        createOtherMenu(pl, 2, nro.models.services.VipRewardCatalog.description(2),
                                 "100.000\nđiềm mùa [" + pl.getSession().vnd + "]",
                                 "Đóng");
                     case 2 ->
-                        createOtherMenu(pl, 3, "Nâng cấp VIP 3 bạn sẽ nhận được\n700 thỏi vàng, 10 phiếu giảm giá 80%\nX3 Kinh nghiệm toàn mùa\nThú cưỡi ve sầu xên vĩnh viễn\n30 viên đá bảo vệ\nBúa hắc hường vĩnh viễn\n10 thẻ đội trưởng vàng\nCải trang thỏ buma vĩnh viễn",
+                        createOtherMenu(pl, 3, nro.models.services.VipRewardCatalog.description(3),
                                 "150.000\nđiềm mùa [" + pl.getSession().vnd + "]",
                                 "Đóng");
                     case 3 ->
-                        createOtherMenu(pl, 4, "Nâng cấp VIP 4 bạn sẽ nhận được\n1000 thỏi vàng, 10 phiếu giảm giá 80%\nX3 Kinh nghiệm toàn mùa\nCải trang hắc mị vĩnh viễn\n50 viên đá bảo vệ\nTàu ngầm cam 19 vĩnh viễn\n20 thẻ rồng thần",
+                        createOtherMenu(pl, 4, nro.models.services.VipRewardCatalog.description(4),
                                 "200.000\nđiềm mùa [" + pl.getSession().vnd + "]",
                                 "Đóng");
                 }
             }
 
             case 1 ->
-                BuyVip(pl, 1, 50000);
+                { if (select == 0) BuyVip(pl, 1, 50000); }
             case 2 ->
-                BuyVip(pl, 2, 100000);
+                { if (select == 0) BuyVip(pl, 2, 100000); }
             case 3 ->
-                BuyVip(pl, 3, 150000);
+                { if (select == 0) BuyVip(pl, 3, 150000); }
             case 4 ->
-                BuyVip(pl, 4, 200000);
+                { if (select == 0) BuyVip(pl, 4, 200000); }
         }
     }
 
@@ -128,200 +128,21 @@ public class ToriBot extends Npc {
                 return;
             }
 
+            var rewards=nro.models.services.VipRewardCatalog.prepare(vipLevel);
+            if(!rewards.fits(pl)) {
+                Service.gI().sendThongBao(pl,"Hành trang không đủ chỗ nhận toàn bộ quà VIP hoặc số hồng ngọc vượt giới hạn. Chưa trừ tiền.");
+                return;
+            }
             var purchaseResult=nro.models.database.PlayerDAO.purchase(pl,"vip_"+vipLevel,cost,()-> {
-                if (vipLevel > pl.vip) {
-                    pl.vip = (byte) vipLevel;
-                }
-                pl.vipPurchaseCount++;
-                switch (vipLevel) {
-                    case 1 ->
-                    VIP1(pl);
-                    case 2 ->
-                    VIP2(pl);
-                    case 3 ->
-                    VIP3(pl);
-                    case 4 ->
-                    VIP4(pl);
-                }
-
-                Service.gI().sendThongBao(pl, "Mua VIP " + vipLevel + " thành công! Bạn đã mua " + pl.vipPurchaseCount + "/4 lượt VIP mùa này.");
+                rewards.grant(pl);
+                InventoryService.gI().sendItemBags(pl);
+                Service.gI().sendMoney(pl);
+                Service.gI().sendThongBao(pl,"Mua VIP "+vipLevel+" thành công! Đã nhận đủ quà, lượt mua "+pl.vipPurchaseCount+"/4."
+                    +(rewards.storedInChest()?" Hành trang đầy; nhận quà vật phẩm tại Thượng Đế → Quay số → Rương phụ.":""));
                 openBaseMenu(pl);
             });
             nro.models.database.PlayerDAO.notifyWalletPurchaseResult(pl,purchaseResult);
         }
     }
 
-    private void VIP1(Player pl) {
-        long currentTime = System.currentTimeMillis();
-        long time = 30L * 24 * 60 * 60 * 1000;
-
-        if (pl.timevip < currentTime) {
-            pl.timevip = currentTime + time;
-        } else {
-            pl.timevip += time;
-        }
-
-        Item gold = ItemService.gI().createNewItem((short) 457, 200);
-
-        Item coupon = ItemService.gI().createNewItem((short) 459, 10);
-
-        Item mount = ItemService.gI().createNewItem((short) 1252);
-        mount.itemOptions.add(new ItemOption(50, 10));
-        mount.itemOptions.add(new ItemOption(77, 10));
-        mount.itemOptions.add(new ItemOption(103, 10));
-        mount.itemOptions.add(new ItemOption(93, 30)); // HSD 30 ngày
-
-        Item hammer = ItemService.gI().createNewItem((short) 1256);
-        hammer.itemOptions.add(new ItemOption(50, 10));
-        hammer.itemOptions.add(new ItemOption(77, 10));
-        hammer.itemOptions.add(new ItemOption(103, 10));
-        hammer.itemOptions.add(new ItemOption(93, 30)); // HSD 30 ngày
-
-        Item protectStone = ItemService.gI().createNewItem((short) 987, 5);
-
-
-        // Thêm toàn bộ vật phẩm vào túi đồ của người chơi
-        InventoryService.gI().addItemBag(pl, gold);
-        InventoryService.gI().addItemBag(pl, coupon);
-        InventoryService.gI().addItemBag(pl, mount);
-        InventoryService.gI().addItemBag(pl, hammer);
-        InventoryService.gI().addItemBag(pl, protectStone);
-
-        InventoryService.gI().sendItemBags(pl);
-    }
-
-    private void VIP2(Player pl) {
-        long currentTime = System.currentTimeMillis();
-        long time = 30L * 24 * 60 * 60 * 1000;
-
-        if (pl.timevip < currentTime) {
-            pl.timevip = currentTime + time;
-        } else {
-            pl.timevip += time;
-        }
-
-        Item gold = ItemService.gI().createNewItem((short) 457, 500);
-
-        Item coupon = ItemService.gI().createNewItem((short) 459, 10);
-
-        Item mount = ItemService.gI().createNewItem((short) 1252);
-        mount.itemOptions.add(new ItemOption(50, 12));
-        mount.itemOptions.add(new ItemOption(77, 12));
-        mount.itemOptions.add(new ItemOption(103, 12));
-        mount.itemOptions.add(new ItemOption(93, 30)); // HSD 30 ngày
-
-        Item hammer = ItemService.gI().createNewItem((short) 1254);
-        hammer.itemOptions.add(new ItemOption(50, 12));
-        hammer.itemOptions.add(new ItemOption(77, 12));
-        hammer.itemOptions.add(new ItemOption(103, 12));
-        hammer.itemOptions.add(new ItemOption(93, 30)); // HSD 30 ngày
-
-        Item protectStone = ItemService.gI().createNewItem((short) 987, 10);
-
-        Item CaiTrang = ItemService.gI().createNewItem((short) 584);
-        CaiTrang.itemOptions.add(new ItemOption(50, 24));
-        CaiTrang.itemOptions.add(new ItemOption(77, 24));
-        CaiTrang.itemOptions.add(new ItemOption(117, 15));
-        CaiTrang.itemOptions.add(new ItemOption(93, 30)); // HSD 30 ngày
-
-        InventoryService.gI().addItemBag(pl, gold);
-        InventoryService.gI().addItemBag(pl, coupon);
-        InventoryService.gI().addItemBag(pl, mount);
-        InventoryService.gI().addItemBag(pl, hammer);
-        InventoryService.gI().addItemBag(pl, protectStone);
-        InventoryService.gI().addItemBag(pl, CaiTrang);
-
-        InventoryService.gI().sendItemBags(pl);
-    }
-
-    private void VIP3(Player pl) {
-        long currentTime = System.currentTimeMillis();
-        long time = 30L * 24 * 60 * 60 * 1000;
-
-        if (pl.timevip < currentTime) {
-            pl.timevip = currentTime + time;
-        } else {
-            pl.timevip += time;
-        }
-
-        Item gold = ItemService.gI().createNewItem((short) 457, 700);
-
-        Item coupon = ItemService.gI().createNewItem((short) 459, 10);
-
-        Item mount = ItemService.gI().createNewItem((short) 1252);
-        mount.itemOptions.add(new ItemOption(50, 12));
-        mount.itemOptions.add(new ItemOption(77, 12));
-        mount.itemOptions.add(new ItemOption(103, 12));
-
-        Item hammer = ItemService.gI().createNewItem((short) 1254);
-        hammer.itemOptions.add(new ItemOption(50, 12));
-        hammer.itemOptions.add(new ItemOption(77, 12));
-        hammer.itemOptions.add(new ItemOption(103, 12));
-
-        Item protectStone = ItemService.gI().createNewItem((short) 987, 30);
-
-        Item CaiTrang = ItemService.gI().createNewItem((short) 584);
-        CaiTrang.itemOptions.add(new ItemOption(50, 24));
-        CaiTrang.itemOptions.add(new ItemOption(77, 24));
-        CaiTrang.itemOptions.add(new ItemOption(117, 15));
-
-        Item captainCard = ItemService.gI().createNewItem((short) 956, 10);
-
-        InventoryService.gI().addItemBag(pl, gold);
-        InventoryService.gI().addItemBag(pl, coupon);
-        InventoryService.gI().addItemBag(pl, mount);
-        InventoryService.gI().addItemBag(pl, hammer);
-        InventoryService.gI().addItemBag(pl, protectStone);
-        InventoryService.gI().addItemBag(pl, CaiTrang);
-        InventoryService.gI().addItemBag(pl, captainCard);
-
-        InventoryService.gI().sendItemBags(pl);
-    }
-
-    private void VIP4(Player pl) {
-        long currentTime = System.currentTimeMillis();
-        long time = 30L * 24 * 60 * 60 * 1000;
-
-        if (pl.timevip < currentTime) {
-            pl.timevip = currentTime + time;
-        } else {
-            pl.timevip += time;
-        }
-
-        Item gold = ItemService.gI().createNewItem((short) 457, 1000);
-
-        Item coupon = ItemService.gI().createNewItem((short) 459, 10);
-
-        Item protectStone = ItemService.gI().createNewItem((short) 987, 50);
-
-        Item submarine = ItemService.gI().createNewItem((short) 1554); // tàu ngầm cam 19 vĩnh viễn
-        submarine.itemOptions.add(new ItemOption(50, 15));
-        submarine.itemOptions.add(new ItemOption(77, 15));
-        submarine.itemOptions.add(new ItemOption(103, 15));
-        submarine.itemOptions.add(new ItemOption(14, 10));
-
-        Item hammer = ItemService.gI().createNewItem((short) 1772); // búa vĩnh viễn
-        hammer.itemOptions.add(new ItemOption(50, 15));
-        hammer.itemOptions.add(new ItemOption(77, 15));
-        hammer.itemOptions.add(new ItemOption(103, 15));
-        hammer.itemOptions.add(new ItemOption(236, 15)); // Kháng tất cả
-
-        Item CaiTrang = ItemService.gI().createNewItem((short) 1557);
-        CaiTrang.itemOptions.add(new ItemOption(50, 25));
-        CaiTrang.itemOptions.add(new ItemOption(77, 25));
-        CaiTrang.itemOptions.add(new ItemOption(117, 25)); // HP
-        CaiTrang.itemOptions.add(new ItemOption(236, 25)); // Kháng tất cả
-
-        Item dragonCard = ItemService.gI().createNewItem((short) 1204, 20); // 20 thẻ rồng thần
-
-        InventoryService.gI().addItemBag(pl, gold);
-        InventoryService.gI().addItemBag(pl, coupon);
-        InventoryService.gI().addItemBag(pl, protectStone);
-        InventoryService.gI().addItemBag(pl, submarine);
-        InventoryService.gI().addItemBag(pl, hammer);
-        InventoryService.gI().addItemBag(pl, CaiTrang);
-        InventoryService.gI().addItemBag(pl, dragonCard);
-
-        InventoryService.gI().sendItemBags(pl);
-    }
 }

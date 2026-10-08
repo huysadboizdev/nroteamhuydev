@@ -95,6 +95,8 @@ public class NPoint {
     public List<Integer> tlHp, tlMp;
     /** Eligibility used by the most recent point calculation, never persisted. */
     public boolean hasDragonPetCollectionBonus;
+    public boolean hasCollectionChestBonus;
+    public int whisWeeklyBonusPercent;
 
     /**
      * Tỉ lệ giáp cộng thêm
@@ -230,15 +232,16 @@ public class NPoint {
 
     private void setPointWhenWearClothes() {
         resetPoint();
-        if (this.player.rewardBlackBall.timeOutOfDateReward[2] > System.currentTimeMillis()) {
-            tlHutHp += RewardBlackBall.R3S_1;
+        this.whisWeeklyBonusPercent = !player.isPet && !player.isBoss && !player.isBot && !player.isNewPet
+                ? nro.models.services.WhisWeeklyService.gI().bonusPercent(player.id) : 0;
+        if (this.player.rewardBlackBall.timeOutOfDateReward[4] > System.currentTimeMillis()) {
+            tlHutHp += RewardBlackBall.R5S_1;
         }
         if (this.player.rewardBlackBall.timeOutOfDateReward[3] > System.currentTimeMillis()) {
             tlPST += RewardBlackBall.R4S_2;
         }
-        if (this.player.rewardBlackBall.timeOutOfDateReward[4] > System.currentTimeMillis()) {
-            tlDameCrit.add(RewardBlackBall.R5S_1);
-            tlSDCM += RewardBlackBall.R5S_1;
+        if (this.player.rewardBlackBall.timeOutOfDateReward[5] > System.currentTimeMillis()) {
+            tlGiap += RewardBlackBall.R6S_1;
         }
         if (this.player.rewardBlackBall.timeOutOfDateReward[6] > System.currentTimeMillis()) {
             tlNeDon += RewardBlackBall.R7S_1;
@@ -479,6 +482,8 @@ public class NPoint {
             this.tlMp.add(10);
             this.tlDame.add(10);
         }
+        this.hasCollectionChestBonus = !player.isPet && !player.isBoss && !player.isBot && !player.isNewPet
+                && nro.models.item.CollectionChestRules.hasBonus(player.inventory);
         setBasePoint();
         setOutfitFusion();
         setSpeed();
@@ -957,6 +962,8 @@ public class NPoint {
             }
         }
 
+        if (this.hasCollectionChestBonus) hpMax += hpMax * 3 / 100L;
+        hpMax = nro.models.services.WhisWeeklyPolicy.applyBonus(hpMax, this.whisWeeklyBonusPercent);
         if (hpMax > 2_147_483_647) {
             hpMax = 2_147_483_647;
         }
@@ -983,9 +990,9 @@ public class NPoint {
             mpMax += (mpMax * 15L / 100L);
         }
 
-        // Xử lý ngọc rồng đen 6 sao
-        if (this.player.rewardBlackBall.timeOutOfDateReward[5] > System.currentTimeMillis()) {
-            mpMax += (mpMax * RewardBlackBall.R6S_1 / 100L);
+        // Xử lý ngọc rồng đen 3 sao
+        if (this.player.rewardBlackBall.timeOutOfDateReward[2] > System.currentTimeMillis()) {
+            mpMax += (mpMax * RewardBlackBall.R3S_1 / 100L);
         }
 
         // Xử lý set worldcup
@@ -1051,6 +1058,8 @@ public class NPoint {
             }
         }
 
+        if (this.hasCollectionChestBonus) mpMax += mpMax * 3 / 100L;
+        mpMax = nro.models.services.WhisWeeklyPolicy.applyBonus(mpMax, this.whisWeeklyBonusPercent);
         if (mpMax
                 > 2_147_483_647) {
             mpMax = 2_147_483_647;
@@ -1209,6 +1218,8 @@ public class NPoint {
             dame /= 2;
         }
 
+        if (this.hasCollectionChestBonus) dame += dame * 3 / 100L;
+        dame = nro.models.services.WhisWeeklyPolicy.applyBonus(dame, this.whisWeeklyBonusPercent);
         if (dame > 2_147_483_647) {
             dame = 2_147_483_647;
         }
@@ -1252,6 +1263,7 @@ public class NPoint {
 
     private void resetPoint() {
         this.hasDragonPetCollectionBonus = false;
+        this.hasCollectionChestBonus = false;
         this.voHieuChuong = 0;
         this.hpAdd = 0;
         this.mpAdd = 0;
@@ -1585,10 +1597,13 @@ public class NPoint {
     }
 
     public void subHP(long sub) {
-        this.hp -= sub;
-        if (this.hp <= 0) {
-            this.hp = 0;
+        if (sub <= 0) {
+            return;
+        }
+        if (sub >= this.hp) {
             this.setHp(0);
+        } else {
+            this.hp -= (int) sub;
         }
     }
 
@@ -1608,54 +1623,54 @@ public class NPoint {
             if (this.tlTNSM != null) {
                 for (Integer tl : this.tlTNSM) {
                     if (tl != null) {
-                        tiemNang += ((long) tiemNang * tl / 100);
+                        tiemNang = ExpArithmetic.add(tiemNang, ExpArithmetic.percent(tiemNang, tl));
                     }
                 }
             }
             long tn = tiemNang;
             if (this.player.charms.tdTriTue > System.currentTimeMillis()) {
-                tiemNang += tn;
+                tiemNang = ExpArithmetic.add(tiemNang, tn);
             }
             if (this.player.charms.tdTriTue3 > System.currentTimeMillis()) {
-                tiemNang += tn * 3;
+                tiemNang = ExpArithmetic.add(tiemNang, ExpArithmetic.multiply(tn, 3));
             }
             if (this.player.charms.tdTriTue4 > System.currentTimeMillis()) {
-                tiemNang += tn * 4;
+                tiemNang = ExpArithmetic.add(tiemNang, ExpArithmetic.multiply(tn, 4));
             }
             if (this.player.charms.tdTriTue4 > System.currentTimeMillis()) {
-                tiemNang += tn * 4;
+                tiemNang = ExpArithmetic.add(tiemNang, ExpArithmetic.multiply(tn, 4));
             }
             if (this.player.timevip > System.currentTimeMillis()) {
-                tiemNang += tn * 3;
+                tiemNang = ExpArithmetic.add(tiemNang, ExpArithmetic.multiply(tn, 3));
             }
             if (this.player.effectSkill.isChibi && this.player.typeChibi == 2) {
-                tiemNang += tn * 2;
+                tiemNang = ExpArithmetic.add(tiemNang, ExpArithmetic.multiply(tn, 2));
             }
             if (this.player.getSession() != null && this.player.getSession().vip > 0 || this.player.isPet
                     && ((Pet) this.player).master.getSession() != null && ((Pet) this.player).master.getSession().vip > 0) {
-                tiemNang += tn * 3;
+                tiemNang = ExpArithmetic.add(tiemNang, ExpArithmetic.multiply(tn, 3));
             }
             if (this.player.itemTime != null && this.player.itemTime.isUseDK) {
-                tiemNang += tn * 2;
+                tiemNang = ExpArithmetic.add(tiemNang, ExpArithmetic.multiply(tn, 2));
             }
             if (player.zone.map.mapId >= 135 && player.zone.map.mapId <= 138) {
                 if (this.player.itemTime != null && this.player.itemTime.isUseKhoBauX2) {
-                    tiemNang += tn * 2;
+                    tiemNang = ExpArithmetic.add(tiemNang, ExpArithmetic.multiply(tn, 2));
                 }
             }
             if (this.player.satellite != null && this.player.satellite.isIntelligent) {
-                tiemNang += tn / 5;
+                tiemNang = ExpArithmetic.add(tiemNang, tn / 5);
             }
             if (this.intrinsic != null && this.intrinsic.id == 24) {
-                tiemNang += ((long) tiemNang * this.intrinsic.param1 / 100);
+                tiemNang = ExpArithmetic.add(tiemNang, ExpArithmetic.percent(tiemNang, this.intrinsic.param1));
             }
             if (this.power >= 60_000_000_000L) {
-                tiemNang -= ((long) tiemNang * 80 / 100);
+                tiemNang -= ExpArithmetic.percent(tiemNang, 80);
             }
             if (this.player instanceof Pet && ((Pet) this.player).master != null) {
                 Player master = ((Pet) this.player).master;
                 if (master.itemTime != null && master.itemTime.isUseBuaSanta) {
-                    tiemNang += tn * 2;
+                    tiemNang = ExpArithmetic.add(tiemNang, ExpArithmetic.multiply(tn, 2));
                 }
                 if (master.nPoint != null && master.nPoint.tlTNSMPet > 0) {
                     int bonus = master.nPoint.tlTNSMPet;
@@ -1673,16 +1688,16 @@ public class NPoint {
                 //  tiemNang *= 10; //x x3 tiềm năng toàn server
             }
             if (MapService.gI().isMapBanDoKhoBau(this.player.zone.map.mapId)) {
-                tiemNang *= 1.5;
+                tiemNang = ExpArithmetic.add(tiemNang, tiemNang / 2);
             }
             if (this.player.cFlag != 0) {
                 if (this.player.cFlag == 8) {
-                    tiemNang += ((long) tiemNang * 10 / 100);
+                    tiemNang = ExpArithmetic.add(tiemNang, ExpArithmetic.percent(tiemNang, 10));
                 } else {
-                    tiemNang += ((long) tiemNang * 5 / 100);
+                    tiemNang = ExpArithmetic.add(tiemNang, ExpArithmetic.percent(tiemNang, 5));
                 }
             }
-            tiemNang *= Manager.RATE_EXP_SERVER;
+            tiemNang = ExpArithmetic.multiply(tiemNang, Manager.RATE_EXP_SERVER);
             tiemNang = calSubTNSM(tiemNang);
             if (tiemNang <= 0) {
                 tiemNang = 1;
@@ -1722,11 +1737,17 @@ public class NPoint {
 
     public int subDameInjureWithDeff(long dame) {
         long def = this.def;
+        if (def > 0 && dame < Long.MIN_VALUE + def) {
+            return 1;
+        }
+        if (def < 0 && dame > Long.MAX_VALUE + def) {
+            return Integer.MAX_VALUE;
+        }
         dame -= def;
         if (dame < 0) {
             dame = 1;
         }
-        return (int) dame;
+        return (int) Math.min(Integer.MAX_VALUE, dame);
     }
 
     /*------------------------------------------------------------------------*/

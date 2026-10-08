@@ -149,6 +149,8 @@ public class NpcFactory {
                     new BaHatMit(mapId, status, cx, cy, tempId, avatar);
                 case ConstNpc.RUONG_DO ->
                     new RuongDo(mapId, status, cx, cy, tempId, avatar);
+                case ConstNpc.RUONG_SUU_TAM ->
+                    new nro.models.npc_list.RuongSuuTam(mapId, status, cx, cy, tempId, avatar);
                 case ConstNpc.DR_MYUU ->
                     new DrMyuu(mapId, status, cx, cy, tempId, avatar);
                 case ConstNpc.DAU_THAN ->
@@ -266,7 +268,7 @@ public class NpcFactory {
                         break;
                     case ConstNpc.SHENRON_NAMEK_CONFIRM:
                         if (select == 0) {
-                            SummonDragonNamek.gI().confirmWish();
+                            SummonDragonNamek.gI().confirmWish(player);
                         } else if (select == 1) {
                             SummonDragonNamek.gI().sendBlackGokuhesNamec(player);
                         }

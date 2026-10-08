@@ -36,6 +36,7 @@ public class DestronGas implements Runnable {
 
     public Clan clan;
     public volatile boolean isOpened;
+    public volatile boolean isInitializing;
     public volatile boolean isClosing;
     private boolean achievementRecorded;
     private boolean bossesRetired;
@@ -66,6 +67,7 @@ public class DestronGas implements Runnable {
     }
 
     public synchronized void update() {
+        if (isInitializing) return;
         if (isOpened) {
             if (isClosing || Util.canDoWithTime(lastTimeOpen, TIME_KHI_GAS_HUY_DIET) || (kickoutkghd && Util.canDoWithTime(timeKickOutKGHD, 60000))) {
                 isClosing = true;
@@ -142,10 +144,15 @@ public class DestronGas implements Runnable {
             for (Zone zone : zones) if (zone != null) zone.dungeonClosing = false;
             this.isOpened = true;
             this.init();
+            this.isInitializing = false;
             sendTextKhiGasHuyDiet();
         } catch (Exception e) {
-            plOpen.clan.lastTimeOpenKhiGasHuyDiet = 0;
-            this.dispose();
+            clan.lastTimeOpenKhiGasHuyDiet = 0;
+            synchronized (this) {
+                this.isClosing = true;
+                this.isInitializing = false;
+                this.dispose();
+            }
         }
     }
 
@@ -308,11 +315,14 @@ public class DestronGas implements Runnable {
         }
         this.removeTextKhiGasHuyDiet();
         this.bosses.clear();
+        synchronized (nro.models.services_dungeon.DungeonAllocationLock.LOCK) {
         this.isOpened = false;
         if (this.clan != null && this.clan.KhiGasHuyDiet == this) this.clan.KhiGasHuyDiet = null;
         this.clan = null;
         this.kickoutkghd = false;
         this.hatchiyatchDead = false;
         this.callBoss = false;
+        this.isInitializing = false;
+        }
     }
 }

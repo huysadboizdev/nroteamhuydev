@@ -36,8 +36,10 @@ public class Whis extends Npc {
         switch (this.mapId) {
             case 154 ->
                 createOtherMenu(player, ConstNpc.BASE_MENU,
-                        "Thử đánh với ta xem nào.\nNgươi còn 1 lượt nữa cơ mà.",
-                        "Nói chuyện", "Học\ntuyệt kỹ", "Top 100", "[LV:" + (player.traning.getTop() + 1) + "]");
+                        "Thử đánh với ta xem nào.\nTop tuần chốt thứ Hai 00:00 giờ Việt Nam."
+                        + "\nTop 1/2/3 nhận 5%/4%/3% sức đánh, HP, KI trong tuần kế tiếp."
+                        + "\nBonus tuần này của ngươi: " + nro.models.services.WhisWeeklyService.gI().bonusPercent(player.id) + "%.",
+                        "Nói chuyện", "Học\ntuyệt kỹ", "Top tuần", "[LV:" + ((long)player.traning.getTop() + 1) + "]");
             case 164 ->
                 createOtherMenu(player, ConstNpc.BASE_MENU,
                         "Ta có thể giúp gì cho ngươi?", "Quay về", "Từ chối");
@@ -61,6 +63,8 @@ public class Whis extends Npc {
                 case CombineService.CHE_TAO_TRANG_BI_THIEN_SU -> {
                     if (select == 0) {
                         CombineService.gI().startCombine(player);
+                    } else {
+                        nro.models.combine.CheTaoTrangBiThienSu.cancel(player);
                     }
                 }
                 case 6 ->
@@ -83,7 +87,7 @@ public class Whis extends Npc {
                 }
             }
             case 2 ->
-                Service.gI().showListTop(player, Manager.Topwhis);
+                Service.gI().showListTop(player, nro.models.services.WhisWeeklyService.gI().top());
             case 1 ->
                 showSkillLearningMenu(player, biKiepTuyetKy);
             case 3 ->

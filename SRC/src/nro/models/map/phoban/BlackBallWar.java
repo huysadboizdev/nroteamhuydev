@@ -40,7 +40,14 @@ public class BlackBallWar implements Runnable {
     public static final byte HOUR_CLOSE = 21;
     public static final byte MIN_CLOSE = 0;
     public static final byte SECOND_CLOSE = 0;
-    public static final int AVAILABLE = 5;
+    public static final int MAX_PLAYERS_PER_ZONE = 50;
+
+    public static int zonesForMap(int mapId) {
+        if (mapId < 85 || mapId > 91) {
+            throw new IllegalArgumentException("Not a black ball map: " + mapId);
+        }
+        return mapId <= 87 ? 2 : 3;
+    }
     private static final int TIME_WIN = 300000;
 
     private final Zone zone;

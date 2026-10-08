@@ -59,7 +59,7 @@ public class Item {
     }
 
     public String getContent() {
-        return "Yêu cầu sức mạnh " + this.template.strRequire + " trở lên";
+        return "Yêu cầu sức mạnh " + (this.template.id>=555&&this.template.id<=567?ItemDefaultOptions.requiredPower(this):this.template.strRequire) + " trở lên";
     }
 
     public void dispose() {

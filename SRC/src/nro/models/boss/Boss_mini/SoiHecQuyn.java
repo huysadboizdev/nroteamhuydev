@@ -12,6 +12,10 @@ import nro.models.map.ItemMap;
 import nro.models.map.Zone;
 import nro.models.player.Player;
 import nro.models.services.Service;
+import nro.models.services.SkillService;
+import nro.models.services.InventoryService;
+import nro.models.services.MiniBossPinkCapsuleDrop;
+import nro.models.item.Item;
 import nro.models.map.service.ChangeMapService;
 import nro.models.task.BadgesTaskService;
 import nro.models.utils.Logger;
@@ -19,19 +23,33 @@ import nro.models.utils.Util;
 
 public class SoiHecQuyn extends Boss {
 
+    private nro.models.services.MiniBossPinkCapsuleDrop capsuleReward;
+
+    @Override
+    protected synchronized void resetBase() {
+        super.resetBase();
+        if (capsuleReward != null) capsuleReward.reset();
+    }
+
     private long lastTimeDrop;
     private long st;
     private int timeLeave;
-    private boolean KiemTraNhatXuong = false;
+    private volatile boolean KiemTraNhatXuong = false;
     private long ThoiGianNhatXuong = 0;
     private long lastTimRestPawn;
+    private long lastBoneNotice;
+    private long lastBoneNoticeOwner;
 
     public SoiHecQuyn() throws Exception {
-        super(BossID.SOI_HEC_QUYN1, BossesData.SOI_HEC_QUYN);
+        super(MiniBossIdentity.nextId(), BossesData.SOI_HEC_QUYN);
     }
 
     @Override
     public void joinMap() {
+        this.ThoiGianNhatXuong = 0;
+        this.KiemTraNhatXuong = false;
+        st = System.currentTimeMillis();
+        timeLeave = Util.nextInt(100000, 300000);
         if (zoneFinal != null) {
             joinMapByZone(zoneFinal);
             this.changeStatus(BossStatus.CHAT_S);
@@ -57,7 +75,9 @@ public class SoiHecQuyn extends Boss {
 
                 // Lọc các zone thỏa mãn điều kiện: số lượng người chơi <= 10 và không có boss
                 for (Zone zone : this.zone.map.zones) {
-                    if (zone.getNumOfPlayers() <= 10 && !BossManager.gI().checkBosses(zone, BossID.SOI_HEC_QUYN)) {
+                    if (zone.getNumOfPlayers() <= 10 && BossManager.gI().getBosses().stream()
+                            .noneMatch(boss -> boss != this && boss instanceof SoiHecQuyn
+                                    && boss.zone == zone && !boss.isDie())) {
                         availableZones.add(zone);
                     }
                 }
@@ -108,7 +128,8 @@ public class SoiHecQuyn extends Boss {
 
     @Override
     public void autoLeaveMap() {
-        if (Util.canDoWithTime(st, timeLeave)) {
+        if (KiemTraNhatXuong && Util.canDoWithTime(ThoiGianNhatXuong, 5000)
+                || !KiemTraNhatXuong && Util.canDoWithTime(st, timeLeave)) {
             this.leaveMapNew();
         }
     }
@@ -123,9 +144,8 @@ public class SoiHecQuyn extends Boss {
     }
 
     public void NhatXuong() {
-        KiemTraNhatXuong = true;
         ThoiGianNhatXuong = System.currentTimeMillis();
-
+        KiemTraNhatXuong = true;
     }
 
     public boolean KiemTraNhatXuong() {
@@ -134,11 +154,14 @@ public class SoiHecQuyn extends Boss {
 
     @Override
     public void attack() {
+        if (KiemTraNhatXuong) {
+            return;
+        }
         if (Util.canDoWithTime(this.lastTimeAttack, 100)) {
             this.lastTimeAttack = System.currentTimeMillis();
             try {
                 Player pl = getPlayerAttack();
-                if (pl == null || pl.location == null) {
+                if (pl == null || pl.location == null || pl.isDie()) {
                     return;
                 }
                 this.playerSkill.skillSelect = this.playerSkill.skills.get(Util.nextInt(0, this.playerSkill.skills.size() - 1));
@@ -150,19 +173,12 @@ public class SoiHecQuyn extends Boss {
                         } else {
                             this.moveTo(pl.location.x + (Util.getOne(-1, 1) * Util.nextInt(10, 40)), pl.location.y);
                         }
-                    } else if (Util.getDistance(this, pl) <= 50) {
-
                     }
+                    SkillService.gI().useSkill(this, pl, null, -1, null);
                     checkPlayerDie(pl);
                 } else {
                     if (Util.isTrue(1, 2)) {
                         this.moveToPlayer(pl);
-                    }
-                }
-                if (ThoiGianNhatXuong > 0) {
-                    if (Util.canDoWithTime(ThoiGianNhatXuong, 5000)) {
-                        ThoiGianNhatXuong = 0;
-                        KiemTraNhatXuong = false;
                     }
                 }
             } catch (Exception ex) {
@@ -171,28 +187,73 @@ public class SoiHecQuyn extends Boss {
     }
 
     @Override
-    public synchronized int injured(Player plAtt, long damage, boolean piercing, boolean isMobAttack) {
-        return 0;
+    public int injured(Player plAtt, long damage, boolean piercing, boolean isMobAttack) {
+        Player owner = MiniBossPinkCapsuleDrop.creditedPlayer(plAtt);
+        if (owner == null) {
+            synchronized (this) {
+                return KiemTraNhatXuong || damage <= 0 ? 0 : super.injured(plAtt, damage, piercing, isMobAttack);
+            }
+        }
+        // Feeding and attacks use the same owner -> boss lock order.
+        synchronized (owner) {
+            synchronized (this) {
+                if (KiemTraNhatXuong || damage <= 0 || isDie()) return 0;
+                int bonePlace = bonePlace(owner);
+                if (bonePlace != 0) {
+                    if (lastBoneNoticeOwner != owner.id || Util.canDoWithTime(lastBoneNotice, 2000)) {
+                        Service.gI().sendThongBao(owner, bonePlace == 2
+                                ? "Bạn có Cục xương trong rương. Hãy lấy ra hành trang và dùng để cho Sói hẹc quyn ăn."
+                                : "Hãy dùng Cục xương trong hành trang để cho Sói hẹc quyn ăn.");
+                        lastBoneNotice = System.currentTimeMillis();
+                        lastBoneNoticeOwner = owner.id;
+                    }
+                    return 0;
+                }
+                return super.injured(plAtt, damage, piercing, isMobAttack);
+            }
+        }
+    }
+
+    private int bonePlace(Player owner) {
+        if (owner.inventory == null) return 0;
+        if (containsBone(owner.inventory.itemsBag)) return 1;
+        return containsBone(owner.inventory.itemsBox) ? 2 : 0;
+    }
+
+    private boolean containsBone(List<Item> items) {
+        if (items == null) return false;
+        for (Item item : items) {
+            if (item != null && item.template != null && item.template.id == 460
+                    && InventoryService.gI().isBillIngredientUsable(item)) return true;
+        }
+        return false;
     }
 
     @Override
     public void reward(Player plKill) {
-        try {
-            int[] itemDropIds = {1591, 1594};
-            for (int itemId : itemDropIds) {
-                int x = this.location.x + Util.nextInt(-20, 20);
-                int y = this.zone.map.yPhysicInTop(x, this.location.y - 24);
+        plKill = nro.models.services.MiniBossPinkCapsuleDrop.creditedPlayer(plKill);
+        if (plKill == null) return;
+        synchronized (plKill) {
+            synchronized (this) {
+                if (capsuleReward == null) capsuleReward = new nro.models.services.MiniBossPinkCapsuleDrop();
+                if (!capsuleReward.drop(this, plKill)) return;
+                try {
+                    int[] itemDropIds = {1591, 1594};
+                    for (int itemId : itemDropIds) {
+                        int x = this.location.x + Util.nextInt(-20, 20);
+                        int y = this.zone.map.yPhysicInTop(x, this.location.y - 24);
 
-                ItemMap itemMap = new ItemMap(this.zone, itemId, 1, x, y, plKill.id);
-                Service.gI().dropItemMap(this.zone, itemMap);
+                        ItemMap itemMap = new ItemMap(this.zone, itemId, 1, x, y, plKill.id);
+                        Service.gI().dropItemMap(this.zone, itemMap);
+                    }
+                    BadgesTaskService.updateCountBagesTask(plKill, ConstTaskBadges.KE_THAO_TUNG_SOI, 1);
+                    int diem = 5;
+                    plKill.event.addEventPoint(diem);
+                    Service.gI().sendThongBao(plKill, "+5 Point");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
-            BadgesTaskService.updateCountBagesTask(plKill, ConstTaskBadges.KE_THAO_TUNG_SOI, 1);
-            int diem = 5;
-            plKill.event.addEventPoint(diem);
-            Service.gI().sendThongBao(plKill, "+5 Point");
-
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 

@@ -8,6 +8,7 @@ SRC/20.jar
 log/
 SRC/log/
 SRC/data/boss-notice-outbox/
+/data/boss-notice-outbox/
 *.class
 *.log
 *.pid

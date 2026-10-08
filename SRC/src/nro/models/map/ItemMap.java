@@ -9,14 +9,13 @@ import nro.models.utils.Util;
 import nro.models.map.service.ItemMapService;
 import nro.models.services.ItemService;
 import nro.models.map.service.MapService;
-import nro.models.services.PlayerService;
 import nro.models.services.Service;
 
 public class ItemMap {
 
-    public Zone zone;
+    public volatile Zone zone;
     public int itemMapId;
-    public ItemTemplate itemTemplate;
+    public volatile ItemTemplate itemTemplate;
     public int quantity;
 
     public int x;
@@ -40,11 +39,14 @@ public class ItemMap {
     }
 
     public ItemMap(Zone zone, int tempId, int quantity, int x, int y, long playerId, boolean keepOwnerUntilDespawn) {
+        this(zone, tempId, quantity, x, y, playerId, keepOwnerUntilDespawn, List.of());
+    }
+
+    /** Installs independent options before addItem exposes this drop to pickup or zone snapshots. */
+    public ItemMap(Zone zone, int tempId, int quantity, int x, int y, long playerId,
+            boolean keepOwnerUntilDespawn, List<ItemOption> initialOptions) {
         this.zone = zone;
-        this.itemMapId = zone.countItemAppeaerd++;
-        if (zone.countItemAppeaerd >= 2000000000) {
-            zone.countItemAppeaerd = 0;
-        }
+        this.itemMapId = allocateItemMapId(zone);
         this.itemTemplate = ItemService.gI().getTemplate((short) tempId);
         this.quantity = quantity;
         this.x = x;
@@ -53,6 +55,7 @@ public class ItemMap {
         this.playerId = keepOwnerUntilDespawn ? playerId : playerId != -1 ? Math.abs(playerId) : playerId;
         this.createTime = System.currentTimeMillis();
         this.options = new ArrayList<>();
+        for (ItemOption option : initialOptions) this.options.add(new ItemOption(option));
         this.isBlackBall = ItemMapService.gI().isBlackBall(this.itemTemplate.id);
         this.isNamecBall = ItemMapService.gI().isNamecBall(this.itemTemplate.id);
         this.lastTimeMoveToPlayer = System.currentTimeMillis();
@@ -61,10 +64,7 @@ public class ItemMap {
 
     public ItemMap(Zone zone, ItemTemplate temp, int quantity, int x, int y, long playerId) {
         this.zone = zone;
-        this.itemMapId = zone.countItemAppeaerd++;
-        if (zone.countItemAppeaerd >= 2000000000) {
-            zone.countItemAppeaerd = 0;
-        }
+        this.itemMapId = allocateItemMapId(zone);
         this.itemTemplate = temp;
         this.quantity = quantity;
         this.x = x;
@@ -76,6 +76,14 @@ public class ItemMap {
         this.isNamecBall = ItemMapService.gI().isNamecBall(this.itemTemplate.id);
         this.lastTimeMoveToPlayer = System.currentTimeMillis();
         this.zone.addItem(this);
+    }
+
+    private static int allocateItemMapId(Zone zone) {
+        synchronized (zone) {
+            int id = zone.countItemAppeaerd++;
+            if (zone.countItemAppeaerd >= 2000000000) zone.countItemAppeaerd = 0;
+            return id;
+        }
     }
 
     public ItemMap(ItemMap itemMap) {
@@ -115,7 +123,8 @@ public class ItemMap {
 
             //========================SATELLITE========================
             if (this.itemTemplate.type == 22) {
-                satelliteUpdate();
+                nro.models.services.SatelliteService.update(this);
+                return;
             }
             if (!keepOwnerUntilDespawn && Util.canDoWithTime(createTime, 45000)) {
                 if (this.itemTemplate.type != 22 && this.itemTemplate.id != 726 && this.itemTemplate.id != 992) {
@@ -148,48 +157,6 @@ public class ItemMap {
             }
         }
         return false;
-    }
-
-    private void satelliteUpdate() {
-        for (Player pl : this.zone.getPlayers()) {
-            if (!pl.isDie() && Util.getDistance(pl.location.x, pl.location.y, x, y) < 200 && pl.satellite != null && (pl.id == this.playerId || this.clanId != -1 && pl.clan != null && pl.clan.id == this.clanId)) {
-                switch (this.itemTemplate.id) {
-                    case 342 -> {
-                        if (!pl.satellite.isMP) {
-                            pl.satellite.isMP = true;
-                            pl.satellite.lastMPTime = System.currentTimeMillis();
-                            if (pl.nPoint.mp < pl.nPoint.mpMax) {
-                                pl.nPoint.addMp(pl.nPoint.mpMax / 10);
-                                PlayerService.gI().sendInfoMp(pl);
-                            }
-                        }
-                    }
-                    case 343 -> {
-                        if (!pl.satellite.isIntelligent) {
-                            pl.satellite.isIntelligent = true;
-                            pl.satellite.lastIntelligentTime = System.currentTimeMillis();
-                        }
-                    }
-                    case 344 -> {
-                        if (!pl.satellite.isDefend) {
-                            pl.satellite.isDefend = true;
-                            pl.satellite.lastDefendTime = System.currentTimeMillis();
-                        }
-                    }
-                    case 345 -> {
-                        if (!pl.satellite.isHP) {
-                            pl.satellite.isHP = true;
-                            pl.satellite.lastHPTime = System.currentTimeMillis();
-                            if (pl.nPoint.hp < pl.nPoint.hpMax) {
-                                pl.nPoint.addHp(pl.nPoint.hpMax / 10);
-                                PlayerService.gI().sendInfoHp(pl);
-                                Service.gI().Send_Info_NV(pl);
-                            }
-                        }
-                    }
-                }
-            }
-        }
     }
 
     private final int timeMoveToPlayer = 10000;

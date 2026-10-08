@@ -196,4 +196,5 @@ public class BossID {
     public static final int CADIC_M = -924;
     public static final int BABY = -925;
     public static final int GAU_TUONG_CUOP = -926;
+    public static final int FAT_MABU_TOURNAMENT = -927;
 }

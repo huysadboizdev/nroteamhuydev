@@ -71,6 +71,9 @@ public class Dende extends Npc {
                     case 0 ->
                         NpcService.gI().createTutorial(player, tempId, this.avartar, ConstNpc.HUONG_DAN_NRNM);
                     case 1 -> {
+                        SummonDragonNamek dragon=SummonDragonNamek.gI();
+                        synchronized(dragon) {
+                        if(!dragon.canSummon(player))return;
                         if (player.zone.map.mapId == 7 && player.idNRNM != -1) {
                             if (player.idNRNM != 353) {
                                 NpcService.gI().createTutorial(player, tempId, this.avartar, "Anh phải có viên Ngọc Rồng Namek 1 sao");
@@ -88,13 +91,23 @@ public class Dende extends Npc {
                                 NpcService.gI().createTutorial(player, tempId, this.avartar, "Hãy gom đủ 7 viên Ngọc Rồng tại đây");
                                 return;
                             }
+                            // Arrays may lag behind a holder's movement/disconnect; validate live holders too.
+                            var hunt=NgocRongNamecService.gI();
+                            var owner=player.clan;
+                            if(owner==null)return;
+                            for(int i=0;i<7;i++) {
+                                Player holder=nro.models.server.Client.gI().getPlayer(hunt.idpNrNamec[i]);
+                                if(holder==null||holder.beforeDispose||holder.zone!=player.zone
+                                        ||holder.clan!=owner||holder.idNRNM!=353+i)return;
+                            }
+                            if(player.clan!=owner||!dragon.summonNamec(player))return;
                             NgocRongNamecService.gI().tOpenNrNamec = System.currentTimeMillis() + 86400000;
                             NgocRongNamecService.gI().firstNrNamec = true;
                             NgocRongNamecService.gI().timeNrNamec = 0;
                             NgocRongNamecService.gI().doneDragonNamec();
                             NgocRongNamecService.gI().initNgocRongNamec((byte) 1);
                             NgocRongNamecService.gI().reInitNrNamec((long) 86399000);
-                            SummonDragonNamek.gI().summonNamec(player);
+                        }
                         }
                     }
                 }

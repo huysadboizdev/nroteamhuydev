@@ -28,6 +28,7 @@ public class SO4 extends Boss {
 
 @Override
     public void reward(Player plKill) {
+        if (questSupportReward(plKill)) return;
         int diem = 5;
         plKill.event.addEventPoint(diem);
         Service.gI().sendThongBao(plKill, "+5 Point");
@@ -73,7 +74,7 @@ public class SO4 extends Boss {
         }
         for (Boss boss : this.parentBoss.getCompanionBosses()) {
             if(boss==null)continue;
-            if (boss.id == BossID.SO_3 && !boss.isDie()) {
+            if (boss.questBossId() == BossID.SO_3 && !boss.isDie()) {
                 boss.changeStatus(BossStatus.ACTIVE);
                 break;
             }

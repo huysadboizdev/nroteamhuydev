@@ -27,7 +27,7 @@ import nro.models.task.BadgesTaskService;
  *
  */
 public class InventoryService {
-    public static final int MAX_STACK_QUANTITY = Integer.MAX_VALUE;
+    public static final int MAX_STACK_QUANTITY = 1_000_000;
 
     private static InventoryService I;
 
@@ -43,6 +43,7 @@ public class InventoryService {
     }
 
     public Item findItem(List<Item> list, int tempId) {
+        if(nro.models.event.EventItemPolicy.isBlocked(tempId))return null;
         try {
             for (Item item : list) {
                 if (item.isNotNullItem() && item.template.id == tempId) {
@@ -116,8 +117,9 @@ public class InventoryService {
 
     public void throwItem(Player player, int where, int index) {
         synchronized(player instanceof Pet pet ? pet.master : player){
+        try(var eventPermit=nro.models.event.EventItemPolicy.admit()) {
             Player owner=player instanceof Pet pet ? pet.master : player;
-            if(owner!=null && CommesonChallengeService.hasPendingId(owner.id))return;
+            if(LiveSyncMutationGate.blocked(player)||(owner!=null && CommesonChallengeService.hasPendingId(owner.id)))return;
         synchronized (player instanceof Pet pet ? pet.master : player) {
         Item itemThrow = null;
         if (where == 0) {
@@ -144,7 +146,9 @@ public class InventoryService {
         }
             }
     
+        
         }
+}
     }
 
     private void __________________Xoá_bỏ_item______________________________() {
@@ -173,7 +177,7 @@ public class InventoryService {
     public void removeItemBag(Player player, int index) {
         synchronized(player instanceof Pet pet ? pet.master : player){
             Player owner=player instanceof Pet pet ? pet.master : player;
-            if(owner!=null && CommesonChallengeService.hasPendingId(owner.id))return;
+            if(LiveSyncMutationGate.blocked(player)||(owner!=null && CommesonChallengeService.hasPendingId(owner.id)))return;
         this.removeItem(player.inventory.itemsBag, index);
     
         }
@@ -182,7 +186,7 @@ public class InventoryService {
     public void removeItemBag(Player player, Item item) {
         synchronized(player instanceof Pet pet ? pet.master : player){
             Player owner=player instanceof Pet pet ? pet.master : player;
-            if(owner!=null && CommesonChallengeService.hasPendingId(owner.id))return;
+            if(LiveSyncMutationGate.blocked(player)||(owner!=null && CommesonChallengeService.hasPendingId(owner.id)))return;
         this.removeItem(player.inventory.itemsBag, item);
     
         }
@@ -191,7 +195,7 @@ public class InventoryService {
     public void removeItemBody(Player player, int index) {
         synchronized(player instanceof Pet pet ? pet.master : player){
             Player owner=player instanceof Pet pet ? pet.master : player;
-            if(owner!=null && CommesonChallengeService.hasPendingId(owner.id))return;
+            if(LiveSyncMutationGate.blocked(player)||(owner!=null && CommesonChallengeService.hasPendingId(owner.id)))return;
         synchronized (player instanceof Pet pet ? pet.master : player) {
         this.removeItem(player.inventory.itemsBody, index);
             }
@@ -202,7 +206,7 @@ public class InventoryService {
     public void removeItemPetBody(Player player, int index) {
         synchronized(player instanceof Pet pet ? pet.master : player){
             Player owner=player instanceof Pet pet ? pet.master : player;
-            if(owner!=null && CommesonChallengeService.hasPendingId(owner.id))return;
+            if(LiveSyncMutationGate.blocked(player)||(owner!=null && CommesonChallengeService.hasPendingId(owner.id)))return;
         synchronized (player instanceof Pet pet ? pet.master : player) {
         this.removeItemBody(player.pet, index);
             }
@@ -213,7 +217,7 @@ public class InventoryService {
     public void removeItemBox(Player player, int index) {
         synchronized(player instanceof Pet pet ? pet.master : player){
             Player owner=player instanceof Pet pet ? pet.master : player;
-            if(owner!=null && CommesonChallengeService.hasPendingId(owner.id))return;
+            if(LiveSyncMutationGate.blocked(player)||(owner!=null && CommesonChallengeService.hasPendingId(owner.id)))return;
         this.removeItem(player.inventory.itemsBox, index);
     
         }
@@ -224,7 +228,8 @@ public class InventoryService {
     }
 
     public void subQuantityItemsBag(Player player, Item item, int quantity) {
-        synchronized (player) {
+        synchronized (LiveSyncMutationGate.owner(player)) {
+            if(LiveSyncMutationGate.blocked(player))return;
             if (CommesonChallengeService.hasPendingId(player.id) || nro.models.services.RubyGiftService.hasPending(player)) return;
             subQuantityItem(player.inventory.itemsBag, item, quantity);
         }
@@ -233,7 +238,7 @@ public class InventoryService {
     public void subQuantityItemsBody(Player player, Item item, int quantity) {
         synchronized(player instanceof Pet pet ? pet.master : player){
             Player owner=player instanceof Pet pet ? pet.master : player;
-            if(owner!=null && CommesonChallengeService.hasPendingId(owner.id))return;
+            if(LiveSyncMutationGate.blocked(player)||(owner!=null && CommesonChallengeService.hasPendingId(owner.id)))return;
         synchronized (player instanceof Pet pet ? pet.master : player) {
         subQuantityItem(player.inventory.itemsBody, item, quantity);
             }
@@ -244,7 +249,7 @@ public class InventoryService {
     public void subQuantityItemsBox(Player player, Item item, int quantity) {
         synchronized(player instanceof Pet pet ? pet.master : player){
             Player owner=player instanceof Pet pet ? pet.master : player;
-            if(owner!=null && CommesonChallengeService.hasPendingId(owner.id))return;
+            if(LiveSyncMutationGate.blocked(player)||(owner!=null && CommesonChallengeService.hasPendingId(owner.id)))return;
         subQuantityItem(player.inventory.itemsBox, item, quantity);
     
         }
@@ -317,6 +322,8 @@ public class InventoryService {
     }
 
     private Item putItemBag(Player player, Item item) {
+        try(var eventPermit=nro.models.event.EventItemPolicy.admit()) {
+        if(nro.models.event.EventItemPolicy.isBlocked(item))return item;
         for (int i = 0; i < player.inventory.itemsBag.size(); i++) {
             if (!player.inventory.itemsBag.get(i).isNotNullItem()) {
                 player.inventory.itemsBag.set(i, item);
@@ -325,9 +332,13 @@ public class InventoryService {
             }
         }
         return item;
-    }
+    
+        }
+}
 
     private Item putItemBox(Player player, Item item) {
+        try(var eventPermit=nro.models.event.EventItemPolicy.admit()) {
+        if(nro.models.event.EventItemPolicy.isBlocked(item))return item;
         for (int i = 0; i < player.inventory.itemsBox.size(); i++) {
             if (!player.inventory.itemsBox.get(i).isNotNullItem()) {
                 player.inventory.itemsBox.set(i, item);
@@ -336,10 +347,14 @@ public class InventoryService {
             }
         }
         return item;
-    }
+    
+        }
+}
 
     public Item putItemBody(Player player, Item item) {
+        if(nro.models.event.EventItemPolicy.isBlocked(item))return item;
         synchronized (player instanceof Pet pet ? pet.master : player) {
+        try(var eventPermit=nro.models.event.EventItemPolicy.admit()) {
         byte type = item.getType();
         Item sItem = item;
         if (!item.isNotNullItem()) {
@@ -372,13 +387,7 @@ public class InventoryService {
         }
 
         // Kiểm tra yêu cầu sức mạnh
-        long powerRequire = item.template.strRequire;
-        for (Item.ItemOption io : item.itemOptions) {
-            if (io.optionTemplate.id == 21) {
-                powerRequire = io.param * 1000000000L;
-                break;
-            }
-        }
+        long powerRequire = nro.models.item.ItemDefaultOptions.requiredPower(item);
         if (player.nPoint.power < powerRequire) {
             Service.gI().sendThongBaoOK(player.isPet ? ((Pet) player).master : player, "Sức mạnh không đủ yêu cầu!");
             return sItem;
@@ -445,13 +454,16 @@ public class InventoryService {
         player.inventory.itemsBody.set(index, item);
         return sItem;
 
-            }
+            
+        }
+}
     }
 
     public void itemBagToBody(Player player, int index) {
         synchronized(player instanceof Pet pet ? pet.master : player){
+        try(var eventPermit=nro.models.event.EventItemPolicy.admit()) {
             Player owner=player instanceof Pet pet ? pet.master : player;
-            if(owner!=null && CommesonChallengeService.hasPendingId(owner.id))return;
+            if(LiveSyncMutationGate.blocked(player)||(owner!=null && CommesonChallengeService.hasPendingId(owner.id)))return;
         synchronized (player instanceof Pet pet ? pet.master : player) {
         if (index < 0) {
             Service.gI().sendThongBao(player, "Không thể thực hiện");
@@ -467,13 +479,16 @@ public class InventoryService {
         }
             }
     
+        
         }
+}
     }
 
     public void itemBodyToBag(Player player, int index) {
         synchronized(player instanceof Pet pet ? pet.master : player){
+        try(var eventPermit=nro.models.event.EventItemPolicy.admit()) {
             Player owner=player instanceof Pet pet ? pet.master : player;
-            if(owner!=null && CommesonChallengeService.hasPendingId(owner.id))return;
+            if(LiveSyncMutationGate.blocked(player)||(owner!=null && CommesonChallengeService.hasPendingId(owner.id)))return;
         synchronized (player instanceof Pet pet ? pet.master : player) {
         Item item = player.inventory.itemsBody.get(index);
         if (item.isNotNullItem()) {
@@ -499,13 +514,16 @@ public class InventoryService {
         }
             }
     
+        
         }
+}
     }
 
     public void itemBagToPetBody(Player player, int index) {
         synchronized(player instanceof Pet pet ? pet.master : player){
+        try(var eventPermit=nro.models.event.EventItemPolicy.admit()) {
             Player owner=player instanceof Pet pet ? pet.master : player;
-            if(owner!=null && CommesonChallengeService.hasPendingId(owner.id))return;
+            if(LiveSyncMutationGate.blocked(player)||(owner!=null && CommesonChallengeService.hasPendingId(owner.id)))return;
         synchronized (player instanceof Pet pet ? pet.master : player) {
         try {
             if (player.pet != null && player.pet.nPoint.power >= 1500000) {
@@ -530,13 +548,16 @@ public class InventoryService {
         }
             }
     
+        
         }
+}
     }
 
     public void itemPetBodyToBag(Player player, int index) {
         synchronized(player instanceof Pet pet ? pet.master : player){
+        try(var eventPermit=nro.models.event.EventItemPolicy.admit()) {
             Player owner=player instanceof Pet pet ? pet.master : player;
-            if(owner!=null && CommesonChallengeService.hasPendingId(owner.id))return;
+            if(LiveSyncMutationGate.blocked(player)||(owner!=null && CommesonChallengeService.hasPendingId(owner.id)))return;
         synchronized (player instanceof Pet pet ? pet.master : player) {
         Item item = player.pet.inventory.itemsBody.get(index);
         if (item.isNotNullItem()) {
@@ -550,32 +571,30 @@ public class InventoryService {
         }
             }
     
+        
         }
+}
     }
 
     public void itemBoxToBodyOrBag(Player player, int index) {
         synchronized(player instanceof Pet pet ? pet.master : player){
+        try(var eventPermit=nro.models.event.EventItemPolicy.admit()) {
             Player owner=player instanceof Pet pet ? pet.master : player;
-            if(owner!=null && CommesonChallengeService.hasPendingId(owner.id))return;
+            if(LiveSyncMutationGate.blocked(player)||(owner!=null && CommesonChallengeService.hasPendingId(owner.id)))return;
         synchronized (player instanceof Pet pet ? pet.master : player) {
         if (index < 0) {
             Service.gI().sendThongBao(player, "Không thể thực hiện");
             return;
         }
         Item item = player.inventory.itemsBox.get(index);
+        if(nro.models.event.EventItemPolicy.isBlocked(item))return;
         if (item.isNotNullItem()) {
             boolean done = false;
             if (item.template.type >= 0 && item.template.type <= 5 || item.template.type == 32) {
                 Item itemBody = player.inventory.itemsBody.get(item.template.type == 32 ? 6 : item.template.type);
                 if (!itemBody.isNotNullItem()) {
                     if (item.template.gender == player.gender || item.template.gender == 3) {
-                        long powerRequire = item.template.strRequire;
-                        for (Item.ItemOption io : item.itemOptions) {
-                            if (io.optionTemplate.id == 21) {
-                                powerRequire = io.param * 1000000000L;
-                                break;
-                            }
-                        }
+                        long powerRequire = nro.models.item.ItemDefaultOptions.requiredPower(item);
                         if (powerRequire <= player.nPoint.power) {
                             player.inventory.itemsBody.set(item.template.type == 32 ? 6 : item.template.type, item);
                             player.inventory.itemsBox.set(index, itemBody);
@@ -603,13 +622,16 @@ public class InventoryService {
         }
             }
     
+        
         }
+}
     }
 
     public void itemBagToBox(Player player, int index) {
         synchronized(player instanceof Pet pet ? pet.master : player){
+        try(var eventPermit=nro.models.event.EventItemPolicy.admit()) {
             Player owner=player instanceof Pet pet ? pet.master : player;
-            if(owner!=null && CommesonChallengeService.hasPendingId(owner.id))return;
+            if(LiveSyncMutationGate.blocked(player)||(owner!=null && CommesonChallengeService.hasPendingId(owner.id)))return;
         if (index < 0 || index >= player.inventory.itemsBag.size()) {
             Service.gI().sendThongBao(player, "Không thể thực hiện");
             return;
@@ -634,13 +656,16 @@ public class InventoryService {
             }
         }
     
+        
         }
+}
     }
 
     public void itemBodyToBox(Player player, int index) {
         synchronized(player instanceof Pet pet ? pet.master : player){
+        try(var eventPermit=nro.models.event.EventItemPolicy.admit()) {
             Player owner=player instanceof Pet pet ? pet.master : player;
-            if(owner!=null && CommesonChallengeService.hasPendingId(owner.id))return;
+            if(LiveSyncMutationGate.blocked(player)||(owner!=null && CommesonChallengeService.hasPendingId(owner.id)))return;
         synchronized (player instanceof Pet pet ? pet.master : player) {
         if (index < 0 || index >= player.inventory.itemsBody.size()) {
             Item item = player.inventory.itemsBody.get(index);
@@ -655,7 +680,9 @@ public class InventoryService {
         }
             }
     
+        
         }
+}
     }
 
     private void __________________Gửi_danh_sách_item_cho_người_chơi________() {
@@ -857,7 +884,10 @@ public class InventoryService {
     }
 
     public boolean addItemBag(Player player, Item item) {
-        synchronized (player) {
+        try(var eventPermit=nro.models.event.EventItemPolicy.admit()) {
+        if(nro.models.event.EventItemPolicy.isBlocked(item))return false;
+        synchronized (LiveSyncMutationGate.owner(player)) {
+        if(LiveSyncMutationGate.blocked(player))return false;
         if (CommesonChallengeService.hasPendingId(player.id) || nro.models.shop_ky_gui.ConsignTransactions.hasPending(player) || nro.models.services.RubyGiftService.hasPending(player)) return false;
         nro.models.item.ItemDefaultOptions.complete(item);
         //ngọc rồng đen
@@ -898,6 +928,8 @@ public class InventoryService {
                 return true;
             case 34:
                 long ruby = (long) player.inventory.ruby + (long) item.quantity;
+                if (VipRewardCatalog.reservedRuby(player)>0
+                        && ruby > Integer.MAX_VALUE-VipRewardCatalog.reservedRuby(player)) return false;
                 if (ruby > Integer.MAX_VALUE) {
                     ruby = Integer.MAX_VALUE;
                 }
@@ -941,13 +973,22 @@ public class InventoryService {
         }
         return addItemList(player.inventory.itemsBag, item);
         }
-    }
+    
+        }
+}
 
     public boolean addItemBox(Player player, Item item) {
-        return addItemList(player.inventory.itemsBox, item);
-    }
+        try(var eventPermit=nro.models.event.EventItemPolicy.admit()) {
+        synchronized(LiveSyncMutationGate.owner(player)) {
+            if(LiveSyncMutationGate.blocked(player))return false;
+            return addItemList(player.inventory.itemsBox, item);
+        }
+    
+        }
+}
 
     public boolean addItemList(List<Item> items, Item itemAdd) {
+        if(nro.models.event.EventItemPolicy.isBlocked(itemAdd))return false;
         if (itemAdd == null || !itemAdd.isNotNullItem() || itemAdd.quantity <= 0) {
             return false;
         }
@@ -975,10 +1016,12 @@ public class InventoryService {
             }
         }
         // Check capacity before changing any stack, so a failed grant is not partial.
+        int emptySlotCapacity = nro.models.item.ItemStackRules.stackable(itemAdd.template)
+                ? MAX_STACK_QUANTITY : Integer.MAX_VALUE;
         long capacity = 0;
         for (Item it : items) {
             if (!it.isNotNullItem()) {
-                capacity += MAX_STACK_QUANTITY;
+                capacity += emptySlotCapacity;
             } else if (canMergeQuantity(it, itemAdd)) {
                 capacity += (long) MAX_STACK_QUANTITY - it.quantity;
             }
@@ -1005,9 +1048,13 @@ public class InventoryService {
         if (itemAdd.quantity > 0) {
             for (int i = 0; i < items.size(); i++) {
                 if (!items.get(i).isNotNullItem()) {
-                    items.set(i, ItemService.gI().copyItem(itemAdd));
-                    itemAdd.quantity = 0;
-                    return true;
+                    Item inserted = ItemService.gI().copyItem(itemAdd);
+                    inserted.quantity = Math.min(itemAdd.quantity, emptySlotCapacity);
+                    items.set(i, inserted);
+                    itemAdd.quantity -= inserted.quantity;
+                    if (itemAdd.quantity == 0) {
+                        return true;
+                    }
                 }
             }
         }
@@ -1035,22 +1082,26 @@ public class InventoryService {
 
     /** Read-only capacity check using the same merge rules as addItemList. */
     public boolean canAddItemList(List<Item> items,Item incoming) {
+        if(nro.models.event.EventItemPolicy.isBlocked(incoming))return false;
         if(incoming==null || !incoming.isNotNullItem() || incoming.quantity<=0)return false;
         int[] increment=isItemIncrementalOption(incoming);
         if(increment[0]!=-1)for(Item existing:items)if(canMergeIncremental(existing,incoming,increment[0]))
             for(ItemOption o:existing.itemOptions)if(o.optionTemplate.id==increment[0]){
                 long total=(long)o.param+increment[1];return total>=0&&total<=Integer.MAX_VALUE;
             }
+        int emptySlotCapacity=nro.models.item.ItemStackRules.stackable(incoming.template)
+                ? MAX_STACK_QUANTITY : Integer.MAX_VALUE;
         long capacity=0;
         for(Item existing:items){
-            if(!existing.isNotNullItem())capacity+=MAX_STACK_QUANTITY;
+            if(!existing.isNotNullItem())capacity+=emptySlotCapacity;
             else if(canMergeQuantity(existing,incoming))capacity+=(long)MAX_STACK_QUANTITY-existing.quantity;
         }
         return capacity>=incoming.quantity;
     }
 
     public boolean canAddItemBag(Player player,Item incoming) {
-        synchronized(player){
+        synchronized(LiveSyncMutationGate.owner(player)){
+        if(LiveSyncMutationGate.blocked(player))return false;
         if(CommesonChallengeService.hasPendingId(player.id)||nro.models.services.RubyGiftService.hasPending(player)||incoming==null||!incoming.isNotNullItem()||incoming.quantity<=0)return false;
         if(incoming.template.type==13){
             var shop=player.idMark.getShopOpen();
@@ -1273,23 +1324,65 @@ public class InventoryService {
         return false;
     }
 
-    public boolean fullSetThan(Player player) {
-        for (int i = 0; i < 5; i++) {
-            Item item = player.inventory.itemsBody.get(i);
-            if (item == null || item.template == null || item.template.level != 13) {
-                return false;
-            }
+    /** Read-only lifetime validation; checking a shop never changes item metadata. */
+    public boolean isBillIngredientUsable(Item item) {
+        if (item == null || item.template == null || item.quantity <= 0 || item.itemOptions == null) return false;
+        long now = System.currentTimeMillis();
+        if (item.expire > 0 && item.expire <= now) return false;
+        long days = java.time.temporal.ChronoUnit.DAYS.between(
+                java.time.Instant.ofEpochMilli(item.createTime).atZone(nro.models.utils.TimeUtil.VIETNAM_ZONE).toLocalDate(),
+                java.time.Instant.ofEpochMilli(now).atZone(nro.models.utils.TimeUtil.VIETNAM_ZONE).toLocalDate());
+        days = Math.max(0, days);
+        for (Item.ItemOption option : item.itemOptions) {
+            if (option != null && option.optionTemplate != null && option.optionTemplate.id == 93
+                    && (long) option.param - days < 0) return false;
         }
         return true;
     }
 
+    /** Count only the five correctly equipped divine pieces for this character. */
+    public int validDivineBodySlots(Player player) {
+        if (player == null || player.inventory == null || player.gender < 0 || player.gender > 2) return 0;
+        synchronized (player) {
+            int[][] ids = {{555,556,562,563,561},{557,558,564,565,561},{559,560,566,567,561}};
+            int count = 0;
+            for (int slot = 0; slot < 5 && slot < player.inventory.itemsBody.size(); slot++) {
+                Item item = player.inventory.itemsBody.get(slot);
+                if (isBillIngredientUsable(item) && item.quantity == 1 && item.template.level == 13 && item.template.type == slot
+                        && item.template.id == ids[player.gender][slot]
+                        && item.template.gender == (slot == 4 ? 3 : player.gender)) count++;
+            }
+            return count;
+        }
+    }
+
+    public boolean fullSetThan(Player player) {
+        return validDivineBodySlots(player) == 5;
+    }
+
+    /** Deterministically pick one food ID with 99 live units in the bag; never mix types. */
+    public int findBillFoodId(Player player) {
+        if (player == null || player.inventory == null) return -1;
+        synchronized (player) {
+            long[] totals = new long[5];
+            for (Item item : player.inventory.itemsBag) {
+                if (isBillIngredientUsable(item) && item.template.id >= 663 && item.template.id <= 667)
+                    totals[item.template.id - 663] += item.quantity;
+            }
+            for (int i = 0; i < totals.length; i++) if (totals[i] >= 99) return 663 + i;
+            return -1;
+        }
+    }
+
     public boolean x99ThucAn(Player player) {
-        Item doAn = player.inventory.itemsBag.stream().filter(it -> it != null && it.template != null && (it.template.id == 663 || it.template.id == 664 || it.template.id == 665 || it.template.id == 666 || it.template.id == 667) && it.quantity >= 99).findFirst().orElse(null);
-        return doAn != null;
+        return findBillFoodId(player) != -1;
     }
 
     public boolean canOpenBillShop(Player player) {
-        return fullSetThan(player) && x99ThucAn(player);
+        if (player == null) return false;
+        synchronized (player) {
+            return fullSetThan(player) && x99ThucAn(player);
+        }
     }
 
     public boolean optionCanUpgrade(int id) {

@@ -26,6 +26,7 @@ public class Inventory {
     public List<Item> itemsBody;
     public List<Item> itemsBag;
     public List<Item> itemsBox;
+    public List<Item> itemsCollection;
 
     public List<Item> itemsBoxCrackBall;
     public List<Item> itemsDaBan;
@@ -41,6 +42,8 @@ public class Inventory {
         itemsBody = new ArrayList<>();
         itemsBag = new ArrayList<>();
         itemsBox = new ArrayList<>();
+        itemsCollection = new ArrayList<>();
+        for (int i = 0; i < nro.models.item.CollectionChestRules.CAPACITY; i++) itemsCollection.add(new Item());
         itemsBoxCrackBall = new ArrayList<>();
         itemsDaBan = new ArrayList<>();
         giftCode = new ArrayList<>();
@@ -136,6 +139,11 @@ public class Inventory {
         this.itemsBody = null;
         this.itemsBag = null;
         this.itemsBox = null;
+        if (this.itemsCollection != null) {
+            for (Item it : this.itemsCollection) it.dispose();
+            this.itemsCollection.clear();
+        }
+        this.itemsCollection = null;
         this.itemsBoxCrackBall = null;
         this.itemsDaBan = null;
     }

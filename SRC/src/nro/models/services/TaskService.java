@@ -316,8 +316,12 @@ public class TaskService {
 
     public void checkDoneTaskKillBoss(Player player, Boss boss) {
         if (player != null && !player.isBot && !player.isBoss && !player.isPet) {
-            AchievementService.gI().checkDoneTask(player, ConstAchievement.TRUM_KET_LIEU_BOSS);
-            switch ((int) boss.id) {
+            if (boss.isQuestSupport()) {
+                if (!boss.claimQuestSupportCredit()) return;
+            } else {
+                AchievementService.gI().checkDoneTask(player, ConstAchievement.TRUM_KET_LIEU_BOSS);
+            }
+            switch (boss.questBossId()) {
                 case BossID.KUKU ->
                     doneTask(player, ConstTask.TASK_19_0);
                 case BossID.MAP_DAU_DINH ->

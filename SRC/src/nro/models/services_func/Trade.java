@@ -55,6 +55,7 @@ public class Trade {
         Player second = first == pl1 ? pl2 : pl1;
         synchronized (first) {
         synchronized (second) {
+        if(nro.models.services.LiveSyncMutationGate.blocked(pl1)||nro.models.services.LiveSyncMutationGate.blocked(pl2))throw new IllegalStateException("Web command is awaiting commit reconciliation");
         if (nro.models.services.CommesonChallengeService.hasPendingId(pl1.id)
                 || nro.models.services.CommesonChallengeService.hasPendingId(pl2.id)
                 || nro.models.services.AdminPlayerActions.hasRenamePendingId(pl1.id)
@@ -248,6 +249,8 @@ public class Trade {
     }
 
     private boolean isItemCannotTran(Item item) {
+        if(nro.models.event.EventItemPolicy.isBlocked(item))return true;
+        if (item != null && item.template != null && nro.models.item.ItemDefaultOptions.isLockedHighTier(item.template.id)) return true;
         if (nro.models.item.SealedEquipment.hasSeal(item)) return true;
         for (Item.ItemOption io : item.itemOptions) {
             if (io.optionTemplate.id == 30) {
@@ -381,6 +384,21 @@ public class Trade {
         }
     }
 
+    public void cancelForDisabledEvent() {
+        Player left=player1,right=player2;
+        if(left==null||right==null)return;
+        Player first=left.id<right.id?left:right,second=first==left?right:left;
+        synchronized(first){synchronized(second){
+            try(var eventPermit=nro.models.event.EventItemPolicy.admit()) {
+                if(player1!=left||player2!=right)return;
+                if(left.inventory.itemsBag.stream().anyMatch(nro.models.event.EventItemPolicy::isBlocked)
+                        ||right.inventory.itemsBag.stream().anyMatch(nro.models.event.EventItemPolicy::isBlocked)
+                        ||itemsTrade1.stream().anyMatch(nro.models.event.EventItemPolicy::isBlocked)
+                        ||itemsTrade2.stream().anyMatch(nro.models.event.EventItemPolicy::isBlocked))cancelTrade();
+            }
+        }}
+    }
+
     private void startTrade() {
         Player left = player1, right = player2;
         if (left == null || right == null) return;
@@ -388,6 +406,8 @@ public class Trade {
         Player second = first == left ? right : left;
         synchronized (first) {
         synchronized (second) {
+        try(var eventPermit=nro.models.event.EventItemPolicy.admit()) {
+        if(nro.models.services.LiveSyncMutationGate.blocked(left)||nro.models.services.LiveSyncMutationGate.blocked(right))return;
         if (nro.models.services.CommesonChallengeService.hasPendingId(left.id)
                 || nro.models.services.CommesonChallengeService.hasPendingId(right.id)
                 || nro.models.services.AdminPlayerActions.hasRenamePendingId(left.id)
@@ -400,6 +420,8 @@ public class Trade {
                 || TransactionService.PLAYER_TRADE.get(left) != this
                 || TransactionService.PLAYER_TRADE.get(right) != this) return;
         if (itemsTrade1.stream().anyMatch(this::isItemCannotTran) || itemsTrade2.stream().anyMatch(this::isItemCannotTran)) return;
+        if(itemsBag1.stream().anyMatch(nro.models.event.EventItemPolicy::isBlocked)
+                ||itemsBag2.stream().anyMatch(nro.models.event.EventItemPolicy::isBlocked))return;
         byte tradeStatus = SUCCESS;
         if (player1.inventory.gold + goldTrade2 > Inventory.LIMIT_GOLD) {
             tradeStatus = FAIL_MAX_GOLD_PLAYER1;
@@ -448,7 +470,9 @@ public class Trade {
                 sendNotifyTrade(tradeStatus);
             }
         }
+        
         }
+}
         }
     }
 

@@ -29,7 +29,8 @@ public class VuaHung extends Npc {
     private static final int DUA_HAU = 569;
     private static final int TEM = 1558;
     private static final int THOI_VANG = 457;
-    private static final List<Integer> nguoiDaTrong = new ArrayList<>();
+    private static final java.util.Set<Long> nguoiDaTrong = java.util.Collections.synchronizedSet(new java.util.HashSet<>());
+    private static long phase = -1;
     private static final long START_TIME = System.currentTimeMillis();
     private static final long THOI_GIAN_TRONG_CAY_MS = 6 * 60 * 60 * 1000;
     private static final int SO_LUONG_TOI_DA = 10;
@@ -42,9 +43,11 @@ public class VuaHung extends Npc {
 
     @Override
     public void openBaseMenu(Player player) {
+        if (!EventItemPolicy.isEnabled("hung_vuong")) return;
         long now = System.currentTimeMillis();
         long elapsed = now - START_TIME;
-        long phaseStartTime = START_TIME + (elapsed / (60 * 60 * 1000)) * (60 * 60 * 1000);
+        long phaseStartTime = START_TIME + (elapsed / THOI_GIAN_TRONG_CAY_MS) * THOI_GIAN_TRONG_CAY_MS;
+        synchronized (nguoiDaTrong) { if (phase != phaseStartTime) { nguoiDaTrong.clear(); phase = phaseStartTime; } }
         long timeInCurrentPhase = now - phaseStartTime;
 
         boolean isPhaseActive = timeInCurrentPhase < 15 * 60 * 1000;
@@ -94,6 +97,11 @@ public class VuaHung extends Npc {
 
     @Override
     public void confirmMenu(Player pl, int select) {
+        synchronized (pl) {
+        try (EventItemPolicy.Permit permit = EventItemPolicy.admit()) {
+        if (nro.models.services.LiveSyncMutationGate.blocked(pl)
+                || nro.models.services.AdminPlayerActions.hasPending(pl)) return;
+        if (!EventItemPolicy.isEnabled("hung_vuong")) return;
         if (canOpenNpc(pl)) {
             switch (pl.idMark.getIndexMenu()) {
                 case 0 -> {
@@ -172,12 +180,18 @@ public class VuaHung extends Npc {
                 case 100 -> {
                     if (select == 0) {
                         if (pl.DuaHauEgg == null) {
+                            synchronized (nguoiDaTrong) {
+                            long now = System.currentTimeMillis();
+                            long phaseStart = START_TIME + ((now - START_TIME) / THOI_GIAN_TRONG_CAY_MS) * THOI_GIAN_TRONG_CAY_MS;
+                            if (phase != phaseStart) { nguoiDaTrong.clear(); phase = phaseStart; }
+                            if (now - phaseStart >= 15 * 60 * 1000 || nguoiDaTrong.size() >= SO_LUONG_TOI_DA || nguoiDaTrong.contains(pl.id)) return;
                             DuaHauEgg.createDuaHauEgg(pl);
                             if (pl.DuaHauEgg != null) {
                                 pl.DuaHauEgg.sendDuaHauEgg();
-                                nguoiDaTrong.add((int) (pl.id));
+                                nguoiDaTrong.add(pl.id);
                                 openBaseMenu(pl);
                                 Service.gI().sendThongBao(pl, "Bạn đã trồng 1 cây Dưa Hấu!");
+                            }
                             }
                         } else {
                             Service.gI().sendThongBao(pl, "Bạn đã có cây dưa hấu nên không thể trồng thêm.");
@@ -211,9 +225,14 @@ public class VuaHung extends Npc {
                 }
             }
         }
+        }
+        }
     }
 
     private void NhanQuaThuong(Player player) {
+        if (!EventItemPolicy.isEnabled("hung_vuong") || InventoryService.gI().getCountEmptyBag(player) < 1) {
+            Service.gI().sendThongBao(player, "Cần chỗ trống trong túi."); return;
+        }
         Item ngaVoi = InventoryService.gI().findItemBag(player, NGA_VOI);
         Item cuaGa = InventoryService.gI().findItemBag(player, CUA_GA);
         Item hongMao = InventoryService.gI().findItemBag(player, HONG_MAO);
@@ -240,6 +259,9 @@ public class VuaHung extends Npc {
     }
 
     private void NhanQuaVip(Player player) {
+        if (!EventItemPolicy.isEnabled("hung_vuong") || InventoryService.gI().getCountEmptyBag(player) < 1) {
+            Service.gI().sendThongBao(player, "Cần chỗ trống trong túi."); return;
+        }
         Item ngaVoi = InventoryService.gI().findItemBag(player, NGA_VOI);
         Item cuaGa = InventoryService.gI().findItemBag(player, CUA_GA);
         Item hongMao = InventoryService.gI().findItemBag(player, HONG_MAO);
@@ -266,6 +288,9 @@ public class VuaHung extends Npc {
     }
 
     private void BanhDay(Player player) {
+        if (!EventItemPolicy.isEnabled("hung_vuong") || InventoryService.gI().getCountEmptyBag(player) < 1) {
+            Service.gI().sendThongBao(player, "Cần chỗ trống trong túi."); return;
+        }
         Item banhDay = InventoryService.gI().findItemBag(player, BANH_DAY);
         if (banhDay != null && banhDay.quantity >= 1) {
             InventoryService.gI().subQuantityItemsBag(player, banhDay, 1);
@@ -284,6 +309,9 @@ public class VuaHung extends Npc {
     }
 
     private void BanhChung(Player player) {
+        if (!EventItemPolicy.isEnabled("hung_vuong") || InventoryService.gI().getCountEmptyBag(player) < 1) {
+            Service.gI().sendThongBao(player, "Cần chỗ trống trong túi."); return;
+        }
         Item banhChung = InventoryService.gI().findItemBag(player, BANH_CHUNG);
         if (banhChung != null && banhChung.quantity >= 1) {
             InventoryService.gI().subQuantityItemsBag(player, banhChung, 1);

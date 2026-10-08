@@ -20,6 +20,7 @@ public class Android15 extends Boss {
 
    @Override
     public void reward(Player plKill) {
+        if (questSupportReward(plKill)) return;
         int diem = 5;
         plKill.event.addEventPoint(diem);
         Service.gI().sendThongBao(plKill, "+5 Point");
@@ -47,6 +48,8 @@ public class Android15 extends Boss {
 
     @Override
     public synchronized int injured(Player plAtt, long damage, boolean piercing, boolean isMobAttack) {
+        if (isQuestSupportRetired()) return 0;
+        markQuestSupportCombat(plAtt, damage);
         if (!this.callApk13 && damage >= this.nPoint.hp) {
             if (this.parentBoss != null) {
                 ((Android14) this.parentBoss).callApk13();

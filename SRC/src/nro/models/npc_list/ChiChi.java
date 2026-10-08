@@ -20,6 +20,7 @@ import nro.models.shop.ShopService;
  *
  */
 public class ChiChi extends Npc {
+    private static final int BASE_MENU_WITHOUT_EVENTS=1_051_000;
 
     public ChiChi(int mapId, int status, int cx, int cy, int tempId, int avartar) {
         super(mapId, status, cx, cy, tempId, avartar);
@@ -27,6 +28,10 @@ public class ChiChi extends Npc {
 
     @Override
     public void openBaseMenu(Player player) {
+        synchronized(player) {
+        try(var eventPermit=nro.models.event.EventItemPolicy.admit()) {
+        if(player.beforeDispose||nro.models.services.LiveSyncMutationGate.blocked(player))return;
+
         if (canOpenNpc(player)) {
             TimedBagCleanupService.gI().cancel(player);
             List<String> menu = new ArrayList<>(Arrays.asList(
@@ -39,18 +44,31 @@ public class ChiChi extends Npc {
 
             String[] menus = menu.toArray(new String[0]);
 
-            createOtherMenu(player, ConstNpc.BASE_MENU,
-                    "Bạn muốn hỏi chi?", menus);
+            boolean summer=nro.models.event.EventItemPolicy.isEnabled("summer");
+            if(!summer)menu=menu.subList(3,menu.size());
+            createOtherMenu(player, summer?ConstNpc.BASE_MENU:BASE_MENU_WITHOUT_EVENTS,
+                    "Bạn muốn hỏi chi?", menu.toArray(new String[0]));
         }
 
-    }
+    
+        }}
+}
 
     @Override
     public void confirmMenu(Player player, int select) {
+        synchronized(player) {
+        try(var eventPermit=nro.models.event.EventItemPolicy.admit()) {
+        if(player.beforeDispose||nro.models.services.LiveSyncMutationGate.blocked(player))return;
+
         if (canOpenNpc(player)) {
             int soLuong = 0;
             if (this.mapId == 5) {
-                if (player.idMark.isBaseMenu()) {
+                if (player.idMark.isBaseMenu()||player.idMark.getIndexMenu()==BASE_MENU_WITHOUT_EVENTS) {
+                    if(player.idMark.getIndexMenu()==BASE_MENU_WITHOUT_EVENTS) {
+                        if(select<0||select>2)return;
+                        select+=3;
+                    }
+                    if(select>=0&&select<=2&&!nro.models.event.EventItemPolicy.isEnabled("summer"))return;
                     switch (select) {
                         case 4:
                             synchronized (player) {
@@ -99,6 +117,7 @@ public class ChiChi extends Npc {
                         }
                     }
                 } else if (player.idMark.getIndexMenu() == ConstNpc.PHAO_BONG_VIP) {
+                    if(!nro.models.event.EventItemPolicy.isEnabled("summer"))return;
                     switch (select) {
                         case 0:
                             Service.gI().showListTop(player, Manager.Topsukien);
@@ -108,6 +127,7 @@ public class ChiChi extends Npc {
                             break;
                     }
                 } else if (player.idMark.getIndexMenu() == ConstNpc.PHAO_BONG) {
+                    if(!nro.models.event.EventItemPolicy.isEnabled("summer"))return;
                     switch (select) {
                         case 0:
                             Service.gI().showListTop(player, Manager.Topsukien1);
@@ -117,6 +137,7 @@ public class ChiChi extends Npc {
                             break;
                     }
                 } else if (player.idMark.getIndexMenu() == ConstNpc.GOKU_DAY) {
+                    if(!nro.models.event.EventItemPolicy.isEnabled("summer"))return;
                     switch (select) {
                         case 0:
                             Service.gI().showListTop(player, Manager.Topsukien2);
@@ -128,5 +149,7 @@ public class ChiChi extends Npc {
                 }
             }
         }
-    }
+    
+        }}
+}
 }

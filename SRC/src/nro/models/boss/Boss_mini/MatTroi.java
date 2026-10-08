@@ -27,11 +27,19 @@ import nro.models.utils.Util;
  */
 public class MatTroi extends Boss {
 
-    private final Map<Long, Long> globalEffectTimers = new ConcurrentHashMap<>();
+    private nro.models.services.MiniBossPinkCapsuleDrop capsuleReward;
+
+    @Override
+    protected synchronized void resetBase() {
+        super.resetBase();
+        if (capsuleReward != null) capsuleReward.reset();
+    }
+
+    private final Map<Long, DelayedBossEffect> globalEffectTimers = new ConcurrentHashMap<>();
     private long st;
 
     public MatTroi() throws Exception {
-        super(BossID.Virut, new BossData(
+        super(MiniBossIdentity.nextId(), new BossData(
                 "Mặt Trời " + Util.nextInt(1, 49),
                 ConstPlayer.TRAI_DAT,
                 new short[]{1501, 1502, 1503, -1, -1, -1},
@@ -47,32 +55,29 @@ public class MatTroi extends Boss {
 
     @Override
     public void die(Player plKill) {
-        this.reward(plKill);
-        this.changeStatus(BossStatus.DIE);
+        try { this.reward(plKill); }
+        finally { this.changeStatus(BossStatus.DIE); }
     }
 
     private void applyEffect(Player player) {
-        long effectEndTime = System.currentTimeMillis() + 30000;
-        globalEffectTimers.put(player.id, effectEndTime);
-        ItemTimeService.gI().sendItemTime(player, 12953, 60);
-        this.chat("Nóng vãi lồn, " + player.name + " Đã bị bỏng nhiệt ");
+        synchronized (player) {
+            DelayedBossEffect effect = new DelayedBossEffect(this, player, 30000, 12953);
+            if (!effect.valid(this)) return;
+            DelayedBossEffect previous = globalEffectTimers.get(player.id);
+            if (previous != null && previous.valid(this)) return;
+            globalEffectTimers.put(player.id, effect);
+            ItemTimeService.gI().sendItemTime(player, 12953, 30);
+            this.chat(player.name + " đã bị bỏng nhiệt!");
+        }
     }
 
     private void checkGlobalEffects() {
-        long currentTime = System.currentTimeMillis();
-
-        globalEffectTimers.forEach((playerId, effectEndTime) -> {
-            if (currentTime >= effectEndTime) {
-                Player player = Client.gI().getPlayer(playerId);
-                if (player != null) {
-                    if (!player.isDie()) {
-                        // Kiểm tra xác suất 30% để player bị chết
-                        if (Util.isTrue(80, 100)) {
-                            player.injured(null, player.nPoint.hp, true, false);
-                        }
-                    }
+        long now = System.currentTimeMillis();
+        globalEffectTimers.forEach((id, effect) -> {
+            synchronized (effect.target) {
+                if (!effect.valid(this) || now >= effect.deadline) {
+                    if (globalEffectTimers.remove(id, effect)) effect.expire(this);
                 }
-                globalEffectTimers.remove(playerId);
             }
         });
     }
@@ -109,7 +114,7 @@ public class MatTroi extends Boss {
                     SkillService.gI().useSkill(this, pl, null, -1, null);
                     checkPlayerDie(pl);
                     if (!globalEffectTimers.containsKey(pl.id)
-                            || System.currentTimeMillis() >= globalEffectTimers.get(pl.id)) {
+                            || System.currentTimeMillis() >= globalEffectTimers.get(pl.id).deadline) {
                         this.updateOdo();
                     }
                 } else {
@@ -122,7 +127,10 @@ public class MatTroi extends Boss {
     }
 
     @Override
-    public void reward(Player plKill) {
+    public synchronized void reward(Player plKill) {
+        plKill = nro.models.services.MiniBossPinkCapsuleDrop.creditedPlayer(plKill);
+        if (capsuleReward == null) capsuleReward = new nro.models.services.MiniBossPinkCapsuleDrop();
+        if (!capsuleReward.drop(this, plKill)) return;
         BadgesTaskService.updateCountBagesTask(plKill, ConstTaskBadges.KOL, 1);
         int x = this.location.x;
         int y = this.zone.map.yPhysicInTop(x, this.location.y - 24);
@@ -144,6 +152,7 @@ public class MatTroi extends Boss {
 
     @Override
     public void joinMap() {
+        globalEffectTimers.clear();
         this.name = "Mặt Trời " + Util.nextInt(1, 49);
         this.nPoint.hpMax = 100;
         this.nPoint.hp = this.nPoint.hpMax;
@@ -163,14 +172,31 @@ public class MatTroi extends Boss {
             }
         }
         if (this.zone != null) {
-            try {
-                int zoneid = 0;
-                this.zone = this.zone.map.zones.get(zoneid);
-                ChangeMapService.gI().changeMap(this, this.zone, -1, -1);
-
-                this.changeStatus(BossStatus.CHAT_S);
-            } catch (Exception e) {
-                this.changeStatus(BossStatus.REST);
+            // Selection and admission are one operation for concurrent respawns.
+            synchronized (MatTroi.class) {
+                try {
+                    nro.models.map.Zone selected = null;
+                    for (nro.models.map.Zone candidate : this.zone.map.zones) {
+                        boolean occupied = new java.util.ArrayList<>(candidate.getBosses()).stream()
+                                .anyMatch(boss -> boss != this && boss instanceof MatTroi);
+                        if (!occupied) {
+                            selected = candidate;
+                            break;
+                        }
+                    }
+                    if (selected == null) {
+                        this.zone = null;
+                        this.lastZone = null;
+                        this.changeStatus(BossStatus.RESPAWN);
+                        return;
+                    }
+                    this.joinMapByZone(selected);
+                    this.changeStatus(BossStatus.CHAT_S);
+                } catch (Exception e) {
+                    this.zone = null;
+                    this.lastZone = null;
+                    this.changeStatus(BossStatus.RESPAWN);
+                }
             }
         } else {
             this.changeStatus(BossStatus.RESPAWN);
@@ -179,6 +205,7 @@ public class MatTroi extends Boss {
 
     @Override
     public void leaveMap() {
+        globalEffectTimers.clear();
         ChangeMapService.gI().exitMap(this);
         this.lastZone = null;
         this.lastTimeRest = System.currentTimeMillis();
@@ -187,23 +214,25 @@ public class MatTroi extends Boss {
 
     @Override
     public void active() {
+        this.checkGlobalEffects();
         if (this.typePk == ConstPlayer.NON_PK) {
             this.changeToTypePK();
         }
         this.attack();
         if (Util.canDoWithTime(st, 900000)) {
             this.changeStatus(BossStatus.LEAVE_MAP);
-            this.checkGlobalEffects();
         }
     }
 
     @Override
     public synchronized int injured(Player plAtt, long damage, boolean piercing, boolean isMobAttack) {
+        if (damage <= 0) return 0;
         if (!this.isDie()) {
             int actualDamage = 1;
             this.nPoint.subHP(actualDamage);
 
             if (this.nPoint.hp <= 0) {
+                this.setDie(plAtt);
                 this.die(plAtt);
             }
 

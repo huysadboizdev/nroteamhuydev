@@ -79,6 +79,9 @@ public class Controller implements IMessageHandler {
             dispatchMessage(s, _msg);
             return;
         }
+        if(nro.models.services.LiveSyncCommandGate.hasPendingId(current.id)) {
+            _msg.cleanup();_msg.dispose();return;
+        }
         if(nro.models.services.CommesonChallengeService.hasPendingId(current.id)){
             _msg.cleanup();_msg.dispose();return;
         }
@@ -105,7 +108,8 @@ public class Controller implements IMessageHandler {
             dispatchMessage(s, _msg);
         } else {
             synchronized (current) {
-                if (nro.models.services.AdminPlayerActions.hasRenamePendingId(current.id)
+                if (nro.models.services.LiveSyncCommandGate.hasPendingId(current.id)
+                        || nro.models.services.AdminPlayerActions.hasRenamePendingId(current.id)
                         || nro.models.services.AdminPlayerActions.hasRenamePendingAccount(((MySession)s).userId)
                         || nro.models.services.CommesonChallengeService.hasPending(current)
                         || nro.models.services.RubyGiftService.gI().hasPending(current)) {
@@ -541,7 +545,9 @@ public class Controller implements IMessageHandler {
                     }
                     break;
                 case -58:
-                    nro.models.services.BossNoticeService.gI().request((MySession)s,_msg.reader().readInt(),_msg.reader().readUnsignedByte(),_msg.reader().readUnsignedShort());
+                    int noticeRequest=_msg.reader().readInt();
+                    if(noticeRequest==-2)nro.models.services.BossNoticeService.gI().requestV2((MySession)s,_msg.reader().readInt(),_msg.reader().readUnsignedByte(),_msg.reader().readUnsignedByte(),_msg.reader().readUnsignedShort());
+                    else nro.models.services.BossNoticeService.gI().request((MySession)s,noticeRequest,_msg.reader().readUnsignedByte(),_msg.reader().readUnsignedShort());
                     break;
                 case -50:
                     if (player != null) {
@@ -964,7 +970,8 @@ public class Controller implements IMessageHandler {
                 SuperRankDAO.insertData(player);
             }
             ServerNotify.gI().sendNotifyTab(player);
-            if(player.session.bossNoticeBoard)nro.models.services.BossNoticeService.gI().request(player.session,0,0,0);
+            if(player.session.bossNoticeCategories)nro.models.services.BossNoticeService.gI().requestV2(player.session,0,2,0,0);
+            else if(player.session.bossNoticeBoard)nro.models.services.BossNoticeService.gI().request(player.session,0,0,0);
             player.setClothes.setup();
             if (player.pet != null) {
                 player.pet.setClothes.setup();

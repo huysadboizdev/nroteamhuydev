@@ -24,6 +24,7 @@ public class XeNuocMia extends Npc {
 
     @Override
     public void openBaseMenu(Player player) {
+        if (!EventItemPolicy.isEnabled("summer")) return;
         createOtherMenu(player, 0, "Cậu muốn uống gì nào",
                 "Mua 1 ly\nnước mía",
                 "Mua 10 ly\nnước mía");
@@ -31,6 +32,11 @@ public class XeNuocMia extends Npc {
 
     @Override
     public void confirmMenu(Player pl, int select) {
+        synchronized (pl) {
+        try (EventItemPolicy.Permit permit = EventItemPolicy.admit()) {
+        if (nro.models.services.LiveSyncMutationGate.blocked(pl)
+                || nro.models.services.AdminPlayerActions.hasPending(pl)) return;
+        if (!EventItemPolicy.isEnabled("summer")) return;
         if (canOpenNpc(pl)) {
             switch (pl.idMark.getIndexMenu()) {
                 case 0 -> {
@@ -85,9 +91,14 @@ public class XeNuocMia extends Npc {
                 }
             }
         }
+        }
+        }
     }
 
     private void MuaNuocMia(Player player) {
+        if (!EventItemPolicy.isEnabled("summer") || InventoryService.gI().getCountEmptyBag(player) < 1) {
+            Service.gI().sendThongBao(player, "Cần chỗ trống trong túi."); return;
+        }
         Item khucMia = InventoryService.gI().findItemBag(player, KHUC_MIA);
         Item nuocDa = InventoryService.gI().findItemBag(player, NUOC_DA);
 
@@ -120,6 +131,9 @@ public class XeNuocMia extends Npc {
     }
 
     private void MuaNuocMiaX10(Player player) {
+        if (!EventItemPolicy.isEnabled("summer") || InventoryService.gI().getCountEmptyBag(player) < 3) {
+            Service.gI().sendThongBao(player, "Cần chỗ trống trong túi."); return;
+        }
         Item khucMia = InventoryService.gI().findItemBag(player, KHUC_MIA);
         Item nuocDa = InventoryService.gI().findItemBag(player, NUOC_DA);
 

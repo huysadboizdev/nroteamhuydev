@@ -37,6 +37,7 @@ public class SnakeWay implements Runnable {
 
     public Clan clan;
     public volatile boolean isOpened;
+    public volatile boolean isInitializing;
     public volatile boolean isClosing;
     private boolean achievementRecorded;
     private boolean bossesRetired;
@@ -71,6 +72,7 @@ public class SnakeWay implements Runnable {
     }
 
     public synchronized void update() {
+        if (isInitializing) return;
         if (isOpened) {
             if (isClosing || Util.canDoWithTime(lastTimeOpen, TIME_CON_DUONG_RAN_DOC) || (kickoutcdrd && Util.canDoWithTime(timeKickOutCDRD, 60000))) {
                 isClosing = true;
@@ -124,10 +126,15 @@ public class SnakeWay implements Runnable {
             for (Zone zone : zones) if (zone != null) zone.dungeonClosing = false;
             this.isOpened = true;
             this.init();
+            this.isInitializing = false;
             sendTextConDuongRanDoc();
         } catch (Exception e) {
-            plOpen.clan.lastTimeOpenConDuongRanDoc = 0;
-            this.dispose();
+            clan.lastTimeOpenConDuongRanDoc = 0;
+            synchronized (this) {
+                this.isClosing = true;
+                this.isInitializing = false;
+                this.dispose();
+            }
         }
     }
 
@@ -318,9 +325,12 @@ public class SnakeWay implements Runnable {
         this.bosses.clear();
         this.allMobsDead = false;
         this.endCDRD = false;
+        synchronized (nro.models.services_dungeon.DungeonAllocationLock.LOCK) {
         this.isOpened = false;
         if (this.clan != null && this.clan.ConDuongRanDoc == this) this.clan.ConDuongRanDoc = null;
         this.clan = null;
         this.kickoutcdrd = false;
+        this.isInitializing = false;
+        }
     }
 }

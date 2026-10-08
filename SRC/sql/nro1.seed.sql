@@ -5066,13 +5066,13 @@ INSERT INTO `item_template` (`id`, `TYPE`, `gender`, `NAME`, `description`, `lev
 ('369', '28', '3', 'Cờ hồng', 'Bật để PK đồ sát các màu cờ khác', '1', '2329', '-1', '0', '0', '0', '0', '-1', '-1', '-1'),
 ('370', '28', '3', 'Cờ cam', 'Bật để PK đồ sát các màu cờ khác', '1', '2328', '-1', '0', '0', '0', '0', '-1', '-1', '-1'),
 ('371', '28', '3', 'Cờ xám', 'Bật để PK đồ sát tất cả', '1', '2331', '-1', '0', '0', '0', '0', '-1', '-1', '-1'),
-('372', '11', '3', 'Ngọc rồng 1 sao đen', '+15% sức đánh cho toàn bang', '1', '2315', '-1', '0', '0', '0', '0', '-1', '-1', '-1'),
-('373', '11', '3', 'Ngọc rồng 2 sao đen', '+20% HP và KI tối đa cho toàn bang', '1', '2316', '-1', '0', '0', '0', '0', '-1', '-1', '-1'),
-('374', '11', '3', 'Ngọc rồng 3 sao đen', 'Mỗi giờ 10 hạt đậu thần cấp 8 cho toàn bang', '1', '2317', '-1', '0', '0', '0', '0', '-1', '-1', '-1'),
-('375', '11', '3', 'Ngọc rồng 4 sao đen', 'Mỗi giờ 1 bùa 1h ngẫu nhiên cho toàn bang', '1', '2318', '-1', '0', '0', '0', '0', '-1', '-1', '-1'),
-('376', '11', '3', 'Ngọc rồng 5 sao đen', 'Mỗi giờ 3 ngọc nâng cấp ngẫu nhiên cho toàn bang', '1', '2319', '-1', '0', '0', '0', '0', '-1', '-1', '-1'),
-('377', '11', '3', 'Ngọc rồng 6 sao đen', 'Mỗi giờ 200.000 vàng cho toàn bang', '1', '2320', '-1', '0', '0', '0', '0', '-1', '-1', '-1'),
-('378', '11', '3', 'Ngọc rồng 7 sao đen', 'Mỗi giờ 2 ngọc cho toàn bang', '1', '2321', '-1', '0', '0', '0', '0', '-1', '-1', '-1'),
+('372', '11', '3', 'Ngọc rồng 1 sao đen', '+21% sức đánh cho toàn bang', '1', '2315', '-1', '0', '0', '0', '0', '-1', '-1', '-1'),
+('373', '11', '3', 'Ngọc rồng 2 sao đen', '+35% HP tối đa cho toàn bang', '1', '2316', '-1', '0', '0', '0', '0', '-1', '-1', '-1'),
+('374', '11', '3', 'Ngọc rồng 3 sao đen', '+35% KI tối đa cho toàn bang', '1', '2317', '-1', '0', '0', '0', '0', '-1', '-1', '-1'),
+('375', '11', '3', 'Ngọc rồng 4 sao đen', '+35% phản sát thương cho toàn bang', '1', '2318', '-1', '0', '0', '0', '0', '-1', '-1', '-1'),
+('376', '11', '3', 'Ngọc rồng 5 sao đen', '+35% hút HP theo sát thương cho toàn bang', '1', '2319', '-1', '0', '0', '0', '0', '-1', '-1', '-1'),
+('377', '11', '3', 'Ngọc rồng 6 sao đen', '+20% giáp giảm sát thương cho toàn bang', '1', '2320', '-1', '0', '0', '0', '0', '-1', '-1', '-1'),
+('378', '11', '3', 'Ngọc rồng 7 sao đen', '+14% né đòn cho toàn bang', '1', '2321', '-1', '0', '0', '0', '0', '-1', '-1', '-1'),
 ('379', '29', '3', 'Máy dò Capsule kì bí', 'Dùng để tìm kiếm Capsule kì bí ở tương lai', '1', '2758', '-1', '1', '0', '100000000', '0', '-1', '-1', '-1'),
 ('380', '27', '3', 'Viên Capsule kì bí', 'Bên trong ẩn chứa nhiều thứ bí ẩn', '1', '2759', '-1', '1', '0', '0', '0', '-1', '-1', '-1'),
 ('381', '29', '3', 'Cuồng nộ', 'Trong vòng tối đa 10 phút +100% sức đánh gốc', '1', '2754', '-1', '1', '0', '0', '0', '-1', '-1', '-1'),
@@ -6519,7 +6519,7 @@ INSERT INTO `item_template` (`id`, `TYPE`, `gender`, `NAME`, `description`, `lev
 ('1822', '75', '3', 'Rada ngọc rồng', 'Vật phẩm sự kiện', '0', '15002', '0', '1', '0', '0', '0', '-1', '-1', '-1'),
 ('1823', '75', '3', 'Rada ngọc rồng Vip', 'Vật phẩm sự kiện', '0', '15003', '0', '0', '0', '0', '0', '-1', '-1', '-1'),
 ('1824', '75', '3', 'Cậu Vàng', 'Đến gặp Anh Hai rồi,\nVất ra đất để nhận thưởng.', '0', '16290', '0', '1', '1500000', '0', '0', '-1', '-1', '-1'),
-('1825', '75', '3', 'Vé Nhệm Vụ KOL Vip', 'Vật phầm sự kiện', '0', '15293', '0', '1', '0', '0', '0', '-1', '-1', '-1'),
+('1825', '75', '3', 'Vé nhiệm vụ KOL VIP', 'Vé dùng để nhận nhiệm vụ KOL VIP. Cần có vé trong hành trang.', '0', '15293', '0', '1', '0', '0', '1000', '-1', '-1', '-1'),
 ('1826', '75', '3', '', '', '0', '0', '0', '0', '0', '0', '0', '-1', '-1', '-1'),
 ('1827', '75', '3', '', '', '0', '0', '0', '0', '0', '0', '0', '-1', '-1', '-1'),
 ('1828', '75', '3', '', '', '0', '0', '0', '0', '0', '0', '0', '-1', '-1', '-1'),
@@ -6811,13 +6811,13 @@ INSERT INTO `map_template` (`id`, `NAME`, `zones`, `max_player`, `data`, `type`,
 ('82', 'Núi khỉ đen', '10', '15', '[0,2,0,20,8]', '0', '2', '0', '20', '8', '["["Hang quỷ chim",0,360,24,384,0,0,81,1380,336]","["Hang khỉ đen",1656,360,1680,384,0,0,83,60,336]"]', '["[54,13,300000,324,384]","[54,13,300000,564,384]","[54,13,300000,804,384]","[54,13,300000,1068,384]","[54,13,300000,1284,384]","[54,13,300000,132,240]","[54,13,300000,396,240]","[55,14,350000,756,192]","[54,13,300000,1188,240]","[54,13,300000,1476,240]","[50,12,180000,252,144]","[50,12,180000,1308,144]"]', '[]', '0'),
 ('83', 'Hang khỉ đen', '10', '15', '[0,2,3,21,0]', '0', '2', '3', '21', '0', '["["Núi khỉ đen",0,312,24,336,0,0,82,1620,384]","["Núi khỉ đỏ",1656,312,1680,336,0,0,79,60,360]"]', '["[55,14,350000,348,240]","[55,14,350000,468,192]","[55,14,350000,612,144]","[55,14,350000,900,144]","[55,14,350000,1020,192]","[55,14,350000,1140,240]","[55,14,350000,1260,288]","[55,14,350000,564,336]","[55,14,350000,924,336]","[56,15,400000,756,336]"]', '[]', '0'),
 ('84', 'Siêu Thị', '10', '15', '[0,0,2,11,8]', '0', '0', '2', '11', '8', '["["Sân sau siêu thị",936,312,960,336,0,0,104,60,336]"]', '[]', '[[17,84,336],[7,180,336],[21,276,336],[16,372,336],[9,468,336],[8,564,336],[10,760,336],[28,660,336]]', '0'),
-('85', 'Hành tinh M-2', '10', '15', '[0,2,3,20,0]', '3', '2', '3', '20', '0', '[]', '["[57,16,450000,108,360]","[57,16,450000,1572,360]","[57,16,450000,1404,360]","[50,12,180000,180,192]"]', '["[36,1044,360]"]', '0'),
-('86', 'Hành tinh Polaris', '10', '15', '[0,2,0,6,5]', '3', '2', '0', '6', '5', '[]', '["[50,12,180000,1524,192]","[50,12,180000,1356,216]","[50,12,180000,156,192]","[50,12,180000,324,240]"]', '["[30,765,336]"]', '0'),
-('87', 'Hành tinh Cretaceous', '10', '15', '[0,2,2,11,0]', '3', '2', '2', '11', '0', '[]', '["[56,15,400000,132,384]","[57,16,450000,1548,384]","[50,12,180000,276,264]","[50,12,180000,1356,264]"]', '["[31,780,384]"]', '0'),
-('88', 'Hành tinh Monmaasu', '10', '15', '[0,2,1,8,0]', '3', '2', '1', '8', '0', '[]', '["[50,12,180000,156,216]","[50,12,180000,1476,216]","[50,12,180000,348,168]","[50,12,180000,1284,168]","[56,15,400000,276,336]","[56,15,400000,1356,336]"]', '["[32,780,336]"]', '0'),
-('89', 'Hành tinh Rudeeze', '10', '15', '[0,2,0,3,1]', '3', '2', '0', '3', '1', '[]', '["[57,16,450000,108,288]","[57,16,450000,1524,360]"]', '["[33,924,192]"]', '0'),
-('90', 'Hành tinh Gelbo', '10', '15', '[0,2,0,10,7]', '3', '2', '0', '10', '7', '[]', '["[57,16,450000,108,360]","[57,16,450000,1596,384]","[50,12,180000,252,192]","[50,12,180000,1380,216]"]', '["[34,804,240]"]', '0'),
-('91', 'Hành tinh Tigere', '10', '15', '[0,2,1,1,8]', '3', '2', '1', '1', '8', '[]', '["[56,15,400000,132,360]","[56,15,400000,1572,360]","[57,16,450000,324,168]","[57,16,450000,1356,168]"]', '["[35,804,120]"]', '0'),
+('85', 'Hành tinh M-2', '2', '50', '[0,2,3,20,0]', '3', '2', '3', '20', '0', '[]', '["[57,16,450000,108,360]","[57,16,450000,1572,360]","[57,16,450000,1404,360]","[50,12,180000,180,192]"]', '["[36,1044,360]"]', '0'),
+('86', 'Hành tinh Polaris', '2', '50', '[0,2,0,6,5]', '3', '2', '0', '6', '5', '[]', '["[50,12,180000,1524,192]","[50,12,180000,1356,216]","[50,12,180000,156,192]","[50,12,180000,324,240]"]', '["[30,765,336]"]', '0'),
+('87', 'Hành tinh Cretaceous', '2', '50', '[0,2,2,11,0]', '3', '2', '2', '11', '0', '[]', '["[56,15,400000,132,384]","[57,16,450000,1548,384]","[50,12,180000,276,264]","[50,12,180000,1356,264]"]', '["[31,780,384]"]', '0'),
+('88', 'Hành tinh Monmaasu', '3', '50', '[0,2,1,8,0]', '3', '2', '1', '8', '0', '[]', '["[50,12,180000,156,216]","[50,12,180000,1476,216]","[50,12,180000,348,168]","[50,12,180000,1284,168]","[56,15,400000,276,336]","[56,15,400000,1356,336]"]', '["[32,780,336]"]', '0'),
+('89', 'Hành tinh Rudeeze', '3', '50', '[0,2,0,3,1]', '3', '2', '0', '3', '1', '[]', '["[57,16,450000,108,288]","[57,16,450000,1524,360]"]', '["[33,924,192]"]', '0'),
+('90', 'Hành tinh Gelbo', '3', '50', '[0,2,0,10,7]', '3', '2', '0', '10', '7', '[]', '["[57,16,450000,108,360]","[57,16,450000,1596,384]","[50,12,180000,252,192]","[50,12,180000,1380,216]"]', '["[34,804,240]"]', '0'),
+('91', 'Hành tinh Tigere', '3', '50', '[0,2,1,1,8]', '3', '2', '1', '1', '8', '[]', '["[56,15,400000,132,360]","[56,15,400000,1572,360]","[57,16,450000,324,168]","[57,16,450000,1356,168]"]', '["[35,804,120]"]', '0'),
 ('92', 'Thành phố phía đông', '10', '15', '[0,2,0,22,8]', '0', '2', '0', '22', '8', '["["Thành phố phía nam",1416,336,1440,360,0,0,93,60,360]","["Nhà Bunma",0,336,24,360,0,0,102,636,360]"]', '["[58,11,200000,204,360]","[58,11,200000,396,360]","[58,11,200000,588,360]","[58,11,200000,804,360]","[58,11,200000,996,360]","[58,11,200000,1188,360]"]', '[]', '0'),
 ('93', 'Thành phố phía nam', '10', '15', '[0,2,0,22,8]', '0', '2', '0', '22', '8', '["["Thành phố phía đông",0,336,24,360,0,0,92,1380,360]","["Đảo Balê",1656,264,1680,288,0,0,94,60,384]"]', '["[59,12,250000,348,288]","[59,12,250000,516,288]","[59,12,250000,684,360]","[59,12,250000,876,360]","[59,12,250000,1092,264]","[59,12,250000,1212,360]","[59,12,250000,1380,360]"]', '[]', '0'),
 ('94', 'Đảo Balê', '10', '15', '[0,2,0,22,8]', '0', '2', '0', '22', '8', '["["Thành phố phía nam",0,360,24,384,0,0,93,1620,288]","["Cao nguyên",1656,360,1680,384,0,0,96,60,144]"]', '["[60,13,300000,324,360]","[60,13,300000,468,168]","[60,13,300000,588,384]","[60,13,300000,804,384]","[60,13,300000,1068,384]","[60,13,300000,1188,168]","[60,13,300000,1356,360]"]', '[]', '0'),
@@ -6852,7 +6852,7 @@ INSERT INTO `map_template` (`id`, `NAME`, `zones`, `max_player`, `data`, `type`,
 ('123', 'Ngũ Hành Sơn', '10', '15', '[1,2,0,1,0]', '0', '2', '0', '1', '0', '["["Ngũ Hành Sơn",1512,336,1536,360,0,0,124,60,360]"]', '["[56,20,400000,324,384]","[56,20,400000,588,408]","[56,20,400000,780,408]","[56,20,400000,1140,360]"]', '["[6,468,312,0]","[49,140,384,4544]"]', '0'),
 ('124', 'Ngũ Hành Sơn', '10', '15', '[1,2,0,1,0]', '0', '2', '0', '1', '0', '["["Ngũ Hành Sơn",0,336,24,360,0,0,123,1476,360]","["Ngũ Hành Sơn",1224,264,1248,288,0,0,122,60,288]"]', '["[57,20,450000,300,408]","[57,20,450000,492,384]","[57,20,450000,636,384]","[57,20,450000,828,336]"]', '["[6,180,360,0]"]', '0'),
 ('125', '125', '10', '15', '[]', '1', '1', '1', '1', '1', '[]', '[]', '[]', '0'),
-('126', 'Thành phố Santa', '10', '15', '[0,2,0,11,10]', '0', '2', '0', '11', '10', '[]', '["[70,0,40000000,400,360]","[50,12,180000,228,240]","[50,12,180000,540,240]","[50,12,180000,708,240]","[50,12,180000,1020,240]","[50,12,180000,372,168]","[50,12,180000,876,168]"]', '[[53,137,360]]', '0'),
+('126', 'Thành phố Santa', '20', '15', '[0,2,0,11,10]', '0', '2', '0', '11', '10', '[]', '["[70,0,40000000,400,360]","[50,12,180000,228,240]","[50,12,180000,540,240]","[50,12,180000,708,240]","[50,12,180000,1020,240]","[50,12,180000,372,168]","[50,12,180000,876,168]"]', '[[53,137,360]]', '0'),
 ('127', 'Cổng phi thuyền', '10', '15', '[0,2,2,12,11]', '9', '2', '2', '12', '11', '[]', '[]', '[[44,108,312]]', '0'),
 ('128', 'Bụng Mabư', '10', '15', '[0,0,0,12,11]', '9', '0', '0', '12', '11', '[]', '[]', '[]', '0'),
 ('129', 'Đại hội võ thuật', '10', '15', '[0,2,0,23,8]', '0', '2', '0', '23', '8', '[]', '[]', '[[23,295,360],[23,474,360]]', '0'),
@@ -10874,3 +10874,382 @@ CREATE TABLE IF NOT EXISTS commeson_attempt (
  UNIQUE KEY uq_commeson_match (match_id),
  KEY ix_commeson_pending (player_id,state)
 ) ENGINE=InnoDB;
+
+
+-- THIEN_SU_RUBY_10_20261006
+SET NAMES utf8mb4;
+START TRANSACTION;
+UPDATE item_shop i
+JOIN tab_shop t ON t.id=i.tab_id
+JOIN shop s ON s.id=t.shop_id
+SET i.type_sell=3, i.cost=10, i.icon_spec=7743
+WHERE s.tag_name='THIEN_SU';
+COMMIT;
+
+-- BEERUS_DESTROYER_RUBY_TRADE_20261006
+-- Scope exclusively to Beerus; preserve rows, tabs and base item options.
+START TRANSACTION;
+UPDATE shop SET type_shop=3 WHERE tag_name='BILL' AND npc_id=55;
+UPDATE item_shop i JOIN tab_shop t ON t.id=i.tab_id JOIN shop s ON s.id=t.shop_id
+SET i.type_sell=3,i.cost=100,i.icon_spec=7743
+WHERE s.tag_name='BILL' AND s.npc_id=55;
+COMMIT;
+
+-- HIGH_TIER_EQUIPMENT_POWER_LOCK_20261006
+-- Values are billions in option21; never place >INT_MAX in template power_require.
+START TRANSACTION;
+DELETE o FROM item_shop_option o JOIN item_shop i ON i.id=o.item_shop_id
+WHERE (i.temp_id BETWEEN 650 AND 662 OR i.temp_id BETWEEN 1048 AND 1062)
+  AND o.option_id IN (21,30);
+INSERT INTO item_shop_option (item_shop_id,option_id,param)
+SELECT i.id,21,CASE
+ WHEN i.temp_id BETWEEN 1048 AND 1062 THEN 80
+ WHEN i.temp_id IN (650,652,654) THEN 40
+ WHEN i.temp_id IN (651,653,655) THEN 44
+ WHEN i.temp_id IN (657,659,661) THEN 50
+ WHEN i.temp_id IN (658,660,662) THEN 43
+ WHEN i.temp_id=656 THEN 47 END
+FROM item_shop i
+WHERE i.temp_id BETWEEN 650 AND 662 OR i.temp_id BETWEEN 1048 AND 1062;
+INSERT INTO item_shop_option (item_shop_id,option_id,param)
+SELECT i.id,30,0 FROM item_shop i
+WHERE i.temp_id BETWEEN 650 AND 662 OR i.temp_id BETWEEN 1048 AND 1062;
+COMMIT;
+
+-- Restore Uub parts to existing verified icons; keep original offsets and other costumes.
+START TRANSACTION;
+UPDATE part SET DATA='[[8586,1,-4],[8587,-2,-4],[2955,0,0]]' WHERE id=946;
+UPDATE part SET DATA='[[8589,2,-1],[8588,-1,-2],[8590,0,-3],[8591,0,-2],[8592,0,-2],[8593,0,-1],[8594,0,-1],[8595,2,0],[8596,2,0],[8597,2,0],[8598,5,0],[8599,1,-1],[8600,2,-1],[8601,2,-2],[8602,3,1],[8603,3,-1],[2955,0,0]]' WHERE id=947;
+UPDATE part SET DATA='[[8605,0,0],[8604,0,1],[8606,0,0],[8607,0,0],[8608,0,0],[8609,0,0],[8610,0,0],[8611,1,1],[8612,1,3],[8613,1,0],[8614,1,0],[8615,1,2],[8616,1,1],[2955,0,0]]' WHERE id=948;
+UPDATE head_avatar SET avatar_id=8586 WHERE head_id=946;
+COMMIT;
+
+-- Align Uub head with body using existing client CharInfo coordinates.
+START TRANSACTION;
+UPDATE part SET DATA='[[8586,1,3],[8587,-2,3],[2955,0,0]]' WHERE id=946;
+COMMIT;
+
+-- Restore complete Uub mapping from local original res moi/part.sql.
+START TRANSACTION;
+UPDATE part SET DATA='[[8586,4,7],[8587,2,5],[2955,0,0]]' WHERE id=946;
+UPDATE part SET DATA='[[8588,2,6],[8589,1,4],[8590,-1,2],[8591,1,2],[8592,1,1],[8593,2,2],[8594,1,2],[8595,3,4],[8596,3,7],[8597,1,8],[8598,1,3],[8599,1,3],[8600,2,6],[8601,2,3],[8602,2,5],[8603,0,2],[2955,0,0]]' WHERE id=947;
+UPDATE part SET DATA='[[8604,9,9],[8605,1,4],[8606,0,3],[8607,1,2],[8608,0,2],[8609,2,2],[8610,0,4],[8611,3,9],[8612,0,7],[8613,1,3],[8614,1,5],[8615,0,8],[8616,0,7],[2955,0,0]]' WHERE id=948;
+UPDATE head_avatar SET avatar_id=8586 WHERE head_id=946;
+COMMIT;
+
+-- Santa KOL VIP ticket and VIP rewards 2026-10-06
+-- Santa green-gem ticket; VIP rewards are supplied by VipRewardCatalog.
+-- Keep existing item/radar IDs: no duplicate card or ticket templates.
+START TRANSACTION;
+UPDATE item_template SET NAME='Vé nhiệm vụ KOL VIP',
+ description='Vé dùng để nhận nhiệm vụ KOL VIP. Cần có vé trong hành trang.',
+ gem=1000 WHERE id=1825;
+-- Remove any duplicate ticket rows and their options before updating the survivor.
+DELETE opt FROM item_shop_option opt
+ JOIN item_shop duplicate ON duplicate.id=opt.item_shop_id
+ WHERE duplicate.tab_id=17 AND duplicate.temp_id=1825
+ AND duplicate.id<>(SELECT keep_id FROM
+  (SELECT MIN(id) AS keep_id FROM item_shop WHERE tab_id=17 AND temp_id=1825) keep_row);
+DELETE FROM item_shop WHERE tab_id=17 AND temp_id=1825
+ AND id<>(SELECT keep_id FROM
+  (SELECT MIN(id) AS keep_id FROM item_shop WHERE tab_id=17 AND temp_id=1825) keep_row);
+SET @santa_kol_vip_shop_id=(SELECT COALESCE(MAX(id),0)+1 FROM item_shop);
+INSERT INTO item_shop(id,tab_id,temp_id,is_new,is_sell,type_sell,cost,icon_spec,create_time)
+ SELECT @santa_kol_vip_shop_id,17,1825,1,1,1,1000,0,NOW()
+ WHERE NOT EXISTS(SELECT 1 FROM item_shop WHERE tab_id=17 AND temp_id=1825);
+UPDATE item_shop SET is_new=1,is_sell=1,type_sell=1,cost=1000,icon_spec=0
+ WHERE tab_id=17 AND temp_id=1825;
+COMMIT;
+
+-- Mob 117 uses ordinary mob resources. Keep its HP and measurement rules.
+UPDATE mob_template SET TYPE=0,range_move=0,speed=0 WHERE id=117;
+
+-- Web manager transactional command receipts (2026-10-06)
+-- Additive migration. Existing completed command history is never replayed.
+ALTER TABLE account ADD COLUMN IF NOT EXISTS admin INT NOT NULL DEFAULT 0;
+CREATE TABLE IF NOT EXISTS server_command_queue (
+ id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+ command_type VARCHAR(50) NOT NULL,
+ payload TEXT NULL,
+ status ENUM('pending','processing','completed','failed') NOT NULL DEFAULT 'pending',
+ created_by VARCHAR(50) DEFAULT 'admin',
+ created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ executed_at TIMESTAMP NULL,
+ result_message VARCHAR(255) NULL,
+ KEY idx_status(status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+ALTER TABLE server_command_queue ADD COLUMN IF NOT EXISTS request_id VARCHAR(64) CHARACTER SET ascii COLLATE ascii_bin NULL;
+ALTER TABLE server_command_queue ADD COLUMN IF NOT EXISTS actor_account_id INT NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS uq_server_command_request ON server_command_queue(request_id);
+CREATE TABLE IF NOT EXISTS admin_command_receipt (
+ command_id BIGINT NOT NULL PRIMARY KEY,
+ command_type VARCHAR(64) NOT NULL,
+ player_id BIGINT NOT NULL DEFAULT 0,
+ account_id INT NOT NULL DEFAULT 0,
+ result_message TEXT NOT NULL,
+ created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ KEY idx_admin_receipt_player(player_id),
+ KEY idx_admin_receipt_account(account_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+-- LIVE CONTROLS MIGRATIONS 20261007
+-- Deployment only: do not seed a guessed rate; absent row uses Config.properties.
+CREATE TABLE IF NOT EXISTS server_runtime_setting (
+    setting_key VARCHAR(64) NOT NULL PRIMARY KEY,
+    setting_value VARCHAR(255) NOT NULL,
+    version BIGINT NOT NULL DEFAULT 1,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Sparse overrides; missing rows retain compiled defaults and scheduling.
+CREATE TABLE IF NOT EXISTS boss_live_override (
+ boss_id INT NOT NULL,
+ phase INT NOT NULL DEFAULT 0,
+ hp INT NULL,
+ damage INT NULL,
+ updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+ PRIMARY KEY(boss_id,phase),
+ CHECK (phase BETWEEN 0 AND 31),
+ CHECK (hp IS NULL OR hp > 0),
+ CHECK (damage IS NULL OR damage >= 0),
+ CHECK (hp IS NOT NULL OR damage IS NOT NULL)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Apply only during saved maintenance, after a backup, before installing the gift transaction JAR.
+-- No catalog foreign key: deleting/recreating a code or player must not erase account claims.
+DELIMITER $$
+DROP FUNCTION IF EXISTS giftcode_canonical_20261007$$
+CREATE FUNCTION giftcode_canonical_20261007(raw TEXT) RETURNS VARCHAR(100) CHARACTER SET ascii COLLATE ascii_bin DETERMINISTIC
+BEGIN
+ DECLARE value TEXT;
+ DECLARE i INT DEFAULT 1;
+ IF raw IS NULL THEN RETURN NULL; END IF;
+ SET value=raw;
+ WHILE LENGTH(value)>0 AND ASCII(LEFT(value,1)) IN (9,10,11,12,13,32) DO SET value=SUBSTRING(value,2); END WHILE;
+ WHILE LENGTH(value)>0 AND ASCII(RIGHT(value,1)) IN (9,10,11,12,13,32) DO SET value=LEFT(value,CHAR_LENGTH(value)-1); END WHILE;
+ IF CHAR_LENGTH(value)=0 OR CHAR_LENGTH(value)>100 THEN RETURN NULL; END IF;
+ WHILE i<=CHAR_LENGTH(value) DO
+  IF ORD(SUBSTRING(value,i,1))<33 OR ORD(SUBSTRING(value,i,1))>126 THEN RETURN NULL; END IF;
+  SET i=i+1;
+ END WHILE;
+ RETURN UPPER(value);
+END$$
+DROP PROCEDURE IF EXISTS migrate_giftcode_20261007$$
+CREATE PROCEDURE migrate_giftcode_20261007()
+BEGIN
+ DECLARE done INT DEFAULT 0;
+ DECLARE account_value INT;
+ DECLARE player_value BIGINT;
+ DECLARE history_value LONGTEXT;
+ DECLARE index_value INT;
+ DECLARE raw_value TEXT;
+ DECLARE code_value VARCHAR(100) CHARACTER SET ascii COLLATE ascii_bin;
+ DECLARE histories CURSOR FOR SELECT id,account_id,giftcode FROM player ORDER BY id;
+ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done=1;
+ -- Preflight all data into temporary staging BEFORE any persistent DDL/data change.
+ IF EXISTS(SELECT 1 FROM giftcode WHERE giftcode_canonical_20261007(code) IS NULL) THEN
+  SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Invalid legacy giftcode: fix empty/space/non-ASCII/overlong codes first';
+ END IF;
+ IF EXISTS(SELECT 1 FROM giftcode GROUP BY giftcode_canonical_20261007(code) HAVING COUNT(*)>1) THEN
+  SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Canonical giftcode duplicates: merge manually before migration';
+ END IF;
+ DROP TEMPORARY TABLE IF EXISTS giftcode_claim_backfill_20261007;
+ CREATE TEMPORARY TABLE giftcode_claim_backfill_20261007(account_id INT NOT NULL,canonical_code VARCHAR(100) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,player_id BIGINT NOT NULL,PRIMARY KEY(account_id,canonical_code)) ENGINE=InnoDB;
+ OPEN histories;
+ scan_loop: LOOP
+  FETCH histories INTO player_value,account_value,history_value;
+  IF done=1 THEN LEAVE scan_loop; END IF;
+  -- Existing player creation writes empty text for no claims; accept it as an empty array.
+  IF history_value='' THEN SET history_value='[]'; END IF;
+  IF account_value<=0 OR JSON_VALID(history_value)=0 THEN
+   SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Invalid player account or legacy giftcode JSON: migration refused';
+  END IF;
+  IF JSON_TYPE(history_value)<>'ARRAY' THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Player giftcode history must be JSON array'; END IF;
+  SET index_value=0;
+  WHILE index_value<JSON_LENGTH(history_value) DO
+   IF JSON_TYPE(JSON_EXTRACT(history_value,CONCAT('$[',index_value,']')))<>'STRING' THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Invalid non-string legacy giftcode history'; END IF;
+   SET raw_value=JSON_UNQUOTE(JSON_EXTRACT(history_value,CONCAT('$[',index_value,']')));
+   SET code_value=giftcode_canonical_20261007(raw_value);
+   IF code_value IS NULL THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Invalid legacy claimed code: migration refused'; END IF;
+   INSERT IGNORE INTO giftcode_claim_backfill_20261007 VALUES(account_value,code_value,player_value);
+   SET index_value=index_value+1;
+  END WHILE;
+ END LOOP;
+ CLOSE histories;
+ CREATE TABLE IF NOT EXISTS giftcode_claim(
+  account_id INT NOT NULL,
+  canonical_code VARCHAR(100) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  request_id CHAR(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  player_id BIGINT NOT NULL,
+  catalog_id INT NOT NULL DEFAULT 0,
+  remaining_after INT NOT NULL DEFAULT 0,
+  claimed_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY(account_id,canonical_code), UNIQUE KEY request_id(request_id)
+ ) ENGINE=InnoDB;
+ -- Backfill applies even when the original catalog code no longer exists.
+ INSERT IGNORE INTO giftcode_claim(account_id,canonical_code,request_id,player_id)
+  SELECT account_id,canonical_code,UUID(),player_id FROM giftcode_claim_backfill_20261007;
+ -- Remove ON UPDATE before canonicalization, retaining original creation timestamps.
+ ALTER TABLE giftcode MODIFY datecreate TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;
+ UPDATE giftcode SET code=giftcode_canonical_20261007(code);
+ ALTER TABLE giftcode MODIFY code VARCHAR(100) CHARACTER SET ascii COLLATE ascii_bin NOT NULL;
+ IF NOT EXISTS(SELECT 1 FROM information_schema.statistics WHERE table_schema=DATABASE() AND table_name='giftcode' AND index_name='giftcode_canonical_unique') THEN
+  ALTER TABLE giftcode ADD UNIQUE KEY giftcode_canonical_unique(code);
+ END IF;
+ DROP TEMPORARY TABLE giftcode_claim_backfill_20261007;
+END$$
+CALL migrate_giftcode_20261007()$$
+DROP PROCEDURE migrate_giftcode_20261007$$
+DROP FUNCTION giftcode_canonical_20261007$$
+DELIMITER ;
+
+
+-- RUBY_FOOD_20261007
+SET NAMES utf8mb4;
+START TRANSACTION;
+SET @ruby_shop=(SELECT id FROM shop WHERE tag_name='SANTA_HONG_NGOC' AND npc_id=39 LIMIT 1);
+SET @ruby_tab=(SELECT MIN(id) FROM tab_shop WHERE shop_id=@ruby_shop);
+INSERT INTO item_shop(tab_id,temp_id,is_new,is_sell,type_sell,cost,icon_spec)
+SELECT @ruby_tab,f.id,1,1,3,5,7743 FROM (SELECT 880 id UNION ALL SELECT 882) f
+JOIN item_template it ON it.id=f.id
+WHERE @ruby_tab IS NOT NULL AND NOT EXISTS(SELECT 1 FROM item_shop WHERE tab_id=@ruby_tab AND temp_id=f.id);
+UPDATE item_shop SET is_new=1,is_sell=1,type_sell=3,cost=5,icon_spec=7743
+WHERE tab_id=@ruby_tab AND temp_id IN(880,882);
+COMMIT;
+
+
+-- RUBY_OCTOPUS_20261007
+SET NAMES utf8mb4;
+START TRANSACTION;
+SET @ruby_shop=(SELECT id FROM shop WHERE tag_name='SANTA_HONG_NGOC' AND npc_id=39 LIMIT 1);
+SET @ruby_tab=(SELECT MIN(id) FROM tab_shop WHERE shop_id=@ruby_shop);
+INSERT INTO item_shop(tab_id,temp_id,is_new,is_sell,type_sell,cost,icon_spec)
+SELECT @ruby_tab,881,1,1,3,5,7743 FROM item_template
+WHERE id=881 AND @ruby_tab IS NOT NULL
+AND NOT EXISTS(SELECT 1 FROM item_shop WHERE tab_id=@ruby_tab AND temp_id=881);
+UPDATE item_shop SET is_new=1,is_sell=1,type_sell=3,cost=5,icon_spec=7743
+WHERE tab_id=@ruby_tab AND temp_id=881;
+COMMIT;
+
+
+-- COLLECTION_CHEST_20261007
+-- Apply after data-saving maintenance and SQL backup.
+SET NAMES utf8mb4;
+SET @has_collection=(SELECT COUNT(*) FROM information_schema.COLUMNS
+    WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='player' AND COLUMN_NAME='items_collection');
+SET @collection_ddl=IF(@has_collection=0,
+    'ALTER TABLE player ADD COLUMN items_collection MEDIUMTEXT NOT NULL DEFAULT ''[]''',
+    'SELECT 1');
+PREPARE collection_stmt FROM @collection_ddl;
+EXECUTE collection_stmt;
+DEALLOCATE PREPARE collection_stmt;
+
+
+-- DISABLE_SUPER_DRAGON_20261007
+-- Keep template ID1015: deleting a row would shift positional catalog lookups.
+UPDATE item_shop SET is_sell = 0 WHERE temp_id = 1015;
+UPDATE item_template SET description = 'Vật phẩm tạm ngưng sử dụng.' WHERE id = 1015;
+
+-- Offline Namek rewards update only items_bag, atomically with this receipt.
+CREATE TABLE IF NOT EXISTS namek_wish_receipt (
+    session_id CHAR(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+    player_id BIGINT NOT NULL,
+    wish TINYINT NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY(session_id,player_id)
+) ENGINE=InnoDB;
+
+
+-- WHIS_WEEKLY_20261008
+-- Weekly Whis scores are separate from legacy player.thachdauwhis.
+CREATE TABLE IF NOT EXISTS whis_weekly_state (
+    id TINYINT NOT NULL PRIMARY KEY,
+    week_start DATE NOT NULL
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS whis_weekly_score (
+    week_start DATE NOT NULL,
+    player_id BIGINT NOT NULL,
+    wins INT NOT NULL DEFAULT 0,
+    last_win BIGINT NOT NULL,
+    PRIMARY KEY (week_start, player_id)
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS whis_weekly_reward (
+    reward_week DATE NOT NULL,
+    player_id BIGINT NOT NULL,
+    rank_no TINYINT NOT NULL,
+    PRIMARY KEY (reward_week, player_id),
+    UNIQUE KEY reward_rank (reward_week, rank_no)
+) ENGINE=InnoDB;
+
+
+-- EVENT_CONTROL_20261008
+CREATE TABLE IF NOT EXISTS game_event_catalog (
+ event_key VARCHAR(32) PRIMARY KEY,name VARCHAR(100) NOT NULL,supported TINYINT NOT NULL,
+ reason TEXT NOT NULL,consumed_ids TEXT NOT NULL,kept_ids TEXT NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+CREATE TABLE IF NOT EXISTS game_event_state (
+ event_key VARCHAR(32) PRIMARY KEY,desired_enabled TINYINT NOT NULL DEFAULT 0,applied_enabled TINYINT NOT NULL DEFAULT 0,
+ revision BIGINT NOT NULL DEFAULT 0,run_id BIGINT NOT NULL DEFAULT 0,status VARCHAR(40) NOT NULL DEFAULT 'OFF',
+ last_error TEXT NOT NULL,updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+ heartbeat_at TIMESTAMP NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+CREATE TABLE IF NOT EXISTS game_event_cleanup_job (
+ id BIGINT AUTO_INCREMENT PRIMARY KEY,event_key VARCHAR(32) NOT NULL,run_id BIGINT NOT NULL,consumed_ids TEXT NOT NULL,
+ status VARCHAR(40) NOT NULL DEFAULT 'pending_maintenance',processed_players BIGINT NOT NULL DEFAULT 0,
+ error_message TEXT NOT NULL,created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ UNIQUE KEY event_run(event_key,run_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+CREATE TABLE IF NOT EXISTS game_event_cleanup_backup (
+ id BIGINT AUTO_INCREMENT PRIMARY KEY,operation_id CHAR(36) NOT NULL,job_id BIGINT NOT NULL,player_id BIGINT NOT NULL,
+ field_name VARCHAR(40) NOT NULL,before_json MEDIUMTEXT NOT NULL,after_json MEDIUMTEXT NOT NULL,
+ phase VARCHAR(20) NOT NULL,created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ UNIQUE KEY cleanup_field(operation_id,job_id,player_id,field_name,phase)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+CREATE TABLE IF NOT EXISTS game_event_cleanup_receipt (
+ job_id BIGINT NOT NULL,player_id BIGINT NOT NULL,phase VARCHAR(20) NOT NULL,
+ completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,PRIMARY KEY(job_id,player_id,phase)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+CREATE TABLE IF NOT EXISTS game_event_cleanup_operation (
+ operation_id CHAR(36) PRIMARY KEY,player_id BIGINT NOT NULL,phase VARCHAR(20) NOT NULL,
+ committed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+CREATE TABLE IF NOT EXISTS game_event_cleanup_consign_backup (
+ job_id BIGINT NOT NULL,listing_id BIGINT NOT NULL,before_json MEDIUMTEXT NOT NULL,
+ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,PRIMARY KEY(job_id,listing_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+-- Generated by .analysis/sync_event_catalog_seed.py from EventCatalog.java.
+-- Preserve deployed desired states on rerun. Initial Hung Vuong and Summer retain existing active gameplay.
+INSERT INTO game_event_catalog(event_key,name,supported,reason,consumed_ids,kept_ids) VALUES(CONVERT(0x68756e675f76756f6e67 USING utf8mb4),CONVERT(0x48c3b96e672056c6b0c6a16e67 USING utf8mb4),1,'',CONVERT(0x5b313232302c313232312c313232322c313534322c313534342c313534352c313534362c313534372c313534382c313534392c313535362c313535385d USING utf8mb4),CONVERT(0x5b313737362c313737372c3338312c3338322c3338332c3338342c3338352c313135302c313135312c313135322c313135332c313135342c313432332c313433382c313633342c313633355d USING utf8mb4)) ON DUPLICATE KEY UPDATE name=VALUES(name),supported=VALUES(supported),reason=VALUES(reason),consumed_ids=VALUES(consumed_ids),kept_ids=VALUES(kept_ids);
+INSERT IGNORE INTO game_event_state(event_key,desired_enabled,applied_enabled,run_id,status,last_error) VALUES(CONVERT(0x68756e675f76756f6e67 USING utf8mb4),1,0,1,'APPLYING','');
+INSERT INTO game_event_catalog(event_key,name,supported,reason,consumed_ids,kept_ids) VALUES(CONVERT(0x73756d6d6572 USING utf8mb4),CONVERT(0x48c3a8 USING utf8mb4),1,'',CONVERT(0x5b313630392c313631322c313631332c313631342c313631352c313631362c313739382c313739392c313830302c313830312c313830325d USING utf8mb4),CONVERT(0x5b313633312c313830345d USING utf8mb4)) ON DUPLICATE KEY UPDATE name=VALUES(name),supported=VALUES(supported),reason=VALUES(reason),consumed_ids=VALUES(consumed_ids),kept_ids=VALUES(kept_ids);
+INSERT IGNORE INTO game_event_state(event_key,desired_enabled,applied_enabled,run_id,status,last_error) VALUES(CONVERT(0x73756d6d6572 USING utf8mb4),1,0,1,'APPLYING','');
+INSERT INTO game_event_catalog(event_key,name,supported,reason,consumed_ids,kept_ids) VALUES(CONVERT(0x68616c6c6f7765656e USING utf8mb4),CONVERT(0x48616c6c6f7765656e USING utf8mb4),1,'',CONVERT(0x5b3538355d USING utf8mb4),CONVERT(0x5b5d USING utf8mb4)) ON DUPLICATE KEY UPDATE name=VALUES(name),supported=VALUES(supported),reason=VALUES(reason),consumed_ids=VALUES(consumed_ids),kept_ids=VALUES(kept_ids);
+INSERT IGNORE INTO game_event_state(event_key,desired_enabled,applied_enabled,run_id,status,last_error) VALUES(CONVERT(0x68616c6c6f7765656e USING utf8mb4),0,0,0,'OFF','');
+INSERT INTO game_event_catalog(event_key,name,supported,reason,consumed_ids,kept_ids) VALUES(CONVERT(0x6368726973746d6173 USING utf8mb4),CONVERT(0x4e6f656c USING utf8mb4),1,'',CONVERT(0x5b3634395d USING utf8mb4),CONVERT(0x5b3634385d USING utf8mb4)) ON DUPLICATE KEY UPDATE name=VALUES(name),supported=VALUES(supported),reason=VALUES(reason),consumed_ids=VALUES(consumed_ids),kept_ids=VALUES(kept_ids);
+INSERT IGNORE INTO game_event_state(event_key,desired_enabled,applied_enabled,run_id,status,last_error) VALUES(CONVERT(0x6368726973746d6173 USING utf8mb4),0,0,0,'OFF','');
+INSERT INTO game_event_catalog(event_key,name,supported,reason,consumed_ids,kept_ids) VALUES(CONVERT(0x6c756e61725f6e65775f79656172 USING utf8mb4),CONVERT(0x54e1babf74 USING utf8mb4),0,CONVERT(0x43e1baa76e20686fc3a06e20746869e1bb876e207068c3a26e206c6fe1baa169206e677579c3aa6e206c69e1bb87752076c3a0204e5043207472c6b0e1bb9b63206b68692062e1baad74 USING utf8mb4),CONVERT(0x5b5d USING utf8mb4),CONVERT(0x5b3536395d USING utf8mb4)) ON DUPLICATE KEY UPDATE name=VALUES(name),supported=VALUES(supported),reason=VALUES(reason),consumed_ids=VALUES(consumed_ids),kept_ids=VALUES(kept_ids);
+INSERT IGNORE INTO game_event_state(event_key,desired_enabled,applied_enabled,run_id,status,last_error) VALUES(CONVERT(0x6c756e61725f6e65775f79656172 USING utf8mb4),0,0,0,'OFF','');
+INSERT INTO game_event_catalog(event_key,name,supported,reason,consumed_ids,kept_ids) VALUES(CONVERT(0x7472756e675f746875 USING utf8mb4),CONVERT(0x5472756e6720746875 USING utf8mb4),0,CONVERT(0x4f757466697420626f73732063c3b32070617274207361692076e1bb8b207472c3ad2c206368c6b06120c491e1bba720c49169e1bb8175206b69e1bb876e2062e1baad74 USING utf8mb4),CONVERT(0x5b5d USING utf8mb4),CONVERT(0x5b5d USING utf8mb4)) ON DUPLICATE KEY UPDATE name=VALUES(name),supported=VALUES(supported),reason=VALUES(reason),consumed_ids=VALUES(consumed_ids),kept_ids=VALUES(kept_ids);
+INSERT IGNORE INTO game_event_state(event_key,desired_enabled,applied_enabled,run_id,status,last_error) VALUES(CONVERT(0x7472756e675f746875 USING utf8mb4),0,0,0,'OFF','');
+INSERT INTO game_event_catalog(event_key,name,supported,reason,consumed_ids,kept_ids) VALUES(CONVERT(0x776f6d656e735f646179 USING utf8mb4),CONVERT(0x382f33 USING utf8mb4),0,CONVERT(0x4368c6b0612063c3b3206c75e1bb936e67206869e1bb877520e1bba96e6720c491e1baa77920c491e1bba7 USING utf8mb4),CONVERT(0x5b5d USING utf8mb4),CONVERT(0x5b5d USING utf8mb4)) ON DUPLICATE KEY UPDATE name=VALUES(name),supported=VALUES(supported),reason=VALUES(reason),consumed_ids=VALUES(consumed_ids),kept_ids=VALUES(kept_ids);
+INSERT IGNORE INTO game_event_state(event_key,desired_enabled,applied_enabled,run_id,status,last_error) VALUES(CONVERT(0x776f6d656e735f646179 USING utf8mb4),0,0,0,'OFF','');
+INSERT INTO game_event_catalog(event_key,name,supported,reason,consumed_ids,kept_ids) VALUES(CONVERT(0x74656163686572735f646179 USING utf8mb4),CONVERT(0x32302f3131 USING utf8mb4),0,CONVERT(0x4368c6b0612063c3b3206ee1bb99692064756e67 USING utf8mb4),CONVERT(0x5b5d USING utf8mb4),CONVERT(0x5b5d USING utf8mb4)) ON DUPLICATE KEY UPDATE name=VALUES(name),supported=VALUES(supported),reason=VALUES(reason),consumed_ids=VALUES(consumed_ids),kept_ids=VALUES(kept_ids);
+INSERT IGNORE INTO game_event_state(event_key,desired_enabled,applied_enabled,run_id,status,last_error) VALUES(CONVERT(0x74656163686572735f646179 USING utf8mb4),0,0,0,'OFF','');
+INSERT INTO game_event_catalog(event_key,name,supported,reason,consumed_ids,kept_ids) VALUES(CONVERT(0x76616c656e74696e65 USING utf8mb4),CONVERT(0x56616c656e74696e65 USING utf8mb4),0,CONVERT(0x4368c6b0612063c3b3206ee1bb99692064756e67 USING utf8mb4),CONVERT(0x5b5d USING utf8mb4),CONVERT(0x5b5d USING utf8mb4)) ON DUPLICATE KEY UPDATE name=VALUES(name),supported=VALUES(supported),reason=VALUES(reason),consumed_ids=VALUES(consumed_ids),kept_ids=VALUES(kept_ids);
+INSERT IGNORE INTO game_event_state(event_key,desired_enabled,applied_enabled,run_id,status,last_error) VALUES(CONVERT(0x76616c656e74696e65 USING utf8mb4),0,0,0,'OFF','');
+INSERT INTO game_event_catalog(event_key,name,supported,reason,consumed_ids,kept_ids) VALUES(CONVERT(0x746f705f7570 USING utf8mb4),CONVERT(0x546f705570 USING utf8mb4),0,CONVERT(0x4576656e74206869e1bb876e206cc3a0206ce1bb9b702072e1bb976e673b206b68c3b46e6720c49169e1bb8175206b6869e1bb836e206769616f2064e1bb8b6368206ee1baa170 USING utf8mb4),CONVERT(0x5b5d USING utf8mb4),CONVERT(0x5b5d USING utf8mb4)) ON DUPLICATE KEY UPDATE name=VALUES(name),supported=VALUES(supported),reason=VALUES(reason),consumed_ids=VALUES(consumed_ids),kept_ids=VALUES(kept_ids);
+INSERT IGNORE INTO game_event_state(event_key,desired_enabled,applied_enabled,run_id,status,last_error) VALUES(CONVERT(0x746f705f7570 USING utf8mb4),0,0,0,'OFF','');
+
+
+-- Preload the existing Noi Banh NPC beside the existing Vua Hung NPC.
+-- The verified codec is direct rows [templateId,x,y]. Remove whitespace only for
+-- the membership check; JSON_ARRAY_APPEND preserves the other NPC rows.
+UPDATE map_template SET npcs=JSON_ARRAY_APPEND(npcs,'$',JSON_ARRAY(66,777,480))
+ WHERE id=183 AND JSON_VALID(npcs) AND REPLACE(npcs,' ','') NOT LIKE '%[66,%';
+UPDATE map_template SET npcs=JSON_ARRAY_APPEND(npcs,'$',JSON_ARRAY(66,215,624))
+ WHERE id=184 AND JSON_VALID(npcs) AND REPLACE(npcs,' ','') NOT LIKE '%[66,%';
+UPDATE map_template SET npcs=JSON_ARRAY_APPEND(npcs,'$',JSON_ARRAY(66,801,672))
+ WHERE id=185 AND JSON_VALID(npcs) AND REPLACE(npcs,' ','') NOT LIKE '%[66,%';

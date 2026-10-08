@@ -1,173 +1,145 @@
-
 package nro.models.combine;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.IntUnaryOperator;
 import nro.models.consts.ConstNpc;
 import nro.models.item.Item;
-import nro.models.item.Item.ItemOption;
-import java.util.ArrayList;
-import java.util.Arrays;
 import nro.models.player.Player;
+import nro.models.services.InventoryService;
 import nro.models.services.ItemService;
 import nro.models.services.Service;
-import nro.models.services.InventoryService;
 import nro.models.utils.Util;
 
-/**
- *
- * @author By Mr Blue
- */
+/** Preview never rolls; confirmation publishes bag/body/ruby under the normal save lock. */
+public final class CheTaoTrangBiThienSu {
+    private CheTaoTrangBiThienSu() { }
 
-public class CheTaoTrangBiThienSu {
-      public static void showInfoCombine(Player player) {
-     if (player.combineNew.itemsCombine.size() < 4 || player.combineNew.itemsCombine.size() > 4) {
-                    Service.gI().sendThongBao(player, "Thiếu vật phẩm, vui lòng thêm vào");
-                    return;
-                } else if (player.combineNew.itemsCombine.stream().filter(item -> item.isNotNullItem() && item.isCongThucVip()).count() != 1) {
-                     Service.gI().sendThongBao(player, "Thiếu Công Thức Vip");
-                    return;
-                } else if (player.combineNew.itemsCombine.stream().filter(item -> item.isNotNullItem() && item.isManhTS() && item.quantity >= 999).count() != 1) {
-                     Service.gI().sendThongBao(player, "Thiếu Mảnh Thiên Sứ");
-                    return;
-                } else if (player.combineNew.itemsCombine.stream().filter(item -> item.isNotNullItem() && item.isDaNangCap1()).count() != 1) {
-                     Service.gI().sendThongBao(player, "Thiếu Đá Nâng Cấp");
-                    return;
-                } else if (player.combineNew.itemsCombine.stream().filter(item -> item.isNotNullItem() && item.isDaMayMan()).count() != 1) {
-                     Service.gI().sendThongBao(player, "Thiếu Đá May Mắn");
-                    return;
-                }
-                Item mTS = null,
-                        daNC = null,
-                        daMM = null,
-                        CtVip = null;
-                for (Item item : player.combineNew.itemsCombine) {
-                    if (item.isNotNullItem()) {
-                        if (item.isManhTS()) {
-                            mTS = item;
-                        } else if (item.isDaNangCap1()) {
-                            daNC = item;
-                        } else if (item.isDaMayMan()) {
-                            daMM = item;
-                        } else if (item.isCongThucVip()) {
-                            CtVip = item;
-                        }
-                    }
-                }
-                if (InventoryService.gI().getCountEmptyBag(player) > 0) {//check chỗ trống hành trang
-                    if (player.inventory.gold < 10000000) {
-                        Service.gI().sendThongBao(player, "Không đủ vàng để thực hiện");
-                        return;
-                    }
-                    player.inventory.gold -= 10000000;
-
-                    int tilemacdinh = 90;
-                    int tileLucky = 5;
-                    if (daNC != null) {
-                        tilemacdinh += (daNC.template.id - 1073);
-                    }
-                    if (daMM != null) {
-                        tileLucky += tileLucky * (daMM.template.id - 1078);
-                    }
-
-                    if (Util.nextInt(0, 100) < tilemacdinh) {
-                        Item itemCtVip = player.combineNew.itemsCombine.stream().filter(item -> item.isNotNullItem() && item.isCongThucVip()).findFirst().get();
-
-                        Item itemManh = player.combineNew.itemsCombine.stream().filter(item -> item.isNotNullItem() && item.isManhTS() && item.quantity >= 999).findFirst().get();
-
-                        tilemacdinh = 100;
-                        short[][] itemIds = {{1048, 1051, 1054, 1057, 1060}, {1049, 1052, 1055, 1058, 1061}, {1050, 1053, 1056, 1059, 1062}}; // thứ tự td - 0,nm - 1, xd - 2
-
-                        Item itemTS = ItemService.gI().DoThienSu(itemIds[itemCtVip.template.gender > 2 ? player.gender : itemCtVip.template.gender][itemManh.typeIdManh()], itemCtVip.template.gender);
-
-                        if (tilemacdinh > 0) {
-                            for (byte w = 0; w < itemTS.itemOptions.size(); w++) {
-                                if (itemTS.itemOptions.get(w).optionTemplate.id != 0 && itemTS.itemOptions.get(w).optionTemplate.id != 20) {
-                                    itemTS.itemOptions.get(w).param += (itemTS.itemOptions.get(w).param * tilemacdinh / 100);
-                                }
-                            }
-                        }
-                        tilemacdinh = Util.nextInt(0, 50);
-
-                        if (tilemacdinh <= tileLucky) {
-                            if (tilemacdinh >= (tileLucky - 3)) {
-                                tileLucky = 3;
-                            } else if (tilemacdinh <= (tileLucky - 4) && tilemacdinh >= (tileLucky - 10)) {
-                                tileLucky = 2;
-                            } else {
-                                tileLucky = 1;
-                            }
-                            itemTS.itemOptions.add(new ItemOption(15, tileLucky));
-                            ArrayList<Integer> listOptionBonus = new ArrayList<>(Arrays.asList(50, 77, 103, 94, 5));
-                            for (int j = 0; j < tileLucky; j++) {
-                                tilemacdinh = Util.nextInt(0, listOptionBonus.size() - 1);
-                                itemTS.itemOptions.add(new ItemOption(listOptionBonus.get(tilemacdinh), Util.nextInt(1, 3)));
-                                listOptionBonus.remove(tilemacdinh);
-                            }
-                        }
-
-                        InventoryService.gI().addItemBag(player, itemTS);
-                        CombineService.gI().sendEffectSuccessCombine(player);
-                    } else {
-                        CombineService.gI().sendEffectFailCombine(player);
-                    }
-                    if (mTS != null && daMM != null && daNC != null && CtVip != null) {
-                        InventoryService.gI().subQuantityItemsBag(player, CtVip, 1);
-                        InventoryService.gI().subQuantityItemsBag(player, daNC, 1);
-                        InventoryService.gI().subQuantityItemsBag(player, mTS, 999);
-                        InventoryService.gI().subQuantityItemsBag(player, daMM, 1);
-                    } else if (CtVip != null && mTS != null) {
-                        InventoryService.gI().subQuantityItemsBag(player, CtVip, 1);
-                        InventoryService.gI().subQuantityItemsBag(player, mTS, 999);
-                    } else if (CtVip != null && mTS != null && daNC != null) {
-                        InventoryService.gI().subQuantityItemsBag(player, CtVip, 1);
-                        InventoryService.gI().subQuantityItemsBag(player, mTS, 999);
-                        InventoryService.gI().subQuantityItemsBag(player, daNC, 1);
-                    } else if (CtVip != null && mTS != null && daMM != null) {
-                        InventoryService.gI().subQuantityItemsBag(player, CtVip, 1);
-                        InventoryService.gI().subQuantityItemsBag(player, mTS, 999);
-                        InventoryService.gI().subQuantityItemsBag(player, daMM, 1);
-                    }
-
-                    InventoryService.gI().sendItemBags(player);
-                     Service.gI().sendMoney(player);
-                    CombineService.gI().reOpenItemCombine(player);
-                } else {
-                     Service.gI().sendThongBao(player, "Bạn phải có ít nhất 1 ô trống hành trang");
-                }
-      }
-            
-    
-
-    public static void CheTaoTS(Player player) {
-         if (player.combineNew.itemsCombine.size() != 4) {
-            Service.gI().sendThongBao(player, "Thiếu đồ");
-            return;
+    public static void showInfoCombine(Player player) {
+        if (player == null || player.combineNew == null) return;
+        synchronized (player) {
+            player.combineNew.thienSuSelection = null;
+            try {
+                ThienSuCraftRecipe.Selection selection = ThienSuCraftRecipe.select(player);
+                var result = ItemService.gI().getTemplate(selection.outputId());
+                if (result == null) throw ThienSuCraftRecipe.invalid("Thiếu dữ liệu trang bị Thiên Sứ");
+                String planet = new String[]{"Trái Đất", "Namek", "Xayda"}[(selection.outputId() - 1048) % 3];
+                String body = selection.equipped().get(selection.bodySlot()).item().template.name;
+                String text = "Chế tạo: " + result.name + " (" + planet + ")\n999 mảnh cùng loại + 1 công thức thường hoặc VIP"
+                        + " + 1 đá nâng cấp + 1 đá may mắn.\nPhí: 50 hồng ngọc.\n"
+                        + "Tỷ lệ thành công: " + probability(selection.successThreshold(), 101) + ".\n"
+                        + "Chỉ số chính tăng 1–30% so với nền Thiên Sứ sau thưởng hành tinh; làm tròn có giới hạn.\n"
+                        + "Tỷ lệ có dòng phụ: " + probability(selection.luckThreshold() + 1, 51) + ", có 1–3 dòng khác nhau, mỗi dòng 1–7%.\n"
+                        + "Phải mặc đủ 5 món Hủy Diệt. Mất món đang mặc: " + body
+                        + ", cùng nguyên liệu và phí, kể cả thất bại theo tỷ lệ.\nThành công nhận trang bị vào túi.";
+                CombineService.gI().whis.createOtherMenu(player, CombineService.CHE_TAO_TRANG_BI_THIEN_SU,
+                        text, "Chế tạo", "Từ chối");
+                player.combineNew.thienSuSelection = selection;
+            } catch (IllegalArgumentException | IllegalStateException ex) {
+                Service.gI().sendThongBao(player, ex.getMessage());
+            }
         }
-        if (player.inventory.gold < 500_000_000) {
-            Service.gI().sendThongBao(player, "Ảo ít thôi con...");
-            return;
-        }
-        if (InventoryService.gI().getCountEmptyBag(player) < 1) {
-            Service.gI().sendThongBao(player, "Bạn phải có ít nhất 1 ô trống hành trang");
-            return;
-        }
-        Item itemTL = player.combineNew.itemsCombine.stream().filter(item -> item.isNotNullItem() && item.isDHD()).findFirst().get();
-        Item itemManh = player.combineNew.itemsCombine.stream().filter(item -> item.isNotNullItem() && item.isManhTS() && item.quantity >= 5).findFirst().get();
-
-        player.inventory.gold -= 500_000_000;
-          CombineService.gI().sendEffectSuccessCombine(player);
-        short[][] itemIds = {{1048, 1051, 1054, 1057, 1060}, {1049, 1052, 1055, 1058, 1061}, {1050, 1053, 1056, 1059, 1062}}; // thứ tự td - 0,nm - 1, xd - 2
-
-        Item itemTS = ItemService.gI().DoThienSu(itemIds[itemTL.template.gender > 2 ? player.gender : itemTL.template.gender][itemManh.typeIdManh()], itemTL.template.gender);
-        InventoryService.gI().addItemBag(player, itemTS);
-
-        InventoryService.gI().subQuantityItemsBag(player, itemTL, 1);
-        InventoryService.gI().subQuantityItemsBag(player, itemManh, 99);
-        InventoryService.gI().sendItemBags(player);
-        Service.gI().sendMoney(player);
-        Service.gI().sendThongBao(player, "Bạn đã nhận được " + itemTS.template.name);
-        player.combineNew.itemsCombine.clear();
-          CombineService.gI().reOpenItemCombine(player);
     }
 
-    
+    private static String probability(int winning, int total) {
+        return String.format(java.util.Locale.ROOT, "%.2f%%", winning * 100.0 / total);
+    }
+
+    public static void cancel(Player player) {
+        if (player == null) return;
+        synchronized (player) {
+            if (player.combineNew != null) player.combineNew.clearItemCombine();
+            if (player.idMark != null) player.idMark.setIndexMenu(ConstNpc.IGNORE_MENU);
+        }
+    }
+
+    /** False denotes a legitimate RNG failure; rejection throws before payment. */
+    public static boolean execute(Player player, IntUnaryOperator random) {
+        if (player == null) throw ThienSuCraftRecipe.invalid("Hãy chọn lại nguyên liệu Thiên Sứ");
+        synchronized (player) {
+            if (player.combineNew == null || player.combineNew.typeCombine != CombineService.CHE_TAO_TRANG_BI_THIEN_SU
+                    || player.combineNew.thienSuSelection == null || player.idMark == null
+                    || player.idMark.getIndexMenu() != CombineService.CHE_TAO_TRANG_BI_THIEN_SU) {
+                throw ThienSuCraftRecipe.invalid("Hãy chọn lại nguyên liệu để xác nhận chế tạo");
+            }
+            ThienSuCraftRecipe.Selection old = player.combineNew.thienSuSelection;
+            player.combineNew.thienSuSelection = null;
+            player.idMark.setIndexMenu(ConstNpc.IGNORE_MENU);
+            synchronized (player.inventory) {
+                ThienSuCraftRecipe.Selection current = ThienSuCraftRecipe.select(player);
+                ThienSuCraftRecipe.validateSnapshot(old, current);
+                // Only copy selected stacks. Generic copyItemsBag normalizes old equipment
+                // and drops IDs/expiry; untouched assets retain their exact instances.
+                List<Item> bag = new ArrayList<>(player.inventory.itemsBag);
+                List<Item> body = new ArrayList<>(player.inventory.itemsBody);
+                for (ThienSuCraftRecipe.Ingredient ingredient : current.ingredients()) {
+                    Item copied = copyIngredient(ingredient.item());
+                    copied.quantity -= ingredient.cost();
+                    if (copied.quantity == 0) bag.set(ingredient.slot(), new Item());
+                    else bag.set(ingredient.slot(), copied);
+                }
+                body.set(current.bodySlot(), new Item());
+                int balance = player.inventory.ruby - ThienSuCraftRecipe.RUBY_FEE;
+                boolean success = ThienSuCraftStats.roll(random, 101) < current.successThreshold();
+                if (success) {
+                    Item output = ItemService.gI().DoThienSu(current.outputId(), current.factoryGender());
+                    if (output == null || output.template == null || output.template.id != current.outputId() || output.quantity != 1
+                            || current.bag().contains(output) || current.body().contains(output)) {
+                        throw ThienSuCraftRecipe.invalid("Không thể chuẩn bị trang bị Thiên Sứ; chưa trừ tài sản");
+                    }
+                    ThienSuCraftStats.apply(output, current.luckThreshold(), random);
+                    nro.models.item.ItemDefaultOptions.complete(output);
+                    if (!InventoryService.gI().addItemList(bag, output)) {
+                        throw ThienSuCraftRecipe.invalid("Không thể nhận trang bị vào túi; chưa trừ tài sản");
+                    }
+                }
+                // PlayerDAO serializes the whole state under the player monitor.
+                player.inventory.itemsBag = bag;
+                player.inventory.itemsBody = body;
+                player.inventory.ruby = balance;
+                player.combineNew.clearItemCombine();
+                player.combineNew.clearParamCombine();
+                long now = System.currentTimeMillis();
+                player.idMark.setLastTimeCombine(now);
+                player.combineNew.lastTimeCombine = now;
+                return success;
+            }
+        }
+    }
+
+    private static Item copyIngredient(Item original) {
+        Item copy = new Item();
+        copy.template = original.template;copy.quantity = original.quantity;copy.quantityGD = original.quantityGD;
+        copy.id = original.id;copy.expire = original.expire;copy.createTime = original.createTime;
+        copy.info = original.info;copy.content = original.content;copy.text = original.text;
+        for (Item.ItemOption option : original.itemOptions) copy.itemOptions.add(new Item.ItemOption(option));
+        return copy;
+    }
+
+    public static void CheTaoTS(Player player) {
+        if (player == null) return;
+        synchronized (player) {
+            boolean success;
+            try { success = execute(player, Util::nextInt); }
+            catch (Exception rejected) {
+                cancel(player);
+                try { Service.gI().sendThongBao(player, rejected.getMessage() == null
+                        ? "Không thể chế tạo; chưa trừ tài sản" : rejected.getMessage()); }
+                catch (Exception packetFailure) { }
+                return;
+            }
+            // Committed outcome cannot be replayed after a refresh/packet failure.
+            try { if (player.setClothes != null) player.setClothes.setup(); } catch (Exception refreshFailure) { }
+            try { Service.gI().point(player); } catch (Exception refreshFailure) { }
+            try { InventoryService.gI().sendItemBody(player); } catch (Exception packetFailure) { }
+            try { Service.gI().Send_Caitrang(player); } catch (Exception packetFailure) { }
+            try { InventoryService.gI().sendItemBags(player); } catch (Exception packetFailure) { }
+            try { Service.gI().sendMoney(player); } catch (Exception packetFailure) { }
+            try {
+                if (success) CombineService.gI().sendEffectSuccessCombine(player);
+                else CombineService.gI().sendEffectFailCombine(player);
+                CombineService.gI().reOpenItemCombine(player);
+            } catch (Exception packetFailure) { }
+        }
+    }
 }

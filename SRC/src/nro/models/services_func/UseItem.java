@@ -101,6 +101,11 @@ public class UseItem {
             if (index == 255) {
                 return;
             }
+            if (type >= nro.models.services.CollectionChestService.BAG_TO_COLLECTION
+                    && type <= nro.models.services.CollectionChestService.COLLECTION_TO_BAG) {
+                nro.models.services.CollectionChestService.transfer(player,type,index);
+                return;
+            }
             int size = switch(type) {
                 case ITEM_BOX_TO_BODY_OR_BAG -> player.inventory.itemsBox.size();
                 case ITEM_BODY_TO_BOX, ITEM_BODY_TO_BAG -> player.inventory.itemsBody.size();
@@ -201,8 +206,8 @@ public class UseItem {
                                     msg.writer().writeUTF("Bạn chắc muốn mở\n" + player.inventory.itemsBag.get(index).template.name + " ?");
                                     player.sendMessage(msg);
                                 } else if (item.template.type == 22) {
-                                    if (player.zone.items.stream().filter(it -> it != null && it.itemTemplate.type == 22).count() > 2) {
-                                        Service.gI().sendThongBaoOK(player, "Mỗi map chỉ đặt được 3 Vệ Tinh");
+                                    if (!nro.models.services.SatelliteService.canPlace(player.zone)) {
+                                        Service.gI().sendThongBaoOK(player, "Mỗi khu chỉ đặt được 3 Vệ Tinh");
                                         return;
                                     }
                                     msg = new Message(-43);
@@ -269,6 +274,25 @@ public class UseItem {
     }
 
     private void useItem(Player pl, Item item, int indexBag) {
+        if(pl==null)return;
+        synchronized(pl) { try(nro.models.event.EventItemPolicy.Permit permit=nro.models.event.EventItemPolicy.admit()) {
+            useItemAdmitted(pl,item,indexBag);
+        }}
+    }
+    private void useItemAdmitted(Player pl, Item item, int indexBag) {
+        if (pl == null || item == null) return;
+        if (item.template != null && nro.models.item.DisabledItemRules.disabled(item.template.id)) {
+            Service.gI().sendThongBao(pl, "Vật phẩm này đang tạm ngưng sử dụng.");
+            return;
+        }
+        synchronized (pl) {
+            if (item.template == null) return;
+            if (item.template.type == 22) {
+                if (pl.inventory == null || !pl.inventory.itemsBag.contains(item) || item.quantity < 1) return;
+                useItemUnchecked(pl, item, indexBag);
+                return;
+            }
+        }
         int required = item != null && item.template != null ? requiredRewardSlots(item.template.id) : 0;
         if (required > 0) {
             synchronized (pl) {
@@ -334,6 +358,10 @@ public class UseItem {
     }
 
     private void useItemUnchecked(Player pl, Item item, int indexBag) {
+        if (item != null && item.template != null && nro.models.event.EventItemPolicy.isBlocked(item.template.id)) {
+            Service.gI().sendThongBao(pl, "Sự kiện đã đóng."); return;
+        }
+
         if (item != null && item.isNotNullItem()) {
 
             if (item.template.id == 570) {
@@ -838,12 +866,7 @@ public class UseItem {
                             case 343:
                             case 344:
                             case 345:
-                                if (pl.zone.items.stream().filter(it -> it != null && it.itemTemplate.type == 22).count() < 3) {
-                                    Service.gI().dropSatellite(pl, item, pl.zone, pl.location.x, pl.location.y);
-                                    InventoryService.gI().subQuantityItemsBag(pl, item, 1);
-                                } else {
-                                    Service.gI().sendThongBaoOK(pl, "Mỗi map chỉ đặt được 3 Vệ Tinh");
-                                }
+                                nro.models.services.SatelliteService.place(pl, item);
                                 break;
                             case 380: //cskb
                                 openCSKB(pl, item);
@@ -910,6 +933,11 @@ public class UseItem {
                                 break;
                             case 401: //đổi đệ tử
                                 changePet(pl, item);
+                                break;
+                            case nro.models.services.AdvancedPetExchange.ITEM_ID:
+                                Service.gI().sendThongBao(pl,
+                                        nro.models.services.AdvancedPetExchange.exchange(pl, item));
+                                InventoryService.gI().sendItemBags(pl);
                                 break;
                             case 402: //sách nâng chiêu 1 đệ tử
                             case 403: //sách nâng chiêu 2 đệ tử
@@ -2397,94 +2425,51 @@ public class UseItem {
     }
 
     private void XuongCho(Player pl, Item item) {
-        List<Player> bosses = pl.zone.getBosses();
-        boolean checkSoi = false;
-
-        synchronized (bosses) {
-            for (Player bossPlayer : bosses) {
-                if (bossPlayer.id == BossID.SOI_HEC_QUYN && !pl.isDie()) {
-                    checkSoi = true;
-                }
-            }
-        }
-
-        if (!checkSoi) {
-            Service.gI().sendThongBao(pl, "Không tìm thấy Sói hẹc quyn");
-            return;
-        }
-
-        synchronized (bosses) {
-            for (Player bossPlayer : bosses) {
-                if (bossPlayer.id == BossID.SOI_HEC_QUYN) {
-                    Boss soihecQuyn = (Boss) bossPlayer;
-                    if (soihecQuyn != null) {
-                        if (((SoiHecQuyn) soihecQuyn).KiemTraNhatXuong()) {
-                            Service.gI().sendThongBao(pl, "Sói đã no rồi");
-                            continue;
-                        } else {
-                            ((SoiHecQuyn) soihecQuyn).NhatXuong();
-                            Service.gI().chat(soihecQuyn, "Ê, Cục xương ngon quá");
-                        }
-
-                        ItemMap itemMap = null;
-                        int x = pl.location.x;
-                        if (x < 0 || x >= pl.zone.map.mapWidth) {
-                            return;
-                        }
-                        int y = pl.zone.map.yPhysicInTop(x, pl.location.y - 24);
-                        itemMap = new ItemMap(pl.zone, 460, 1, x, y, pl.id);
-                        BadgesTaskService.updateCountBagesTask(pl, ConstTaskBadges.KE_THAO_TUNG_SOI, 1);
-                        itemMap.isPickedUp = true;
-                        itemMap.createTime -= 23000;
-                        if (itemMap != null) {
-                            Service.gI().dropItemMap(pl.zone, itemMap);
-                        }
-
-                        InventoryService.gI().subQuantityItemsBag(pl, item, 1);
-                        InventoryService.gI().sendItemBags(pl);
-
-                        if (Util.nextInt(4) < 3) { // 75% cơ hội
-                            int rand = Util.nextInt(0, 6); // Random từ 0 đến 6
-                            short idItem = (short) (rand + 441); // Item 441 + rand
-                            Item it = ItemService.gI().createNewItem(idItem);
-                            it.itemOptions.add(new Item.ItemOption(95 + rand, (rand == 3 || rand == 4) ? 3 : 5));
-
-                            if (InventoryService.gI().getCountEmptyBag(pl) > 0) {
-                                InventoryService.gI().addItemBag(pl, it);
-                                Service.gI().sendThongBao(pl, "Bạn vừa nhận được " + it.template.name);
-                            } else {
-                                Service.gI().sendThongBao(pl, "Hành trang không đủ chỗ trống.");
-                            }
-                        } else {
-                            short idItem = 459; // Item 459
-                            Item it = ItemService.gI().createNewItem(idItem);
-                            it.itemOptions.add(new Item.ItemOption(112, 80));
-                            it.itemOptions.add(new Item.ItemOption(93, 90));
-                            it.itemOptions.add(new Item.ItemOption(20, Util.nextInt(10000)));
-                            if (InventoryService.gI().getCountEmptyBag(pl) > 0) {
-                                InventoryService.gI().addItemBag(pl, it);
-                                Service.gI().sendThongBao(pl, "Bạn vừa nhận được " + it.template.name);
-                            } else {
-                                Service.gI().sendThongBao(pl, "Hành trang không đủ chỗ trống.");
-                            }
-                        }
-
-                        try {
-                            Thread.sleep(5000);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-
-                        ItemMapService.gI().removeItemMapAndSendClient(itemMap);
-                        ((SoiHecQuyn) soihecQuyn).leaveMapNew();
+        if (pl == null || pl.zone == null || pl.inventory == null) return;
+        for (Player candidate : new ArrayList<>(pl.zone.getBosses())) {
+            if (!(candidate instanceof SoiHecQuyn wolf)) continue;
+            synchronized (pl) {
+                synchronized (wolf) {
+                    if (pl.isDie() || wolf.isDie() || pl.zone != wolf.zone || pl.location == null
+                            || wolf.location == null || Util.getDistance(pl, wolf) > 200
+                            || !pl.inventory.itemsBag.contains(item) || item == null || item.template == null
+                            || item.template.id != 460 || !InventoryService.gI().isBillIngredientUsable(item)) continue;
+                    if (wolf.KiemTraNhatXuong()) {
+                        Service.gI().sendThongBao(pl, "Sói đã no rồi");
+                        return;
                     }
-
+                    if (wolf.bossStatus != nro.models.consts.BossStatus.ACTIVE
+                            && wolf.bossStatus != nro.models.consts.BossStatus.CHAT_S) continue;
+                    if (InventoryService.gI().getCountEmptyBag(pl) <= 0) {
+                        Service.gI().sendThongBao(pl, "Hành trang không đủ chỗ nhận thưởng. Chưa sử dụng Cục xương.");
+                        return;
+                    }
+                    Item gift;
+                    if (Util.nextInt(4) < 3) {
+                        int rand = Util.nextInt(0, 6);
+                        gift = ItemService.gI().createNewItem((short) (441 + rand));
+                        gift.itemOptions.add(new Item.ItemOption(95 + rand, (rand == 3 || rand == 4) ? 3 : 5));
+                    } else {
+                        gift = ItemService.gI().createNewItem((short) 459);
+                        gift.itemOptions.add(new Item.ItemOption(112, 80));
+                        gift.itemOptions.add(new Item.ItemOption(93, 90));
+                        gift.itemOptions.add(new Item.ItemOption(20, Util.nextInt(10000)));
+                    }
+                    if (!InventoryService.gI().addItemBag(pl, gift)) {
+                        Service.gI().sendThongBao(pl, "Hành trang không thể nhận thưởng. Chưa sử dụng Cục xương.");
+                        return;
+                    }
+                    wolf.NhatXuong();
+                    InventoryService.gI().subQuantityItemsBag(pl, item, 1);
+                    wolf.reward(pl);
+                    Service.gI().chat(wolf, "Ồ, Cục xương ngon quá");
+                    Service.gI().sendThongBao(pl, "Bạn vừa nhận được " + gift.template.name);
+                    InventoryService.gI().sendItemBags(pl);
+                    return;
                 }
             }
-
-            InventoryService.gI().sendItemBags(pl);
         }
-
+        Service.gI().sendThongBao(pl, "Không tìm thấy Sói hẹc quyn ở gần");
     }
 
     public void NoelItemBox(Player pl, Item item) {

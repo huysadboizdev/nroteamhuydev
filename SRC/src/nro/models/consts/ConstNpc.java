@@ -27,8 +27,8 @@ public class ConstNpc {
             + "1) Giữ ngọc sao đen trên người hơn 5 phút liên tục\n"
             + "2) Sau 30 phút tham gia tàu sẽ đón về và đang giữ ngọc sao đen trên người\n"
             + "Các phần thưởng như sau\b1 sao đen: +21% sức đánh\b2 sao đen: +35% HP\b"
-            + "3 sao đen: Biến 35% tấn công thành HP\b4 sao đen: Phản 35% sát thương\b"
-            + "5 sao đen: 35% Sức đánh chí mạng\b6 sao đen: KI+40%\b7 sao đen: 14% Né đòn";
+            + "3 sao đen: +35% KI tối đa\b4 sao đen: Phản 35% sát thương\b"
+            + "5 sao đen: Hút HP bằng 35% sát thương\b6 sao đen: +20% giáp\b7 sao đen: 14% Né đòn";
     public static final String HUONG_DAN_MAP_MA_BU = "Tại khu vực này, ta đã dùng ma pháp phong ấn\b"
             + "dù các ngươi có mạnh đến đâu\bcũng sẽ trở thành yếu đuối như nhau\n"
             + "Chỉ có ta với con nhóc Ôsin mới giải được ma pháp này\b"

@@ -23,6 +23,7 @@ public class Fide extends Boss {
 
     @Override
     public void reward(Player plKill) {
+        if (questSupportReward(plKill)) return;
         int diem = 5;
         plKill.event.addEventPoint(diem);
         Service.gI().sendThongBao(plKill, "+5 Point");

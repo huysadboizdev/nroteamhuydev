@@ -9,7 +9,9 @@ public class TabShopDanhHieu extends TabShop {
   synchronized(player){
    this.itemShops=new ArrayList<>();this.shop=base.shop;this.id=base.id;this.name=base.name;
    Set<Integer> owned=new HashSet<>(BagesTemplate.listEffect(player));
+   int selectedGoDauTre=GoDauTreShopRows.selectedItem(player,base.itemShops);
    for(ItemShop original:base.itemShops){
+    if(GoDauTreShopRows.isFamily(original.temp.id)&&original.temp.id!=selectedGoDauTre)continue;
     if(original.temp.gender!=player.gender && original.temp.gender<=2)continue;
     if(owned.contains((int)original.temp.id)!=false)continue;
     BagesTemplate title=BagesTemplate.fineBadgesbyIdItem(original.temp.id);if(title==null)continue;

@@ -355,6 +355,12 @@ public class ChangeMapService {
 
         zoneJoin = checkMapCanJoin(pl, zoneJoin);
 
+        if (zoneJoin == null && (mapId == 126 || MapService.gI().isMapBlackBallWar(mapId))) {
+            Service.gI().sendThongBao(pl, mapId == 126 ? "Khu Hirudegarn \u0111\u00e3 \u0111\u1ea7y ho\u1eb7c \u0111\u00e3 h\u1ebft gi\u1edd (15h-16h, 22h-23h)" : "Các khu sao đen đã đầy hoặc sự kiện đã kết thúc");
+            Service.gI().hideWaitDialog(pl);
+            return;
+        }
+
         if (zoneJoin != null && pl.zone != null) {
             boolean currMapIsCold = MapService.gI().isMapCold(pl.zone.map);
             boolean nextMapIsCold = MapService.gI().isMapCold(zoneJoin.map);
@@ -363,7 +369,7 @@ public class ChangeMapService {
             boolean nextMapIsMabu = MapService.gI().isMapMaBu(zoneJoin.map.mapId);
             boolean sameZone = pl.zone.map.mapId == zoneJoin.map.mapId;
             if (typeSpace == AUTO_SPACE_SHIP) {
-                spaceShipArrive(pl, (byte) 0, pl.haveTennisSpaceShip ? TENNIS_SPACE_SHIP : DEFAULT_SPACE_SHIP);
+                if (zoneJoin.map.mapId != 126) spaceShipArrive(pl, (byte) 0, pl.haveTennisSpaceShip ? TENNIS_SPACE_SHIP : DEFAULT_SPACE_SHIP);
                 pl.idMark.setIdSpaceShip(pl.haveTennisSpaceShip ? TENNIS_SPACE_SHIP : DEFAULT_SPACE_SHIP);
             } else {
                 pl.idMark.setIdSpaceShip(typeSpace);
@@ -402,9 +408,14 @@ public class ChangeMapService {
             if (!this.goToMap(pl, zoneJoin)) {
                 pl.location.x = previousX;
                 pl.location.y = previousY;
+                if (zoneJoin.map.mapId == 126 || MapService.gI().isMapBlackBallWar(zoneJoin.map.mapId)) {
+                    Service.gI().sendThongBao(pl, zoneJoin.map.mapId == 126 ? "Khu Hirudegarn \u0111\u00e3 \u0111\u1ea7y ho\u1eb7c \u0111\u00e3 h\u1ebft gi\u1edd (15h-16h, 22h-23h)" : "Khu vực sao đen đã đầy hoặc đã kết thúc");
+                }
                 Service.gI().resetPoint(pl, previousX, previousY);
                 return;
             }
+            if (zoneJoin.map.mapId == 126 && typeSpace == AUTO_SPACE_SHIP)
+                spaceShipArrive(pl, (byte) 1, pl.haveTennisSpaceShip ? TENNIS_SPACE_SHIP : DEFAULT_SPACE_SHIP);
             if (pl.pet != null) {
                 pl.pet.joinMapMaster();
             }
@@ -413,6 +424,7 @@ public class ChangeMapService {
                 pl.zone.load_Me_To_Another(pl);
             } else {
                 zoneJoin.mapInfo(pl); //-24
+                nro.models.event.EventRuntimeService.gI().syncNpcVisibility(pl);
                 pl.timeChangeZone = System.currentTimeMillis();
             }
             pl.idMark.setIdSpaceShip(NON_SPACE_SHIP);
@@ -573,8 +585,9 @@ public class ChangeMapService {
             EffectSkillService.gI().removeBodyChangeTechnique(player);
         }
         try {
-            for (int i = player.zone.getPlayers().size() - 1; i >= 0; i--) {
-                Player pl = player.zone.getPlayers().get(i);
+            java.util.List<Player> currentPlayers = player.zone.getPlayers();
+            for (int i = currentPlayers.size() - 1; i >= 0; i--) {
+                Player pl = currentPlayers.get(i);
                 if (pl.isPl() && pl.effectSkill != null && pl.effectSkill.isBodyChangeTechnique) {
                     Service.gI().playerInfoUpdate(pl, player, "!Tiểu đội trưởng", 180, 181, 182);
                 }
@@ -784,23 +797,27 @@ public class ChangeMapService {
         int mapId = zoneJoin.map.mapId;
         if (MapService.gI().isMapBanDoKhoBau(mapId)) {
             var dungeon = player.clan.BanDoKhoBau;
-            return dungeon != null && dungeon.isOpened && !dungeon.isClosing && dungeon.getMapById(mapId) == zoneJoin;
+            return dungeon != null && dungeon.isOpened && !dungeon.isInitializing && !dungeon.isClosing && dungeon.getMapById(mapId) == zoneJoin;
         }
         if (MapService.gI().isMapConDuongRanDoc(mapId)) {
             var dungeon = player.clan.ConDuongRanDoc;
-            return dungeon != null && dungeon.isOpened && !dungeon.isClosing && dungeon.getMapById(mapId) == zoneJoin;
+            return dungeon != null && dungeon.isOpened && !dungeon.isInitializing && !dungeon.isClosing && dungeon.getMapById(mapId) == zoneJoin;
         }
         if (MapService.gI().isMapKhiGasHuyDiet(mapId)) {
             var dungeon = player.clan.KhiGasHuyDiet;
-            return dungeon != null && dungeon.isOpened && !dungeon.isClosing && dungeon.getMapById(mapId) == zoneJoin;
+            return dungeon != null && dungeon.isOpened && !dungeon.isInitializing && !dungeon.isClosing && dungeon.getMapById(mapId) == zoneJoin;
         }
         var dungeon = player.clan.doanhTrai;
-        return dungeon != null && dungeon.isOpened && !dungeon.isClosing && dungeon.getMapById(mapId) == zoneJoin;
+        return dungeon != null && dungeon.isOpened && !dungeon.isInitializing && !dungeon.isClosing && dungeon.getMapById(mapId) == zoneJoin;
     }
 
     public boolean goToMap(Player player, Zone zoneJoin) {
         if (zoneJoin == null) return false;
         synchronized (player) {
+            if (zoneJoin.map.mapId == 126) return commitEventMap(player, zoneJoin);
+            if (MapService.gI().isMapBlackBallWar(zoneJoin.map.mapId)) {
+                synchronized (zoneJoin.playerAdmissionLock) { return commitToMap(player, zoneJoin); }
+            }
             if (MapService.gI().isMapPhoBan(zoneJoin.map.mapId)) {
                 synchronized (zoneJoin) { return commitToMap(player, zoneJoin); }
             }
@@ -808,19 +825,78 @@ public class ChangeMapService {
         }
     }
 
+    /** Caller owns player; no event gate is held during old-zone cleanup or pet movement. */
+    private boolean commitEventMap(Player player, Zone destination) {
+        var event = nro.models.services.HirudegarnEventService.gI();
+        java.time.Instant admittedSession;
+        synchronized (event.eventGate) {
+            if (!event.prepareZone(destination) || !canCommitDungeonEntry(player, destination)
+                    || !hasEventSlot(player, destination) || !event.isOpen()) return false;
+            if (player.zone == destination) {
+                registerSameZone(player, destination);
+                return true;
+            }
+            admittedSession = event.sessionEnd();
+        }
+        Zone origin = player.zone;
+        if (origin != null) exitMap(player);
+        boolean accepted;
+        synchronized (event.eventGate) {
+            accepted = admittedSession != null && admittedSession.equals(event.sessionEnd())
+                    && !destination.dungeonClosing && hasEventSlot(player, destination);
+            if (accepted) {
+                player.zone = destination;
+                destination.addPlayer(player);
+            }
+        }
+        if (!accepted) {
+            if (origin != null) {
+                player.zone = origin;
+                origin.addPlayer(player);
+                origin.load_Me_To_Another(player);
+            }
+            return false;
+        }
+        if (origin != null && player.mobMe != null) player.mobMe.goToMap(destination);
+        if (player instanceof nro.models.boss.Boss boss) nro.models.services.BossNoticeService.gI().appeared(boss);
+        return true;
+    }
+
+    private boolean hasEventSlot(Player player, Zone destination) {
+        return player.isBoss || player.isPet || player.isNewPet || player.zone == destination
+                || destination.getNumOfPlayers() < destination.maxPlayer;
+    }
+
     private boolean commitToMap(Player player, Zone zoneJoin) {
         if (!canCommitDungeonEntry(player, zoneJoin)) return false;
+        if (MapService.gI().isMapBlackBallWar(zoneJoin.map.mapId)
+                && !player.isBoss && !player.isPet && !player.isNewPet
+                && (zoneJoin.finishBlackBallWar
+                    || (player.zone != zoneJoin && zoneJoin.getNumOfPlayers() >= zoneJoin.maxPlayer))) {
+            return false;
+        }
+        if (player.zone == zoneJoin) {
+            registerSameZone(player, zoneJoin);
+            return true;
+        }
         Zone oldZone = player.zone;
         if (oldZone != null) {
             this.exitMap(player);
-            if (player.mobMe != null) {
-                player.mobMe.goToMap(zoneJoin);
-            }
+            if (player.mobMe != null) player.mobMe.goToMap(zoneJoin);
         }
         player.zone = zoneJoin;
         player.zone.addPlayer(player);
         if(player instanceof nro.models.boss.Boss boss)nro.models.services.BossNoticeService.gI().appeared(boss);
         return true;
+    }
+
+    /** Boss spawn code may assign its target zone before committing membership. */
+    private void registerSameZone(Player player, Zone destination) {
+        boolean missingBoss = player.isBoss && !destination.getBosses().contains(player);
+        destination.addPlayer(player);
+        if (missingBoss && player instanceof nro.models.boss.Boss boss) {
+            nro.models.services.BossNoticeService.gI().appeared(boss);
+        }
     }
 
     public void exitMap(Player player) {
@@ -1156,29 +1232,7 @@ public class ChangeMapService {
     }
 
     public Zone getMapCanJoin(Player player, int mapId) {
-        if (MapService.gI().isMapOffline(player.zone.map.mapId)) {
-            return getZoneJoinByMapIdAndZoneId(player, mapId, 0);
-        }
-
-        Map map = getMapById(mapId);
-        if (map == null) {
-            return null;
-        }
-
-        if (map.zones.size() > 0) {
-            Zone zone0 = map.zones.get(0);
-            if (zone0 != null && zone0.getNumOfPlayers() < Zone.PLAYERS_TIEU_CHUAN_TRONG_MAP) {
-                return zone0;
-            }
-        }
-
-        for (Zone zone : map.zones) {
-            if (zone != null && zone.getNumOfPlayers() < Zone.PLAYERS_TIEU_CHUAN_TRONG_MAP) {
-                return zone;
-            }
-        }
-
-        return null;
+        return MapService.gI().getMapCanJoin(player, mapId, -1);
     }
 
     public Zone getZoneJoinByMapIdAndZoneId(Player player, int mapId, int zoneId) {

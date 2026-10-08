@@ -81,10 +81,11 @@ public class ServerNotify extends Thread {
         Message msg;
         try {
             msg = new Message(50);
-            int count=Math.min(127,Manager.NOTIFY.size());
+            java.util.List<String> snapshot=Manager.NOTIFY;
+            int count=Math.min(127,snapshot.size());
             msg.writer().writeByte(count);
             for (int i = 0; i < count; i++) {
-                String[] arr = Manager.NOTIFY.get(i).split("<>",2);
+                String[] arr = snapshot.get(i).split("<>",2);
                 msg.writer().writeShort(i);
                 msg.writer().writeUTF(arr[0]);
                 msg.writer().writeUTF(arr.length>1?arr[1]:"");

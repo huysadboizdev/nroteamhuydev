@@ -16,6 +16,9 @@ import nro.models.utils.Util;
 
 public class Broly extends Boss {
     private long lastTimeAttack;
+    private BrolyZoneCoordinator.Lease lease;
+    private boolean transforming;
+    private long lastTransformationFailure;
 
     public Broly() throws Exception {
 
@@ -41,14 +44,14 @@ public class Broly extends Boss {
                 new String[]{"|-1|Các ngươi giỏi lắm. Ta sẽ quay lại."}, //text chat 3
                 600//type appear
         ));
+        nro.models.boss.Boss_Manager.BrolyManager.gI().publish(this);
     }
 
     @Override
-    public void active() {
-        super.active();
-        if (this.nPoint.hpMax == 1_500_000) {
-            this.leaveMap();
-        }
+    public synchronized void active() {
+        if (transformToSuper()) return;
+        if (zone!=null && !isDie() && bossStatus==BossStatus.ACTIVE) super.active();
+        transformToSuper();
     }
 
     @Override
@@ -62,54 +65,87 @@ public class Broly extends Boss {
         st = System.currentTimeMillis();
     }
 
-    public void joinMap2() {
-        if (this.zone == null) {
-            if (this.parentBoss != null) {
-                this.zone = parentBoss.zone;
-            } else if (this.lastZone == null) {
-                this.zone = getMapJoin();
-            } else {
-                this.zone = this.lastZone;
+    public synchronized void joinMap2() {
+        if(lease!=null && coordinator().owns(lease))return;
+        Zone candidate=zone!=null?zone:parentBoss!=null?parentBoss.zone:lastZone!=null?lastZone:getMapJoin();
+        zone=null;
+        if(candidate!=null && candidate.map.zones.size()>2) {
+            int count=candidate.map.zones.size()-2;
+            int start=Util.nextInt(count);
+            for(int i=0;i<count;i++) {
+                Zone target=candidate.map.zones.get(2+(start+i)%count);
+                lease=coordinator().reserve(target,this);
+                if(lease==null)continue;
+                try {
+                    enterZone(target,-1,-1);
+                    if(zone!=target || !target.getBosses().contains(this))throw new IllegalStateException("Broly map admission rejected");
+                    changeStatus(BossStatus.CHAT_S);return;
+                } catch(Exception failure) {
+                    cleanupZone();coordinator().release(lease);lease=null;
+                    nro.models.utils.Logger.logException(getClass(),failure,"Broly spawn map="+target.map.mapId+" zone="+target.zoneId);
+                    break;
+                }
             }
         }
-        if (this.zone != null) {
-            try {
+        lastZone=null;lastTimeRest=System.currentTimeMillis();changeStatus(BossStatus.REST);
+    }
 
-                int zoneid = Util.nextInt(2, this.zone.map.zones.size() - 1);
+    private BrolyZoneCoordinator coordinator() {return nro.models.boss.Boss_Manager.BrolyManager.gI().zones();}
+    public synchronized void claimExistingZone() {if(zone!=null)lease=coordinator().reserve(zone,this);}
+    protected void enterZone(Zone target,int x,int y) {
+        // changeMap expects a boss's destination to be selected before admission.
+        if(zone==null)zone=target;
+        ChangeMapService.gI().changeMap(this,target,x,y);
+    }
+    protected void exitZone() {ChangeMapService.gI().exitMap(this);}
+    private void cleanupZone() {
+        Zone old=zone;
+        try {exitZone();} finally {if(old!=null)old.removePlayer(this);zone=null;}
+    }
+    protected SuperBroly createSuperBroly(Zone target,int x,int y) throws Exception {return new SuperBroly(target,x,y);}
 
-                while (zoneid < this.zone.map.zones.size() && this.zone.map.zones.get(zoneid).getBosses().size() > 0) {
-                    zoneid++;
+    public synchronized boolean transformToSuper() {
+        if(transforming || zone==null || nPoint==null || isDie() || bossStatus!=BossStatus.ACTIVE
+                || nPoint.hpMax<1_500_000 || System.currentTimeMillis()-lastTransformationFailure<30_000)return false;
+        Zone old=zone;int x=location.x,y=location.y;
+        if(lease==null)lease=coordinator().reserve(old,this);
+        if(!coordinator().owns(lease))return false;
+        transforming=true;
+        SuperBroly next=null;
+        BrolyZoneCoordinator.Lease nextLease=null;
+        boolean detached=false;
+        try {
+            next=createSuperBroly(old,x,y);
+            // The normal boss remains owner while construction can fail.
+            cleanupZone();detached=true;
+            nextLease=coordinator().transfer(lease,next);
+            if(nextLease==null)throw new IllegalStateException("Broly transformation ownership changed");
+            next.acceptLease(nextLease);
+            next.joinMap();
+            if(next.zone!=old || !old.getBosses().contains(next))throw new IllegalStateException("Super Broly map admission rejected");
+            lease=null;lastZone=null;lastTimeRest=System.currentTimeMillis();changeStatus(BossStatus.REST);
+            return true;
+        } catch(Exception failure) {
+            if(next!=null)next.abortSpawn();
+            if(nextLease!=null)lease=coordinator().transfer(nextLease,this);
+            if(detached || zone!=old) {
+                try {enterZone(old,x,y);if(zone!=old || !old.getBosses().contains(this))throw new IllegalStateException("Broly rollback admission rejected");changeStatus(BossStatus.ACTIVE);}
+                catch(Exception rollback) {
+                    failure.addSuppressed(rollback);old.addPlayer(this);zone=old;location.x=x;location.y=y;bossStatus=BossStatus.ACTIVE;
+                    try {changeStatus(BossStatus.ACTIVE);} catch(Exception notice) {failure.addSuppressed(notice);}
                 }
-
-                if (zoneid < this.zone.map.zones.size()) {
-                    this.zone = this.zone.map.zones.get(zoneid);
-                } else {
-                    if (this.id == BossID.BROLY) {
-                        this.changeStatus(BossStatus.DIE);
-                        return;
-                    }
-                    this.zone = this.zone.map.zones.get(Util.nextInt(2, this.zone.map.zones.size() - 1));
-                }
-
-                if (this.zone.zoneId < 2) {
-                    this.leaveMap();
-                }
-
-                ChangeMapService.gI().changeMap(this, this.zone, -1, -1);
-                this.changeStatus(BossStatus.CHAT_S);
-            } catch (Exception e) {
-                this.changeStatus(BossStatus.REST);
             }
-        } else {
-            this.changeStatus(BossStatus.RESPAWN);
-        }
+            lastTransformationFailure=System.currentTimeMillis();
+            nro.models.utils.Logger.logException(getClass(),failure,"Broly transformation map="+old.map.mapId+" zone="+old.zoneId);
+            return false;
+        } finally {transforming=false;}
     }
 
     private long st;
 
     @Override
     public synchronized int injured(Player plAtt, long damage, boolean piercing, boolean isMobAttack) {
-        if (!this.isDie()) {
+        if (!transforming && zone!=null && bossStatus!=BossStatus.REST && !this.isDie()) {
             if (!piercing && Util.isTrue(this.nPoint.tlNeDon, 1000)) {
                 this.chat("Xí hụt");
                 return 0;
@@ -120,7 +156,9 @@ public class Broly extends Boss {
                 SkillService.gI().useSkill(this, null, null, -1, null);
             }
             damage = this.nPoint.subDameInjureWithDeff(damage);
-            if (!piercing && plAtt.playerSkill.skillSelect.template.id != Skill.TU_SAT && damage > this.nPoint.hpMax / 100) {
+            boolean suicide=plAtt!=null && plAtt.playerSkill!=null && plAtt.playerSkill.skillSelect!=null
+                    && plAtt.playerSkill.skillSelect.template!=null && plAtt.playerSkill.skillSelect.template.id==Skill.TU_SAT;
+            if (!piercing && !suicide && damage > this.nPoint.hpMax / 100) {
                 damage = this.nPoint.hpMax / 100;
             }
             this.nPoint.subHP(damage);
@@ -186,17 +224,13 @@ public class Broly extends Boss {
     }
 
     @Override
-    public void leaveMap() {
-        Zone zone = this.zone;
-        int x = this.location.x;
-        int y = this.location.y;
-        ChangeMapService.gI().exitMap(this);
-        try {
-            new SuperBroly(zone, x, y);
-        } catch (Exception ex) {
+    public synchronized void leaveMap() {
+        try {cleanupZone();} finally {
+            coordinator().release(lease);lease=null;
+            this.lastZone=null;this.lastTimeRest=System.currentTimeMillis();changeStatus(BossStatus.REST);
         }
-        this.lastZone = null;
-        this.lastTimeRest = System.currentTimeMillis();
-        this.changeStatus(BossStatus.REST);
+    }
+    @Override public synchronized void dispose() {
+        leaveMap();nro.models.boss.Boss_Manager.BrolyManager.gI().removeBoss(this);super.dispose();
     }
 }

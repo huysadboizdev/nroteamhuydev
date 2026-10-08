@@ -3,10 +3,10 @@ import nro.models.player.Player;
 import nro.models.map.service.ChangeMapService;
 import nro.models.utils.Util;
 
-import java.time.LocalTime;
-import java.util.Calendar;
+
+
 import nro.models.services.Service;
-import nro.models.utils.TimeUtil;
+
 
 public class Tapion extends Npc {
 
@@ -18,7 +18,7 @@ public class Tapion extends Npc {
     public void openBaseMenu(Player player) {
         if (canOpenNpc(player)) {
             if (mapId == 19) {
-                this.createOtherMenu(player, 0, "Ác quỷ truyền thuyết Hirudegarn\nđã thoát khỏi phong ấn ngàn năm\nHãy giúp tôi chế ngự nó", "OK", "Từ chối");
+                this.createOtherMenu(player, 0, "Ác quỷ truyền thuyết Hirudegarn\nđã thoát khỏi phong ấn ngàn năm\nHãy giúp tôi chế ngự nó\n15h-16h v\u00e0 22h-23h", "OK", "Từ chối");
             } else if (mapId == 126) {
                 this.createOtherMenu(player, 0, "Tôi sẽ đưa bạn về", "OK", "Từ chối");
             }
@@ -31,12 +31,10 @@ public class Tapion extends Npc {
             switch (select) {
                 case 0 -> {
                     if (mapId == 19) {
-                        Calendar calendar = Calendar.getInstance();
-                        int hour = calendar.get(Calendar.HOUR_OF_DAY);
-                        if (hour >= 1 && hour < 23) {
+                        if (nro.models.services.HirudegarnEventService.gI().isOpen()) {
                             ChangeMapService.gI().changeMapNonSpaceship(player, 126, 200 + Util.nextInt(-100, 100), 360);
                         }else{
-                            Service.gI().sendThongBao(player, "Vui lòng quay lại vào lúc 22h");
+                            Service.gI().sendThongBao(player, "S\u1ef1 ki\u1ec7n m\u1edf l\u00fac 15h-16h v\u00e0 22h-23h");
                         }
                     } else if (mapId == 126) {
                         ChangeMapService.gI().changeMapNonSpaceship(player, 19, 1000 + Util.nextInt(-100, 100), 360);

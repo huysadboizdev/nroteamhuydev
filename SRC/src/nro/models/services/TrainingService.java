@@ -75,6 +75,11 @@ public class TrainingService {
 
     public Boss callBoss(Player pl, int bossID, boolean isThachDau) {
         try {
+            if (bossID == BossID.WHIS) {
+                Boss boss = Whis.start(pl);
+                if (boss != null) { pl.isThachDau = isThachDau; Service.gI().sendHideNpc(pl, ConstNpc.WHIS, true); }
+                return boss;
+            }
             pl.isThachDau = isThachDau;
             if (getNpc(bossID) != -1) {
                 Service.gI().sendHideNpc(pl, getNpc(bossID), true);
@@ -106,7 +111,7 @@ public class TrainingService {
                     return new ToSuKaio(pl);
                 }
                 case BossID.WHIS -> {
-                    return new Whis(pl);
+                    return Whis.start(pl);
                 }
             }
         } catch (Exception e) {

@@ -4,21 +4,57 @@ import nro.models.boss.BossID;
 import nro.models.consts.BossStatus;
 import nro.models.boss.BossesData;
 import static nro.models.consts.BossType.PHOBAN;
-import nro.models.database.PlayerDAO;
-import nro.models.database.TraningDAO;
+import nro.models.services.WhisWeeklyService;
+import nro.models.services.WhisFightGuard;
 import nro.models.player.Player;
 import nro.models.services.Service;
 import nro.models.map.service.ChangeMapService;
-import nro.models.server.Manager;
-import static nro.models.server.Manager.isTopWhisChanged;
+import nro.models.utils.Logger;
 import nro.models.utils.Util;
 
 public class Whis extends TrainingBoss {
 
+    private final Object fightToken;
+    private boolean victoryHandled;
+    private volatile boolean ready;
+
     public Whis(Player player) throws Exception {
+        this(player, reserveOwner(player));
+    }
+
+    private static Object reserveOwner(Player player) {
+        if (player == null) return null;
+        Object token = WhisFightGuard.reserve(player.id);
+        if (token == null) throw new IllegalStateException("Whis fight already active");
+        return token;
+    }
+
+    private Whis(Player player, Object token) throws Exception {
         super(PHOBAN, BossID.WHIS, BossesData.WHIS);
+        fightToken = token;
         playerAtt = player;
-        Service.gI().setPos0(player, 488, 360);
+        try {
+            if (player != null) Service.gI().setPos0(player, 488, 360);
+            ready = true;
+        } catch (RuntimeException failure) {
+            nro.models.boss.Boss_Manager.OtherBossManager.gI().removeBoss(this);
+            if (player != null) WhisFightGuard.release(player.id, token);
+            throw failure;
+        }
+    }
+
+    @Override
+    public void update() { if (ready) super.update(); }
+
+    public static Whis start(Player player) throws Exception {
+        if (player == null || player.zone == null || player.zone.map.mapId != 154 || player.isDie()) return null;
+        Object token = WhisFightGuard.reserve(player.id);
+        if (token == null) {
+            Service.gI().sendThongBao(player, "Bạn đang có một trận Whis, hãy kết thúc trận đó trước.");
+            return null;
+        }
+        try { return new Whis(player, token); }
+        catch (Exception failure) { WhisFightGuard.release(player.id, token); throw failure; }
     }
 
     private long lastJoinMapTime;
@@ -28,19 +64,19 @@ public class Whis extends TrainingBoss {
 
     @Override
     public void joinMap() {
-        if (playerAtt.zone != null) {
+        if (playerAtt != null && playerAtt.zone != null && playerAtt.zone.map.mapId == 154 && !playerAtt.beforeDispose) {
             this.zone = playerAtt.zone;
-            this.level = playerAtt.traning.getTop() + 1;
-            this.nPoint.hpMax *= level;
+            this.level = Math.max(1L, (long) playerAtt.traning.getTop() + 1L);
+            this.nPoint.hpMax = (int) Math.min(Integer.MAX_VALUE, (long) this.nPoint.hpMax * level);
             this.nPoint.hp = this.nPoint.hpMax;
-            this.nPoint.dame *= level;
+            this.nPoint.dame = (int) Math.min(Integer.MAX_VALUE, (long) this.nPoint.dame * level);
             this.name = "Whis [LV:" + level + "]";
             ChangeMapService.gI().changeMap(this, this.zone, 725, 312);
             this.chat("Ta sẽ dạy ngươi vài chiêu");
             this.changeStatus(BossStatus.AFK);
             lastTimeAFK = System.currentTimeMillis();
             lastJoinMapTime = System.currentTimeMillis();
-        }
+        } else { leaveMap(); }
     }
 
     @Override
@@ -64,6 +100,7 @@ public class Whis extends TrainingBoss {
 
     @Override
     public synchronized int injured(Player plAtt, long damage, boolean piercing, boolean isMobAttack) {
+        if (plAtt == null || plAtt != playerAtt || isMobAttack || victoryHandled || damage <= 0) return 0;
         if(nPoint==null||nPoint.hp<=0)return 0;
         if (!piercing && Util.isTrue(400, 1000)) {
             this.chat("Xí hụt");
@@ -81,11 +118,13 @@ public class Whis extends TrainingBoss {
             this.setDie(plAtt);
             die(plAtt);
         }
-        return (int) damage;
+        return (int) Math.min(Integer.MAX_VALUE, Math.max(0L, damage));
     }
 
     @Override
-    public void die(Player plKill) {
+    public synchronized void die(Player plKill) {
+        if ((plKill != null && plKill != playerAtt) || victoryHandled) return;
+        victoryHandled = true;
         this.enterDefeatedWait();
         this.lastTimeAFK = System.currentTimeMillis();
 
@@ -98,23 +137,24 @@ public class Whis extends TrainingBoss {
             Service.gI().sendPlayerVS(playerAtt, playerAtt, (byte) 0);
         }
 
-        if (plKill != null) {
-            plKill.thachdauwhis++;
-            if (!Manager.isTopWhisChanged) {
-                Manager.isTopWhisChanged = true;
+        if (plKill == null || playerAtt == null || playerAtt.beforeDispose) return;
+        try {
+            synchronized (playerAtt) {
+                WhisWeeklyService.gI().recordWin(playerAtt, (int)Math.min(Integer.MAX_VALUE,level),
+                    (int)Math.min(Integer.MAX_VALUE, Math.max(0L,System.currentTimeMillis()-lastJoinMapTime)));
             }
-            Service.gI().sendMoney(plKill);
-            PlayerDAO.updatePlayer(plKill);
-
-            try {
-                playerAtt.traning.setTop((int) level);
-                playerAtt.traning.setTime((int) (System.currentTimeMillis() - lastJoinMapTime));
-                playerAtt.traning.setLastTime(System.currentTimeMillis());
-                TraningDAO.updatePlayer(playerAtt);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            Service.gI().sendThongBao(playerAtt, "Bạn thắng Whis: +1 điểm bảng xếp hạng tuần.");
+        } catch (Exception e) {
+            Logger.logException(Whis.class,e);
+            Service.gI().sendThongBao(playerAtt, "Chưa lưu được điểm Whis do lỗi dữ liệu. Vui lòng báo quản trị viên.");
         }
+    }
+
+    @Override
+    public synchronized void leaveMap() {
+        Player owner = playerAtt;
+        try { super.leaveMap(); }
+        finally { if (owner != null) WhisFightGuard.release(owner.id, fightToken); }
     }
 
     @Override

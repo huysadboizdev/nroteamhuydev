@@ -59,7 +59,7 @@ public class BlackBallWarService {
             Service.gI().sendFlagBag(player);
 
             if (player.clan != null) {
-                List<Player> players = player.zone.getPlayers();
+                List<Player> players = new ArrayList<>(player.zone.getPlayers());
                 for (Player pl : players) {
                     if (pl.clan != null && player.clan.equals(pl.clan)) {
                         Service.gI().changeFlag(pl, Util.nextInt(1, 7));
@@ -74,7 +74,7 @@ public class BlackBallWarService {
     public void joinMapBlackBallWar(Player player) {
         boolean changed = false;
         if (player.clan != null) {
-            List<Player> players = player.zone.getPlayers();
+            List<Player> players = new ArrayList<>(player.zone.getPlayers());
             for (Player pl : players) {
                 if (pl.clan != null && !player.equals(pl) && player.clan.equals(pl.clan) && !player.isBoss) {
                     Service.gI().changeFlag(player, pl.cFlag);
@@ -104,7 +104,7 @@ public class BlackBallWarService {
                     player.idMark.setLastTimeHoldBlackBall(System.currentTimeMillis());
                     Service.gI().sendFlagBag(player);
                     if (player.clan != null) {
-                        List<Player> players = player.zone.getPlayers();
+                        List<Player> players = new ArrayList<>(player.zone.getPlayers());
                         for (Player pl : players) {
                             if (pl.clan != null && player.clan.equals(pl.clan)) {
                                 Service.gI().changeFlag(pl, 8);

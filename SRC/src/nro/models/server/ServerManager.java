@@ -43,6 +43,7 @@ import nro.models.minigame.ConSoMayManGem;
 import nro.models.minigame.ConSoMayManGold;
 import nro.models.services.ClanService;
 import nro.models.services.TaskService;
+import nro.models.services.Service;
 import nro.models.shop.ShopTab;
 import nro.models.shop_ky_gui.ConsignShopManager;
 
@@ -105,7 +106,7 @@ public class ServerManager {
     public void run() {
         try {
             isRunning = true;
-            activeServerSocket();
+            nro.models.event.EventCleanupService.resumeMaintenanceIfNeeded();
 
             // Gửi các nhiệm vụ cập nhật theo từng dịch vụ
             new Thread(NgocRongNamecService.gI(), "Update NRNM").start();
@@ -121,6 +122,10 @@ public class ServerManager {
             BossManager.gI().loadBoss();
             Manager.MAPS.forEach(nro.models.map.Map::initBoss);
             EventManager.gI().init();
+            nro.models.event.EventStateDAO.load();
+            nro.models.event.EventRuntimeService.gI().start();
+            nro.models.event.EventStateDAO.applied();
+            activeServerSocket();
 
             new Thread(BossManager.gI(), "Update boss").start();
             new Thread(YardartManager.gI(), "Update yardart boss").start();
@@ -140,6 +145,7 @@ public class ServerManager {
             new Thread(ConSoMayManGem.gI(), "ConSoMayManGemThread").start();
 
             startTopUpdater();
+            nro.models.services.LiveSyncService.gI().start();
         } catch (Exception e) {
             Logger.logException(this.getClass(), e);
         }
@@ -148,11 +154,34 @@ public class ServerManager {
     private void startTopUpdater() {
         topUpdater = Executors.newSingleThreadScheduledExecutor();
         topUpdater.scheduleAtFixedRate(() -> {
+            updateWhisWeekly();
             if (shouldUpdateTop()) {
                 updateTop();
                 Manager.resetTopFlags();
             }
         }, 0, 3000, TimeUnit.MILLISECONDS);
+    }
+
+    private void updateWhisWeekly() {
+        try {
+            nro.models.services.WhisWeeklyService.gI().refresh();
+            Manager.Topwhis = nro.models.services.WhisWeeklyService.gI().top();
+        } catch (Exception e) { Logger.logException(ServerManager.class,e); }
+        try {
+            nro.models.event.EventCleanupLogoutService.drain();
+            nro.models.event.EventCleanupService.online();
+            nro.models.event.EventStateDAO.heartbeat();
+        } catch(Exception e) { Logger.logException(ServerManager.class,e); }
+        // No service monitor is held while taking player locks.
+        for (nro.models.player.Player player : Client.gI().getPlayers()) {
+            try {
+                synchronized (player) {
+                    if (player.beforeDispose || player.nPoint == null || !player.isPl()) continue;
+                    int bonus = nro.models.services.WhisWeeklyService.gI().bonusPercent(player.id);
+                    if (player.nPoint.whisWeeklyBonusPercent != bonus) Service.gI().point(player);
+                }
+            } catch (Exception e) { Logger.logException(ServerManager.class,e); }
+        }
     }
 
     private boolean shouldUpdateTop() {
@@ -183,9 +212,6 @@ public class ServerManager {
             }
             if (Manager.isTopSukien2Changed) {
                 Manager.Topsukien1 = Manager.realTop(Manager.queryTopsukien1, con);
-            }
-            if (Manager.isTopWhisChanged) {
-                Manager.Topwhis = Manager.realTop(Manager.queryTopwhis, con);
             }
 
             Manager.resetTopFlags();
@@ -275,7 +301,23 @@ public class ServerManager {
     }
 
     public void close() {
+        try {
+            nro.models.services.LiveSyncService.gI().stop();
+            if(!nro.models.services.GiftCodeService.gI().drainPending())throw new IllegalStateException("Gift claims still awaiting reconciliation");
+            if(!nro.models.services.shenron.SummonDragonNamek.reconcilePendingForMaintenance())throw new IllegalStateException("Namek wish still awaiting reconciliation");
+            nro.models.event.EventCleanupService.drainOnline();
+            nro.models.event.EventCleanupLogoutService.drain();
+            if(!nro.models.event.EventCleanupLogoutService.empty())throw new IllegalStateException("Event cleanup logout saves must drain before maintenance");
+        } catch (Exception failure) {
+            Logger.logException(ServerManager.class,failure);
+            nro.models.services.LiveSyncService.gI().start();
+            Maintenance.cancelFailedMaintenance();
+            return;
+        }
         isRunning = false;
+        nro.models.event.EventRuntimeService.gI().stop();
+        try { nro.models.services.QuestSupportService.gI().shutdown(); }
+        catch (Exception failure) { Logger.logException(ServerManager.class, failure, "Quest support shutdown"); }
         try {
             ClanService.gI().close();
         } catch (Exception e) {
@@ -286,7 +328,16 @@ public class ServerManager {
         } catch (Exception e) {
             Logger.error("Lỗi save shop ký gửi!\n");
         }
-        Client.gI().close();
+        try {
+            Client.gI().close();
+            nro.models.event.EventCleanupLogoutService.drain();
+            if(!nro.models.event.EventCleanupLogoutService.empty())throw new IllegalStateException("Event logout saves incomplete");
+            nro.models.event.EventCleanupService.maintenance();
+        }
+        catch(Exception cleanupFailure) {
+            Logger.logException(ServerManager.class,cleanupFailure,"Event maintenance cleanup incomplete; do not reopen");
+            return;
+        }
         Logger.success("SUCCESSFULLY MAINTENANCE!\n");
 
         try {

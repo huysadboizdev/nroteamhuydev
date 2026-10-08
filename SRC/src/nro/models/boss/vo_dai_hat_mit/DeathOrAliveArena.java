@@ -94,7 +94,9 @@ public abstract class DeathOrAliveArena extends Boss {
     public void joinMap() {
         if (playerAtt != null && playerAtt.zone != null) {
             this.zone = playerAtt.zone;
-            this.nPoint.hpMax = playerAtt.nPoint.hpMax / 100 * (100 + ((int) Math.abs(this.id) - 82));
+            long hpPercent = 100L + Math.abs(this.id) - 82L;
+            this.nPoint.hpMax = (int) Math.min(Integer.MAX_VALUE,
+                    playerAtt.nPoint.hpMax / 100L * hpPercent);
             this.nPoint.hp = this.nPoint.hpMax;
             ChangeMapService.gI().changeMap(this, this.zone, 523, 336);
         }

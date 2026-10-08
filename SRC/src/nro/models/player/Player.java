@@ -113,6 +113,9 @@ public class Player implements Runnable {
     public boolean powerReduced = false;
     public String originalName;
     public boolean beforeDispose;
+    public volatile boolean liveLogoutCompleted;
+    public volatile boolean liveLogoutCleanupCompleted;
+    public volatile boolean giftLogoutSaved;
 
     public int mbv = 0;
     public boolean baovetaikhoan;
@@ -219,6 +222,8 @@ public class Player implements Runnable {
 
     public boolean justRevived;
     public long lastTimeRevived;
+    /** Incremented on every zone exit, including an immediate return to the same zone. */
+    public volatile long zoneExitSequence;
 
     public long timeChangeZone;
     public long lastUseOptionTime;
@@ -347,6 +352,7 @@ public class Player implements Runnable {
     public boolean receivedKilis = false;
     public KolQuestState kolQuestState = new KolQuestState();
     public nro.models.services.WalletPurchaseService.Pending walletPurchasePending;
+    public boolean walletLogoutSaved;
     public boolean kolRewardPending;
     public int kolPendingQuest;
     public boolean kolPendingVip;
@@ -442,6 +448,8 @@ public class Player implements Runnable {
     }
 
     public void update() {
+        if(nro.models.services.LiveSyncCommandGate.hasPendingId(id))return;
+        if(nro.models.services.GiftCodeService.hasPendingId(id))return;
         if(isPl()) nro.models.services.CommesonChallengeService.gI().update(this);
         if(nro.models.services.CommesonChallengeService.hasPending(this))return;
         if (nro.models.shop_ky_gui.ConsignTransactions.hasPending(this) || nro.models.services.RubyGiftService.hasPending(this)) return;
@@ -531,13 +539,6 @@ public class Player implements Runnable {
                         this.achievement.done(ConstAchievement.HOAT_DONG_CHAM_CHI, 1000);
                     }
                     if (this.isPl()) {
-                        Calendar calendar = Calendar.getInstance();
-                        int hour = calendar.get(Calendar.HOUR_OF_DAY);
-                        if (hour >= 22 && hour < 23) {
-                            if (zone.map.mapId == 126) {
-                                //  ChangeMapService.gI().changeMapNonSpaceship(this, 19, 1000 + Util.nextInt(-100, 100), 360);
-                            }
-                        }
                         TaskService.gI().checkCurrentTaskConditions(this);
                         TaskService.gI().sendUpdateCountSubTask(this);
                         autoSendBadges();
@@ -1684,6 +1685,12 @@ public class Player implements Runnable {
     }
 
     public void dispose() {
+        if(nro.models.event.EventCleanupLogoutService.pending(id))return;
+        if(nro.models.services.LiveSyncCommandGate.hasPendingId(id))return;
+        if(!nro.models.services.GiftCodeService.gI().reconcilePending(this))return;
+        if(nro.models.services.GiftCodeService.hasPendingId(id))return;
+        if (!nro.models.services.WalletPurchaseService.gI().reconcilePending(this)) return;
+        if (walletPurchasePending != null || nro.models.services.WalletPurchaseService.hasPending(this)) return;
         nro.models.services.CommesonChallengeService.gI().reconcile(this);
         if(nro.models.services.CommesonChallengeService.hasPending(this))return;
         if (!nro.models.services.AdminPlayerActions.gI().reconcileRename(this)) return;
@@ -1694,6 +1701,8 @@ public class Player implements Runnable {
         if (!nro.models.services.RubyGiftService.gI().reconcilePending(this)) return;
         synchronized (this) {
         if (nro.models.shop_ky_gui.ConsignTransactions.hasPending(this) || nro.models.services.RubyGiftService.hasPending(this)) return;
+        if(nro.models.event.EventCleanupLogoutService.pending(id))return;
+        if(nro.models.services.LiveSyncCommandGate.hasPendingId(id))return;
         nro.models.services.RubyGiftService.gI().cancel(this);
         if (itemsTradeWVP != null) {
             if (!itemsTradeWVP.isEmpty()) {

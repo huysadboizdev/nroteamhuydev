@@ -19,13 +19,19 @@ public class KhiDot extends Boss {
 
     @Override
     public void reward(Player plKill) {
+        try (nro.models.event.EventItemPolicy.Permit permit=nro.models.event.EventItemPolicy.admit()) {
+        if (!seasonalAllowed()) return;
         ItemMap it = new ItemMap(this.zone, 1045, 1, this.location.x, this.zone.map.yPhysicInTop(this.location.x,
                 this.location.y - 24), plKill.id);
-        Service.gI().dropItemMap(this.zone, it);
+        nro.models.event.EventRuntimeService.dropSeasonal(this.zone, it, "trung_thu");
+    
+        }
     }
 
     @Override
     public synchronized int injured(Player plAtt, long damage, boolean piercing, boolean isMobAttack) {
+        try (nro.models.event.EventItemPolicy.Permit permit=nro.models.event.EventItemPolicy.admit()) {
+        if (!seasonalAllowed()) return 0;
         if (!this.isDie()) {
             if (!piercing && Util.isTrue(this.nPoint.tlNeDon, 1000)) {
                 this.chat("Xí hụt");
@@ -47,10 +53,13 @@ public class KhiDot extends Boss {
         } else {
             return 0;
         }
+    
+        }
     }
 
     @Override
     public void joinMap() {
+        if (!seasonalAllowed()) return;
         super.joinMap(); //To change body of generated methods, choose Tools | Templates.
         st = System.currentTimeMillis();
     }

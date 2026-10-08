@@ -100,6 +100,8 @@ public final class RubyGiftService {
     }
     private String validate(Pending p) {
         Player a=p.sender(),b=p.target();
+        if(LiveSyncMutationGate.blocked(a)||LiveSyncMutationGate.blocked(b))return "Web command is awaiting commit reconciliation.";
+        if (a!=null && b!=null && (a.walletPurchasePending!=null || b.walletPurchasePending!=null)) return "Thanh toán đang chờ đối soát, vui lòng thử lại sau.";
         if (System.currentTimeMillis()-p.createdAt()>60_000)return "Yêu cầu đã hết hạn. Hãy mở lại vé.";
         if (a==null||b==null||a==b||a.id==b.id||!a.isPl()||!b.isPl())return "Nhân vật nhận không hợp lệ.";
         if (a.getSession()!=p.senderSession()||b.getSession()!=p.targetSession()||a.beforeDispose||b.beforeDispose||!online.test(a)||!online.test(b))return "Nhân vật đã thoát hoặc thay phiên đăng nhập.";
@@ -109,7 +111,7 @@ public final class RubyGiftService {
         if (p.amount()<=0||net(p.amount())<=0)return "Số hồng ngọc không hợp lệ.";
         if (a.inventory==null||b.inventory==null||a.inventory.ruby<0||b.inventory.ruby<0)return "Dữ liệu hồng ngọc không hợp lệ.";
         if (a.inventory.ruby<p.amount())return "Không đủ hồng ngọc.";
-        if ((long)b.inventory.ruby+net(p.amount())>Integer.MAX_VALUE)return "Hồng ngọc người nhận vượt giới hạn.";
+        if ((long)b.inventory.ruby+net(p.amount())+VipRewardCatalog.reservedRuby(b)>Integer.MAX_VALUE)return "Hồng ngọc người nhận vượt giới hạn.";
         if (ticket(a)==null)return "Cần một Vé tặng hồng ngọc trong hành trang.";
         return null;
     }

@@ -71,8 +71,10 @@ public class Client implements Runnable {
 
     private void remove(MySession session) {
         if (session.player != null) {
-            this.remove(session.player);
-            session.player.dispose();
+            Player retiring=session.player;
+            this.remove(retiring);
+            retiring.dispose();
+            if(!nro.models.event.EventCleanupLogoutService.pending(retiring.id)&&!nro.models.services.LiveSyncCommandGate.hasPendingId(retiring.id)&&!nro.models.services.GiftCodeService.hasPendingId(retiring.id))retiring.liveLogoutCompleted=true;
         }
         if (session.joinedGame) {
             session.joinedGame = false;
@@ -88,6 +90,7 @@ public class Client implements Runnable {
     private void remove(Player player) {
         boolean cleanup;
         synchronized (player) {
+            nro.models.services.LiveSyncCommandGate.retire(player.id,player.getSession().userId);
             synchronized (registryLock) {
             this.players_id.remove(player.id, player);
             this.players_name.remove(player.name, player);
@@ -132,13 +135,24 @@ public class Client implements Runnable {
                 ChangeMapService.gI().exitMap(player.pet);
             }
         }
+        nro.models.event.EventCleanupLogoutService.retainIfPending(player);
         PlayerDAO.updatePlayer(player);
     }
 
     public void kickSession(MySession session) {
-        if (session != null) {
-            this.remove(session);
-            session.disconnect();
+        if (session != null && session.claimLogout()) {
+            Player retiring=session.player;
+            try { this.remove(session); }
+            finally {
+                try { session.disconnect(); }
+                finally {
+                    if(retiring!=null) {
+                        retiring.liveLogoutCleanupCompleted=true;
+                        if(!nro.models.event.EventCleanupLogoutService.pending(retiring.id)&&!nro.models.services.LiveSyncCommandGate.hasPendingId(retiring.id)&&!nro.models.services.GiftCodeService.hasPendingId(retiring.id))
+                            nro.models.services.LiveSyncCommandGate.retired(retiring.id,session.userId);
+                    }
+                }
+            }
         }
     }
 
@@ -174,11 +188,15 @@ public class Client implements Runnable {
 
     public void close() {
         Logger.log(Logger.YELLOW, "BEGIN KICK OUT SESSION " + players.size() + "\n");
-        while (!players.isEmpty()) {
-            Player pl = players.remove(0);
-            if (pl != null && pl.getSession() != null) {
-                this.kickSession(pl.getSession());
+        synchronized(nro.models.services.LiveSyncCommandGate.LIFECYCLE_LOCK) {
+        for(Player pl:getPlayers()) {
+            synchronized(pl) {
+            if(pl.getSession()==null)throw new IllegalStateException("Registered player has no session; maintenance cannot verify save");
+            TransactionService.gI().cancelTrade(pl);
+            if(!PlayerDAO.saveChecked(pl))throw new IllegalStateException("Player full save failed; event cleanup must not start");
+            this.kickSession(pl.getSession());
             }
+        }
         }
         Logger.success("SUCCESSFUL\n");
     }

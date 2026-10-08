@@ -223,13 +223,13 @@ public class SkillService {
                                 && Math.abs(playerMap.location.x - player.newSkill._xPlayer) <= player.newSkill._xObjTaget
                                 && Math.abs(playerMap.location.y - player.newSkill._yPlayer) <= player.newSkill._yObjTaget
                                 && this.canAttackPlayer(player, playerMap)) {
-                            this.playerAttackPlayer(player, playerMap, false);
+                            this.playerAttackPlayer(player, playerMap, false, player.newSkill.skillSelect.template.id);
                         }
                         if (player.newSkill.dir == 1 && player.location.x < playerMap.location.x && !playerMap.isDie()
                                 && Math.abs(playerMap.location.x - player.newSkill._xPlayer) <= player.newSkill._xObjTaget
                                 && Math.abs(playerMap.location.y - player.newSkill._yPlayer) <= player.newSkill._yObjTaget
                                 && this.canAttackPlayer(player, playerMap)) {
-                            this.playerAttackPlayer(player, playerMap, false);
+                            this.playerAttackPlayer(player, playerMap, false, player.newSkill.skillSelect.template.id);
                         }
                     }
                     if (!player.isBoss) {
@@ -674,13 +674,13 @@ public class SkillService {
                                     EffectSkillService.gI().setStartHuytSao(pl, tileHP);
                                     EffectSkillService.gI().sendEffectPlayer(pl, pl, EffectSkillService.TURN_ON_EFFECT, EffectSkillService.HUYT_SAO_EFFECT);
                                     pl.nPoint.calPoint();
-                                    pl.nPoint.setHp((int) pl.nPoint.hp + ((int) pl.nPoint.hp * tileHP / 100));
+                                    pl.nPoint.setHp((long) pl.nPoint.hp + ((long) pl.nPoint.hp * tileHP / 100));
                                     Service.gI().point(pl);
                                     Service.gI().Send_Info_NV(pl);
                                     ItemTimeService.gI().sendItemTime(pl, 3781, 30);
                                     PlayerService.gI().sendInfoHpMp(pl);
                                 } else if (!pl.isBoss && pl.gender == ConstPlayer.NAMEC && player.cFlag == pl.cFlag) {
-                                    pl.nPoint.setHP((int) pl.nPoint.hp - (((int) pl.nPoint.hpMax * 10 / 100) < pl.nPoint.hp ? ((int) pl.nPoint.hpMax * 10 / 100) : 0));
+                                    pl.nPoint.setHP((long) pl.nPoint.hp - (((long) pl.nPoint.hpMax * 10 / 100) < pl.nPoint.hp ? ((long) pl.nPoint.hpMax * 10 / 100) : 0));
                                     Service.gI().point(pl);
                                     Service.gI().Send_Info_NV(pl);
                                 }
@@ -694,7 +694,7 @@ public class SkillService {
                                 EffectSkillService.gI().setStartHuytSao(pl, tileHP);
                                 EffectSkillService.gI().sendEffectPlayer(pl, pl, EffectSkillService.TURN_ON_EFFECT, EffectSkillService.HUYT_SAO_EFFECT);
                                 pl.nPoint.calPoint();
-                                pl.nPoint.setHp((int) pl.nPoint.hp + ((int) pl.nPoint.hp * tileHP / 100));
+                                pl.nPoint.setHp((long) pl.nPoint.hp + ((long) pl.nPoint.hp * tileHP / 100));
                                 Service.gI().point(pl);
                                 Service.gI().Send_Info_NV(pl);
                                 ItemTimeService.gI().sendItemTime(pl, 3781, 30);
@@ -705,7 +705,7 @@ public class SkillService {
                         EffectSkillService.gI().setStartHuytSao(player, tileHP);
                         EffectSkillService.gI().sendEffectPlayer(player, player, EffectSkillService.TURN_ON_EFFECT, EffectSkillService.HUYT_SAO_EFFECT);
                         player.nPoint.calPoint();
-                        player.nPoint.setHp((int) player.nPoint.hp + ((int) player.nPoint.hp * tileHP / 100));
+                        player.nPoint.setHp((long) player.nPoint.hp + ((long) player.nPoint.hp * tileHP / 100));
                         Service.gI().point(player);
                         Service.gI().Send_Info_NV(player);
                         ItemTimeService.gI().sendItemTime(player, 3781, 30);
@@ -766,7 +766,7 @@ public class SkillService {
                         for (Player pl : playersMap) {
                             if (!player.equals(pl) && canAttackPlayer(player, pl) && Util.getDistance(player, pl) <= rangeBom) {
                                 dame = pl.isBoss ? player.effectSkill.isMonkey ? dame / 3 : dame / 2 : dame;
-                                BossNoticeService.injure(pl,player,dame,MapService.gI().isMapYardart(player.zone.map.mapId),false);
+                                BossNoticeService.injure(pl,player,dame,MapService.gI().isMapYardart(player.zone.map.mapId),false,(int)Skill.TU_SAT);
                                 PlayerService.gI().sendInfoHpMpMoney(pl);
                                 Service.gI().Send_Info_NV(pl);
                             }
@@ -811,9 +811,9 @@ public class SkillService {
                         msg.writer().writeByte(0); //read continue
                         Service.gI().sendMessAllPlayerInMap(pl, msg);
                         boolean isDie = pl.isDie();
-                        player.nPoint.setHP(player.nPoint.getHP() + ((int) player.nPoint.hpMax * percentTriThuong / 100));
-                        pl.nPoint.setHP(pl.nPoint.getHP() + ((int) pl.nPoint.hpMax * percentTriThuong / 100));
-                        pl.nPoint.setMP(pl.nPoint.getMP() + ((int) pl.nPoint.mpMax * percentTriThuong / 100));
+                        player.nPoint.setHP((long) player.nPoint.getHP() + ((long) player.nPoint.hpMax * percentTriThuong / 100));
+                        pl.nPoint.setHP((long) pl.nPoint.getHP() + ((long) pl.nPoint.hpMax * percentTriThuong / 100));
+                        pl.nPoint.setMP((long) pl.nPoint.getMP() + ((long) pl.nPoint.mpMax * percentTriThuong / 100));
                         if (isDie) {
                             AchievementService.gI().checkDoneTask(pl, ConstAchievement.CHAM_SOC_DAC_BIET);
                             Service.gI().chat(pl, "Cảm ơn " + player.name + " đã hồi sinh mình");
@@ -853,7 +853,8 @@ public class SkillService {
                     if (damePST >= plAtt.nPoint.hp) {
                         damePST = plAtt.nPoint.hp - 1;
                     }
-                    if (plAtt.isBoss && !(plAtt instanceof Broly || plAtt instanceof SuperBroly)) {
+                    if (plAtt.isBoss && !(plAtt instanceof Broly || plAtt instanceof SuperBroly
+                            || plAtt instanceof nro.models.boss.Mabu.FatMabuTournament)) {
                         if (damePST > plAtt.nPoint.hpMax / 100) {
                             int giamdame = 0;
                             if (plAtt.nPoint.hpMax / 200 > 1) {
@@ -900,6 +901,11 @@ public class SkillService {
     }
 
     private void playerAttackPlayer(Player plAtt, Player plInjure, boolean miss) {
+        int skillId=plAtt!=null&&plAtt.playerSkill!=null&&plAtt.playerSkill.skillSelect!=null&&plAtt.playerSkill.skillSelect.template!=null?plAtt.playerSkill.skillSelect.template.id:-1;
+        playerAttackPlayer(plAtt,plInjure,miss,skillId);
+    }
+
+    private void playerAttackPlayer(Player plAtt, Player plInjure, boolean miss, int executingSkillId) {
         if (plAtt == null || plInjure == null || plAtt.nPoint == null || plInjure.nPoint == null
                 || plAtt.playerSkill == null || plAtt.playerSkill.skillSelect == null) {
             return;
@@ -921,7 +927,7 @@ public class SkillService {
                 dameAttack /= 3;
             }
         }
-        int dameHit = BossNoticeService.injure(plInjure,plAtt,miss ? 0 : dameAttack,false,false);
+        int dameHit = BossNoticeService.injure(plInjure,plAtt,miss ? 0 : dameAttack,false,false,executingSkillId);
         // injured() can independently dodge or negate a beam after target qualification.
         if (hadCostumeCharge && dameHit == 0) {
             plAtt.effectSkin.isXChuong = true;

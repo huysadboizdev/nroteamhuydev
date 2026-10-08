@@ -198,7 +198,18 @@ public class PetService {
         return petData;
     }
 
-    private Pet createNewPet(Player player, boolean isMabu, boolean isUub, boolean isKidBeer, boolean isJiren, byte... gender) {
+    public static String defaultPetName(int type) {
+        return switch (type) {
+            case 0 -> "$Đệ tử";
+            case 1 -> "$Mabư";
+            case 2 -> "$Uub";
+            case 3 -> "$Kid Beer";
+            case 4 -> "$Kid Jiren";
+            default -> throw new IllegalArgumentException("Invalid pet type");
+        };
+    }
+
+    public Pet createNewPet(Player player, boolean isMabu, boolean isUub, boolean isKidBeer, boolean isJiren, byte... gender) {
         int[] data;
 
         if (isMabu) {
@@ -215,7 +226,7 @@ public class PetService {
 
         Pet pet = new Pet(player);
 
-        pet.name = "$" + (isMabu ? "Mabư" : isUub ? "Uub" : isKidBeer ? "Kid Beer" : isJiren ? "Kid Jiren" : "Đệ tử");
+        pet.name = defaultPetName(isMabu ? 1 : isUub ? 2 : isKidBeer ? 3 : isJiren ? 4 : 0);
 
         pet.gender = (gender != null && gender.length != 0) ? gender[0] : (byte) Util.nextInt(0, 2);
 

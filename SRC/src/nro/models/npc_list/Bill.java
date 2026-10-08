@@ -61,10 +61,11 @@ public class Bill extends Npc {
                         switch (select) {
                             case 0 -> {
                                 if (InventoryService.gI().canOpenBillShop(player)) {
-                                    createOtherMenu(player, 2,
-                                            "Đói bụng quá... ngươi mang cho ta 99 phần đồ ăn\n"
-                                            + "ta sẽ cho một món đồ Hủy Diệt.\n"
-                                            + "Nếu tâm trạng ta vui ngươi có thể nhận trang bị tăng đến 15%",
+                                    createOtherMenu(player, 100,
+                                            "Phải mặc đủ 5 món Thần để mở shop và mỗi lần mua.\n"
+                                            + "Tiêu hao 99 thức ăn cùng loại trong hành trang + món Thần đang mặc tương ứng + 100 hồng ngọc.\n"
+                                            + "Nhận đồ Hủy Diệt thường với một dòng HP/KI/sức đánh 1–5%, không có ấn.\n"
+                                            + "Mua xong phải mặc bổ sung đủ bộ Thần để mua tiếp.",
                                             "OK", "Từ chối");
                                     player.idMark.setIndexMenu(100);
                                 } else {
@@ -89,17 +90,23 @@ public class Bill extends Npc {
                             }
                         }
                     }
+                    case 100 -> {
+                        if (select == 0) {
+                            synchronized (player) {
+                                if (InventoryService.gI().canOpenBillShop(player)) {
+                                    ShopService.gI().opendShop(player, "BILL", true);
+                                } else {
+                                    Service.gI().sendThongBao(player,
+                                            "Cần mặc đủ 5 món Thần và có 99 thức ăn cùng loại trong hành trang để mở shop.");
+                                }
+                            }
+                        }
+                    }
                     case 10 -> {
                         if (select == 0) {
                             doiNhanhItem(player);
                         }
                     }
-                }
-            }
-
-            case 2 -> {
-                if (select == 100 && InventoryService.gI().canOpenBillShop(player)) {
-                    ShopService.gI().opendShop(player, "BILL", true);
                 }
             }
 

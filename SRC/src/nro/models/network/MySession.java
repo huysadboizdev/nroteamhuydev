@@ -34,6 +34,11 @@ public class MySession extends Session {
     public String ipAddress;
     public boolean isAdmin;
     public int userId;
+    private boolean logoutStarted;
+    public synchronized boolean claimLogout() {
+        if(logoutStarted)return false;
+        logoutStarted=true;return true;
+    }
     public String uu;
     public String pp;
 
@@ -62,6 +67,7 @@ public class MySession extends Session {
     public volatile boolean inventory200;
     public volatile boolean clientCapabilitiesNegotiated;
     public volatile boolean bossNoticeBoard;
+    public volatile boolean bossNoticeCategories;
     public long lastBossNoticeRequest;
 
     @Override public boolean supportsInventory200() { return inventory200; }
@@ -99,6 +105,12 @@ public class MySession extends Session {
     }
 
     public void login(String username, String password) {
+        synchronized(nro.models.services.LiveSyncCommandGate.LIFECYCLE_LOCK) {
+            loginInternal(username,password);
+        }
+    }
+
+    private void loginInternal(String username, String password) {
         if (!inventory200) {
             Service.gI().sendThongBaoOK(this, "Vui lòng cập nhật client mới để sử dụng 200 ô hành trang và rương nhà.");
             return;

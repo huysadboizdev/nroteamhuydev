@@ -42,11 +42,19 @@ import nro.models.utils.Util;
 
 public class Odo extends Boss {
 
+    private nro.models.services.MiniBossPinkCapsuleDrop capsuleReward;
+
+    @Override
+    protected synchronized void resetBase() {
+        super.resetBase();
+        if (capsuleReward != null) capsuleReward.reset();
+    }
+
     private long lastTimeOdo;
     private long lastTimeHpRegen;
 
     public Odo() throws Exception {
-        super(BossID.O_DO1, new BossData(
+        super(MiniBossIdentity.nextId(), new BossData(
                 "Ở Dơ " + Util.nextInt(1, 49),
                 ConstPlayer.TRAI_DAT,
                 new short[]{400, 401, 402, -1, -1, -1},
@@ -58,12 +66,12 @@ public class Odo extends Boss {
                 new String[]{}, //text chat 1
                 new String[]{}, //text chat 2
                 new String[]{},
-                600000));
+                600));
     }
 
     @Override
-    public int injured(Player plAtt, long damage, boolean piercing, boolean isMobAttack) {
-        if (!this.isDie()) {
+    public synchronized int injured(Player plAtt, long damage, boolean piercing, boolean isMobAttack) {
+        if (damage > 0 && !this.isDie()) {
             damage = 50000;
             this.nPoint.subHP(damage);
             if (isDie()) {
@@ -90,10 +98,13 @@ public class Odo extends Boss {
                         if (subHp >= pl.nPoint.hp) {
                             subHp = pl.nPoint.hp - 1;
                         }
+                        if (subHp <= 0) {
+                            continue;
+                        }
                         this.chat("Bùm Bùm");
                         Service.gI().chat(pl, textOdo[Util.nextInt(0, textOdo.length - 1)]);
-                        PlayerService.gI().sendInfoHpMpMoney(pl);
                         pl.injured(null, subHp, true, false);
+                        PlayerService.gI().sendInfoHpMpMoney(pl);
                     }
                 }
                 this.lastTimeOdo = System.currentTimeMillis(); // Cập nhật thời gian của Odo
@@ -149,9 +160,12 @@ public class Odo extends Boss {
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();
+            } finally {
+                this.regenHp();
             }
+        } else {
+            this.regenHp();
         }
-        this.regenHp();
     }
 
     @Override
@@ -162,7 +176,10 @@ public class Odo extends Boss {
     }
 
     @Override
-    public void reward(Player plKill) {
+    public synchronized void reward(Player plKill) {
+        plKill = nro.models.services.MiniBossPinkCapsuleDrop.creditedPlayer(plKill);
+        if (capsuleReward == null) capsuleReward = new nro.models.services.MiniBossPinkCapsuleDrop();
+        if (!capsuleReward.drop(this, plKill)) return;
         try {
             int count1591 = Util.nextInt(1, 1);
             int count1594 = Util.nextInt(1, 1);
@@ -225,7 +242,8 @@ public class Odo extends Boss {
                 int zoneid = 0;
                 this.zone = this.zone.map.zones.get(zoneid);
                 ChangeMapService.gI().changeMap(this, this.zone, -1, -1);
-
+                this.lastTimeOdo = System.currentTimeMillis();
+                this.lastTimeHpRegen = this.lastTimeOdo;
                 this.changeStatus(BossStatus.CHAT_S);
             } catch (Exception e) {
                 this.changeStatus(BossStatus.REST);

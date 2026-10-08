@@ -24,7 +24,7 @@ import nro.models.utils.Util;
 
 public class Virut extends Boss {
 
-    private final Map<Long, Long> globalEffectTimers = new ConcurrentHashMap<>();
+    private final Map<Long, DelayedBossEffect> globalEffectTimers = new ConcurrentHashMap<>();
     private long st;
 
     public Virut() throws Exception {
@@ -49,27 +49,24 @@ public class Virut extends Boss {
     }
 
     private void applyEffect(Player player) {
-        long effectEndTime = System.currentTimeMillis() + 300000;
-        globalEffectTimers.put(player.id, effectEndTime);
-        ItemTimeService.gI().sendItemTime(player, 7143, 10);
-        this.chat("Khè Khè, " + player.name + " Đã bị nhiễm ");
+        synchronized (player) {
+            DelayedBossEffect effect = new DelayedBossEffect(this, player, 300000, 7143);
+            if (!effect.valid(this)) return;
+            DelayedBossEffect previous = globalEffectTimers.get(player.id);
+            if (previous != null && previous.valid(this)) return;
+            globalEffectTimers.put(player.id, effect);
+            ItemTimeService.gI().sendItemTime(player, 7143, 10);
+            this.chat(player.name + " đã bị nhiễm Virut!");
+        }
     }
 
     private void checkGlobalEffects() {
-        long currentTime = System.currentTimeMillis();
-
-        globalEffectTimers.forEach((playerId, effectEndTime) -> {
-            if (currentTime >= effectEndTime) {
-                Player player = Client.gI().getPlayer(playerId);
-                if (player != null) {
-                    if (!player.isDie()) {
-                        // Kiểm tra xác suất 30% để player bị chết
-                        if (Util.isTrue(80, 100)) {
-                            player.injured(null, player.nPoint.hp, true, false);
-                        }
-                    }
+        long now = System.currentTimeMillis();
+        globalEffectTimers.forEach((id, effect) -> {
+            synchronized (effect.target) {
+                if (!effect.valid(this) || now >= effect.deadline) {
+                    if (globalEffectTimers.remove(id, effect)) effect.expire(this);
                 }
-                globalEffectTimers.remove(playerId);
             }
         });
     }
@@ -106,7 +103,7 @@ public class Virut extends Boss {
                     SkillService.gI().useSkill(this, pl, null, -1, null);
                     checkPlayerDie(pl);
                     if (!globalEffectTimers.containsKey(pl.id)
-                            || System.currentTimeMillis() >= globalEffectTimers.get(pl.id)) {
+                            || System.currentTimeMillis() >= globalEffectTimers.get(pl.id).deadline) {
                         this.updateOdo();
                     }
                 } else {
@@ -141,6 +138,7 @@ public class Virut extends Boss {
 
     @Override
     public void joinMap() {
+        globalEffectTimers.clear();
         this.name = "Virut " + Util.nextInt(1, 49);
         this.nPoint.hpMax = 100;
         this.nPoint.hp = this.nPoint.hpMax;
@@ -176,6 +174,7 @@ public class Virut extends Boss {
 
     @Override
     public void leaveMap() {
+        globalEffectTimers.clear();
         ChangeMapService.gI().exitMap(this);
         this.lastZone = null;
         this.lastTimeRest = System.currentTimeMillis();

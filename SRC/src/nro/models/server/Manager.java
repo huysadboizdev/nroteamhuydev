@@ -74,7 +74,7 @@ public final class Manager {
     public static byte SECOND_WAIT_LOGIN = 5;
     public static int MAX_PER_IP = 1000;
     public static int MAX_PLAYER = 2000;
-    public static byte RATE_EXP_SERVER = 1;
+    public static volatile byte RATE_EXP_SERVER = 1;
     public static boolean LOCAL = false;
     public static boolean TEST = false;
     public static boolean DAO_AUTO_UPDATER = false;
@@ -87,7 +87,7 @@ public final class Manager {
     public static final List<ArrHead2Frames> ARR_HEAD_2_FRAMES = new ArrayList<>();
     public static final Map<String, Byte> IMAGES_BY_NAME = new HashMap<>();
     public static final List<ItemTemplate> ITEM_TEMPLATES = new ArrayList<>();
-    public static final List<MobTemplate> MOB_TEMPLATES = new ArrayList<>();
+    public static volatile List<MobTemplate> MOB_TEMPLATES = new ArrayList<>();
     public static final List<NpcTemplate> NPC_TEMPLATES = new ArrayList<>();
     public static final List<TaskMain> TASKS = new ArrayList<>();
     public static final List<SideTaskTemplate> SIDE_TASKS_TEMPLATE = new ArrayList<>();
@@ -102,16 +102,16 @@ public final class Manager {
     public static final List<FlagBag> FLAGS_BAGS = new ArrayList<>();
     public static final List<NClass> NCLASS = new ArrayList<>();
     public static final List<Npc> NPCS = new ArrayList<>();
-    public static List<Shop> SHOPS = new ArrayList<>();
+    public static volatile List<Shop> SHOPS = new ArrayList<>();
     public static final List<Clan> CLANS = new ArrayList<>();
-    public static final List<String> NOTIFY = new ArrayList<>();
+    public static volatile List<String> NOTIFY = new ArrayList<>();
     public static final List<BadgesTaskTemplate> TASKS_BADGES_TEMPLATE = new ArrayList<>();
     public static final List<BagesTemplate> BAGES_TEMPLATES = new ArrayList<>();
     public static final short[][] trangBiKichHoat = {{0, 6, 21, 27}, {1, 7, 22, 28}, {2, 8, 23, 29}};
     public static List<TOP> Topsukien;
     public static List<TOP> Topsukien1;
     public static List<TOP> Topsukien2 = new ArrayList<>();
-    public static List<TOP> Topwhis;
+    public static volatile List<TOP> Topwhis = java.util.List.of();
     public static List<TOP> Topmaydam;
     public static final String queryTopmaydam = "SELECT id, point_maydam, total_damage_maydam FROM player ORDER BY point_maydam DESC LIMIT 100";
     public static final String queryTopsukien1 = "SELECT id, point_sukien1 FROM player ORDER BY point_sukien1 DESC LIMIT 100";
@@ -175,6 +175,20 @@ public final class Manager {
         }
 
         this.loadDatabase();
+        // loadDatabase has released its connection; production pool can contain only one.
+        try {
+            nro.models.services.WhisWeeklyService.gI().refresh();
+            Topwhis = nro.models.services.WhisWeeklyService.gI().top();
+        } catch (SQLException unavailable) {
+            throw new IllegalStateException("Cannot initialize weekly Whis ranking", unavailable);
+        }
+        // SQL overrides the file only when a durable live EXP setting exists.
+        try (Connection con = LocalManager.getConnection()) {
+            RATE_EXP_SERVER=(byte)nro.models.services.LiveSettingsDAO.loadExpRate(con,RATE_EXP_SERVER);
+            nro.models.services.BossLiveReload.loadStartup(con);
+        } catch (Exception unavailable) {
+            System.err.println("[LiveSettings] EXP SQL unavailable; using Config.properties rate");
+        }
         nro.models.item.ItemStackRules.normalizeCatalog();
         nro.models.player_badges.BadgeRules.normalizeCatalog();
         NpcFactory.createNpcConMeo();
@@ -201,6 +215,9 @@ public final class Manager {
             map.initNpc(mapTemp.npcId, mapTemp.npcX, mapTemp.npcY);
         }
         new NonInteractiveNPC().initNonInteractiveNPC();
+        for (nro.models.map.Map map : MAPS) {
+            if (map.mapId == 126) map.startHirudegarnEvent();
+        }
 
         scheduler.scheduleAtFixedRate(() -> {
             try {
@@ -903,12 +920,10 @@ public final class Manager {
             rs = ps.executeQuery();
             while (rs.next()) {
                 GiftCode giftcode = new GiftCode();
-                giftcode.code = rs.getString("code");
+                giftcode.code = nro.models.player.GiftCode.canonical(rs.getString("code"));
                 giftcode.id = rs.getInt("id");
                 giftcode.countLeft = rs.getInt("count_left");
-                if (giftcode.countLeft == -1) {
-                    giftcode.countLeft = 999999999;
-                }
+
                 giftcode.datecreate = rs.getTimestamp("datecreate");
                 giftcode.dateexpired = rs.getTimestamp("expired");
                 JSONArray jar = (JSONArray) JSONValue.parse(rs.getString("detail"));
@@ -943,7 +958,6 @@ public final class Manager {
             Topsukien = realTop(queryTopsukien, ConnectionDatabase);
             Logger.success(Logger.PURPLE + "Successfully Top Su Kien (" + Topsukien.size() + ")\n");
             Topsukien1 = realTop(queryTopsukien1, ConnectionDatabase);
-            Topwhis = realTop(queryTopwhis, ConnectionDatabase);
             Logger.success(Logger.RED + "Successfully top Thach Dau Whis (" + Topwhis.size() + ")\n");
             Topmaydam = realTop(queryTopmaydam, ConnectionDatabase);
             Manager.timeRealTop = System.currentTimeMillis();

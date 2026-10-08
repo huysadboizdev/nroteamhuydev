@@ -35,8 +35,49 @@ public final class ItemDefaultOptions {
         profiles=Collections.unmodifiableMap(loaded);
     }
 
+    public static boolean isLockedHighTier(int id) {
+        return id >= 650 && id <= 662 || id >= 1048 && id <= 1062;
+    }
+
+    public static int highTierPowerBillions(int id) {
+        if(id >= 1048 && id <= 1062)return 80;
+        return switch(id) {
+            case 650,652,654 -> 40;
+            case 651,653,655 -> 44;
+            case 657,659,661 -> 50;
+            case 658,660,662 -> 43;
+            case 656 -> 47;
+            default -> 0;
+        };
+    }
+
+    /** The server enforces the canonical tier policy even on forged or stale option lists. */
+    public static long requiredPower(Item item) {
+        int billions=highTierPowerBillions(item.template.id);
+        if(billions>0)return billions*1_000_000_000L;
+        if(item.itemOptions!=null)for(Item.ItemOption option:item.itemOptions)
+            if(option!=null&&option.optionTemplate!=null&&option.optionTemplate.id==21&&(option.param>0||item.template.id<555||item.template.id>567))
+                return option.param*1_000_000_000L;
+        if(item.template.id>=555&&item.template.id<=567)return 15_000_000_000L;
+        return item.template.strRequire;
+    }
+
     public static void complete(Item item) {
         if(item==null||!item.isNotNullItem())return;
+        // Divine templates store zero; requirement lives in option21. Repair old rewards after decoding.
+        if(item.template.id>=555&&item.template.id<=567){
+            if(item.itemOptions==null)item.itemOptions=new ArrayList<>();
+            item.itemOptions.removeIf(o->o!=null&&o.optionTemplate!=null&&o.optionTemplate.id==21&&o.param<=0);
+            if(item.itemOptions.stream().noneMatch(o->o!=null&&o.optionTemplate!=null&&o.optionTemplate.id==21&&o.param>0))
+                item.itemOptions.add(new Item.ItemOption(21,15));
+        }
+        if(isLockedHighTier(item.template.id)) {
+            if(item.itemOptions==null)item.itemOptions=new ArrayList<>();
+            item.itemOptions.removeIf(o->o!=null&&o.optionTemplate!=null
+                    &&(o.optionTemplate.id==21||o.optionTemplate.id==30));
+            item.itemOptions.add(new Item.ItemOption(21,highTierPowerBillions(item.template.id)));
+            item.itemOptions.add(new Item.ItemOption(30,0));
+        }
         List<OptionValue> defaults=profiles.get((int)item.template.id);
         if(defaults==null)return;
         if(item.itemOptions==null)item.itemOptions=new ArrayList<>();

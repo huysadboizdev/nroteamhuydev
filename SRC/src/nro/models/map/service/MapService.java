@@ -79,6 +79,7 @@ public class MapService {
     }
 
     public Zone getMapCanJoin(Player player, int mapId, int zoneId) {
+        if (mapId == 126 && !nro.models.services.HirudegarnEventService.gI().isOpen()) return null;
         if (player.clan != null && (
                 (isMapDoanhTrai(mapId) && player.clan.doanhTrai != null && player.clan.doanhTrai.isClosing)
                 || (isMapBanDoKhoBau(mapId) && player.clan.BanDoKhoBau != null && player.clan.BanDoKhoBau.isClosing)
@@ -99,6 +100,7 @@ public class MapService {
 
         if (this.isMapDoanhTrai(mapId) && (player.zone == null || player.clan == null || player.clan.doanhTrai == null)) {
             Zone zone = getZone(21 + player.gender);
+            if (zone == null) return null;
             player.location.x = Util.nextInt(100, zone.map.mapWidth - 100);
             player.location.y = zone.map.yPhysicInTop(player.location.x, 100);
             return zone;
@@ -108,6 +110,7 @@ public class MapService {
             if (player.clan == null || player.clan.BanDoKhoBau == null || player.zone == null) {
                 // Đưa về zone mặc định an toàn
                 Zone zone = getZone(5);
+                if (zone == null) return null;
                 player.location.x = Util.nextInt(100, zone.map.mapWidth - 100);
                 player.location.y = zone.map.yPhysicInTop(player.location.x, 100);
                 return zone;
@@ -116,6 +119,7 @@ public class MapService {
 
         if (this.isMapKhiGasHuyDiet(mapId) && (player.zone == null || player.clan == null || player.clan.KhiGasHuyDiet == null)) {
             Zone zone = getZone(5);
+            if (zone == null) return null;
             player.location.x = Util.nextInt(100, zone.map.mapWidth - 100);
             player.location.y = zone.map.yPhysicInTop(player.location.x, 100);
             return zone;
@@ -123,6 +127,7 @@ public class MapService {
 
         if (this.isMapConDuongRanDoc(mapId) && (player.zone == null || player.clan == null || player.clan.ConDuongRanDoc == null)) {
             Zone zone = getZone(48);
+            if (zone == null) return null;
             player.location.x = Util.nextInt(100, zone.map.mapWidth - 100);
             player.location.y = zone.map.yPhysicInTop(player.location.x, 100);
             return zone;
@@ -285,7 +290,7 @@ public class MapService {
         }
 
         //**********************************************************************
-        if (zoneId == -1) { //vào khu bất kỳ
+        if (zoneId == -1) { // Prefer zone 0, then the first available zone.
             return getZone(mapId);
         } else {
             return getZoneByMapIDAndZoneID(mapId, zoneId);
@@ -302,13 +307,15 @@ public class MapService {
             return null;
         }
 
-        int z = Util.nextInt(0, map.zones.size() - 1);
-        //  int z = 0;
-        while (map.zones.get(z).getNumOfPlayers() >= map.zones.get(z).maxPlayer) {
-            z = Util.nextInt(0, map.zones.size() - 1);
-            //    z++;
+        if (mapId == 126 && !nro.models.services.HirudegarnEventService.gI().isOpen()) return null;
+        boolean eventMap = mapId == 126 || isMapBlackBallWar(mapId);
+        for (Zone candidate : map.zones) {
+            if (candidate != null && (!eventMap || !candidate.finishBlackBallWar)
+                    && candidate.getNumOfPlayers() < candidate.maxPlayer) {
+                return candidate;
+            }
         }
-        return map.zones.get(z);
+        return null;
     }
 
     public Zone getZoneByMapIDAndZoneID(int mapId, int zoneId) {
@@ -607,6 +614,12 @@ public class MapService {
     }
 
     public void goToMap(Player player, Zone zoneJoin) {
+        if (zoneJoin != null && (zoneJoin.map.mapId == 126 || isMapBlackBallWar(zoneJoin.map.mapId))) {
+            if (!ChangeMapService.gI().goToMap(player, zoneJoin)) {
+                Service.gI().sendThongBao(player, zoneJoin.map.mapId == 126 ? "Khu Hirudegarn \u0111\u00e3 \u0111\u1ea7y ho\u1eb7c \u0111\u00e3 h\u1ebft gi\u1edd (15h-16h, 22h-23h)" : "Khu vực sao đen đã đầy hoặc đã kết thúc");
+            }
+            return;
+        }
         Zone oldZone = player.zone;
         if (oldZone != null) {
             ChangeMapService.gI().exitMap(player);

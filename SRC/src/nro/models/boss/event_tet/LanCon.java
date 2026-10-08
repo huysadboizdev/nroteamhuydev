@@ -27,6 +27,7 @@ public class LanCon extends Boss {
 
     @Override
     public void joinMap() {
+        if (!seasonalAllowed()) return;
         if (zoneFinal != null) {
             joinMapByZone(zoneFinal);
             this.notifyJoinMap();
@@ -109,6 +110,7 @@ public class LanCon extends Boss {
 
     @Override
     public void attack() {
+        if (!seasonalAllowed()) return;
         if (Util.canDoWithTime(this.lastTimeAttack, 250)) {
             this.lastTimeAttack = System.currentTimeMillis();
             try {
@@ -140,6 +142,7 @@ public class LanCon extends Boss {
 
     @Override
     public void afk() {
+        if (!seasonalAllowed()) return;
         if (Util.canDoWithTime(this.lastTimeAttack, 500)) {
             this.lastTimeAttack = System.currentTimeMillis();
             Player pl = Client.gI().getPlayer(playerId);
@@ -180,6 +183,8 @@ public class LanCon extends Boss {
 
     @Override
 public synchronized int injured(Player plAtt, long damage, boolean piercing, boolean isMobAttack) {
+        try (nro.models.event.EventItemPolicy.Permit permit=nro.models.event.EventItemPolicy.admit()) {
+        if (!seasonalAllowed()) return 0;
     if (!this.isDie()) {
         if (!piercing && Util.isTrue(100, 1000)) {
             this.chat("Xí hụt");
@@ -210,7 +215,9 @@ public synchronized int injured(Player plAtt, long damage, boolean piercing, boo
     } else {
         return 0;
     }
-}
+
+        }
+    }
 private boolean isPlayerChatThang(Player plAtt) {   
     String lastChat = plAtt.getLastChatMessage();  
     return lastChat != null && lastChat.toLowerCase().contains("thang");
@@ -218,5 +225,9 @@ private boolean isPlayerChatThang(Player plAtt) {
 
     @Override
     public void reward(Player plKill) {
+        try (nro.models.event.EventItemPolicy.Permit permit=nro.models.event.EventItemPolicy.admit()) {
+        if (!seasonalAllowed()) return;
+    
+        }
     }
 }

@@ -29,7 +29,7 @@ public final class BossNoticeOutbox {
         int count=0;for(Path p:files){
             // The bundled Gson predates Java records; construct via the canonical constructor.
             var r=new JsonParser().parse(Files.readString(p)).getAsJsonObject();
-            BossNoticeRow row=new BossNoticeRow(r.get("spawnId").getAsString(),r.get("serverRun").getAsString(),r.get("bossId").getAsLong(),r.get("form").getAsInt(),r.get("bossName").getAsString(),r.get("mapName").getAsString(),r.get("appearedAt").getAsLong(),r.get("defeatedAt").getAsLong(),r.get("killerName").getAsString(),r.get("status").getAsString(),r.get("nextSpawnAt").getAsLong(),r.get("etaKind").getAsString(),r.get("version").getAsLong(),r.get("updatedAt").getAsLong());
+            BossNoticeRow row=new BossNoticeRow(r.get("spawnId").getAsString(),r.get("serverRun").getAsString(),r.get("bossId").getAsLong(),r.get("form").getAsInt(),r.get("bossName").getAsString(),r.get("mapName").getAsString(),r.get("appearedAt").getAsLong(),r.get("defeatedAt").getAsLong(),r.get("killerName").getAsString(),r.get("status").getAsString(),r.get("nextSpawnAt").getAsLong(),r.get("etaKind").getAsString(),r.get("version").getAsLong(),r.get("updatedAt").getAsLong(),r.has("category")?r.get("category").getAsInt():BossNoticeCatalog.legacyCategory(r.get("bossId").getAsLong(),r.get("form").getAsInt()),r.has("semanticBossId")?r.get("semanticBossId").getAsInt():r.get("bossId").getAsInt(),r.has("questSupport")&&r.get("questSupport").getAsBoolean(),r.has("zoneId")?r.get("zoneId").getAsInt():-1,r.has("schemaVersion")?r.get("schemaVersion").getAsInt():1);
             dao.save(row);Files.deleteIfExists(p);count++;
         }return count;
     }

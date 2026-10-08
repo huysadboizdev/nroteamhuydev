@@ -11,12 +11,15 @@ public final class BossNoticeTracker {
         current.put(key,r);recent.put(r.spawnId(),r);while(recent.size()>1000)recent.remove(recent.keySet().iterator().next());sink.accept(r);
     }
     public synchronized void appear(Object key,long id,int form,String name,String map){
+        appear(key,id,form,name,map,(int)id,false,-1);
+    }
+    public synchronized void appear(Object key,long id,int form,String name,String map,int semanticId,boolean support,int zone){
         BossNoticeRow old=current.get(key);long now=clock.getAsLong();
         if(old!=null&&old.status().equals("ALIVE")&&old.form()==form&&old.bossName().equals(name)){
-            if(!old.mapName().equals(map))put(key,old.change(map,0,"","ALIVE",0,"UNKNOWN",now));return;
+            if(!old.mapName().equals(map)||old.zoneId()!=zone)put(key,old.location(map,zone,now));return;
         }
         if(old!=null&&old.status().equals("ALIVE"))depart(key);
-        put(key,new BossNoticeRow(UUID.randomUUID().toString(),run,id,form,name,map,now,0,"","ALIVE",0,"UNKNOWN",1,now));
+        put(key,new BossNoticeRow(UUID.randomUUID().toString(),run,id,form,name,map,now,0,"","ALIVE",0,"UNKNOWN",1,now,BossNoticeCatalog.category(semanticId,form),semanticId,support,zone,2));
     }
     public synchronized void defeat(Object key,String killer){
         BossNoticeRow old=current.get(key);if(old==null||!old.status().equals("ALIVE"))return;

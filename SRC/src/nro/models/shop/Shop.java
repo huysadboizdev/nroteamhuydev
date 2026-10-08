@@ -15,6 +15,7 @@ import nro.models.shop.TabShopSoHuu;
 public class Shop {
 
     public int id;
+    public long catalogVersion;
 
     public byte npcId;
 
@@ -29,6 +30,7 @@ public class Shop {
     }
 
     public Shop(Shop shop, Player player) {
+        this.catalogVersion=shop.catalogVersion;
         this.tabShops = new ArrayList<>();
         this.id = shop.id;
         this.npcId = shop.npcId;
@@ -57,6 +59,7 @@ public class Shop {
     }
 
     public Shop(Shop shop) {
+        this.catalogVersion=shop.catalogVersion;
         this.tabShops = new ArrayList<>();
         this.id = shop.id;
         this.npcId = shop.npcId;

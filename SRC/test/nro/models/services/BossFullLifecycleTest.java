@@ -69,7 +69,8 @@ public final class BossFullLifecycleTest {
   }
   WhisProbe whis=blank(WhisProbe.class);whis.nPoint=new NPoint(whis);whis.nPoint.hp=100;whis.nPoint.hpMax=100;
   var level=nro.models.boss.luyen_tap_tu_dong.Whis.class.getDeclaredField("level");level.setAccessible(true);level.setLong(whis,1);
-  whis.injured(null,40,true,false);check(whis.nPoint.hp==60&&whis.kills==0,"Whis cannot die at half remaining HP");whis.injured(null,60,true,false);whis.injured(null,40,true,false);check(whis.kills==1,"Whis dies at zero once, repeat hits do not reward again");
+  Player whisOwner=player(90);whis.playerAtt=whisOwner;
+  whis.injured(whisOwner,40,true,false);check(whis.nPoint.hp==60&&whis.kills==0,"Whis cannot die at half remaining HP");whis.injured(whisOwner,60,true,false);whis.injured(whisOwner,40,true,false);check(whis.kills==1,"Whis dies at zero once, repeat hits do not reward again");
   Probe owner=probe();owner.currentLevel=0;owner.bossAppearTogether=new Boss[][]{new Boss[]{null}};
   Boss child=blank(nro.models.boss.tieu_doi_sat_thu.SO1.class);var parent=Boss.class.getDeclaredField("parentBoss");parent.setAccessible(true);parent.set(child,owner);child.doneChatE();check(owner.bossStatus==BossStatus.ACTIVE,"null companion slots skipped");owner.currentLevel=9;child.doneChatE();check(owner.getCompanionBosses().length==0,"late callback after form advance safely ignored");
   for(Class<? extends Boss> type:java.util.List.of(CongressProbe.class,ArenaProbe.class,RankProbe.class,CloneProbe.class)){

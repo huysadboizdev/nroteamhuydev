@@ -19,6 +19,7 @@ public class DrKore extends Boss {
 
     @Override
     public void reward(Player plKill) {
+        if (questSupportReward(plKill)) return;
         int diem = 5;
         plKill.event.addEventPoint(diem);
         Service.gI().sendThongBao(plKill, "+5 Point");
@@ -44,7 +45,7 @@ public class DrKore extends Boss {
         }
         for (Boss boss : this.getCompanionBosses()) {
             if(boss==null)continue;
-            if (boss.id == BossID.ANDROID_19 && !boss.isDie()) {
+            if (boss.questBossId() == BossID.ANDROID_19 && !boss.isDie()) {
                 this.chat("Hút năng lượng của nó, mau lên");
                 boss.chat("Tuân lệnh đại ca, hê hê hê");
                 break;
@@ -89,7 +90,7 @@ public class DrKore extends Boss {
     public void doneChatS() {
         for (Boss boss : this.getCompanionBosses()) {
             if(boss==null)continue;
-            if (boss.id == BossID.ANDROID_19) {
+            if (boss.questBossId() == BossID.ANDROID_19) {
                 boss.changeToTypePK();
                 break;
             }

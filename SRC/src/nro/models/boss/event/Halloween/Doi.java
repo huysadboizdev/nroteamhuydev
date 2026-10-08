@@ -22,12 +22,17 @@ public class Doi extends Boss {
 
     @Override
     public void reward(Player plKill) {
+        try (nro.models.event.EventItemPolicy.Permit permit=nro.models.event.EventItemPolicy.admit()) {
+        if (!seasonalAllowed()) return;
         ItemMap it = new ItemMap(this.zone, 585, 1, this.location.x, this.zone.map.yPhysicInTop(this.location.x,
                 this.location.y - 24), plKill.id);
-        Service.gI().dropItemMap(this.zone, it);
+        nro.models.event.EventRuntimeService.dropSeasonal(this.zone, it, "halloween");
+    
+        }
     }
 
     public void halloween(Player player) {
+        if (!seasonalAllowed()) return;
         if (player.effectSkill != null && !player.effectSkill.isHalloween) {
             EffectSkillService.gI().setIsHalloween(player, 3, 1800000);
         }
@@ -35,6 +40,8 @@ public class Doi extends Boss {
 
     @Override
     public synchronized int injured(Player plAtt, long damage, boolean piercing, boolean isMobAttack) {
+        try (nro.models.event.EventItemPolicy.Permit permit=nro.models.event.EventItemPolicy.admit()) {
+        if (!seasonalAllowed()) return 0;
         if (!this.isDie()) {
             if (!piercing && Util.isTrue(10, 1000)) {
                 this.chat("Xí hụt");
@@ -59,10 +66,13 @@ public class Doi extends Boss {
         } else {
             return 0;
         }
+    
+        }
     }
 
     @Override
     public void attack() {
+        if (!seasonalAllowed()) return;
         if (Util.canDoWithTime(this.lastTimeAttack, Util.nextInt(500, 1000)) && this.typePk == ConstPlayer.PK_ALL) {
             this.lastTimeAttack = System.currentTimeMillis();
             try {
@@ -97,6 +107,7 @@ public class Doi extends Boss {
 
     @Override
     public void joinMap() {
+        if (!seasonalAllowed()) return;
         this.name = "Dơi " + Util.nextInt(10, 100);
         super.joinMap(); //To change body of generated methods, choose Tools | Templates.
         st = System.currentTimeMillis();

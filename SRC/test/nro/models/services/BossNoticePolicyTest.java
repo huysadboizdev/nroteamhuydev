@@ -31,7 +31,11 @@ public final class BossNoticePolicyTest {
         field(b,Boss.class,"lastTimeRest",1000L);field(b,Boss.class,"secondsRest",300);check(b.noticeNextSpawnAt()==301000,"real rest timer");
         field(b,Boss.class,"parentBoss",b);check(b.noticeNextSpawnAt()==0,"parent spawn cannot advertise timer");field(b,Boss.class,"parentBoss",null);
         Conditional c=blank(Conditional.class);field(c,Boss.class,"data",new BossData[]{data});c.currentLevel=0;c.bossStatus=BossStatus.REST;field(c,Boss.class,"lastTimeRest",1000L);check(c.noticeNextSpawnAt()==0,"custom rest never invents ETA");
-        b.zone=zone();check(b.noticePublic(),"world map boss visible");b.zone.map.mapId=140;check(!b.noticePublic(),"private training map excluded");b.zone.map.mapId=5;b.isNotifyDisabled=true;check(!b.noticePublic(),"hidden bosses excluded");
+        b.zone=zone();check(b.noticePublic(),"world map boss visible");
+        b.setQuestSupportIdentity(BossID.KUKU,-900000000);check(b.noticePublic(),"quest support enters public board");
+        var notify=Boss.class.getDeclaredMethod("canSendNotify");notify.setAccessible(true);check(!(boolean)notify.invoke(b),"quest support still cannot broadcast spawn spam");
+        field(b,Boss.class,"questSupportRetired",true);check(!b.noticePublic(),"retired support excluded");field(b,Boss.class,"questSupportRetired",false);
+        b.zone.map.mapId=140;check(!b.noticePublic(),"private training map excluded");b.zone.map.mapId=5;b.isNotifyDisabled=true;check(!b.noticePublic(),"hidden bosses excluded");
         System.out.println("PASS BossNotice policy: request0 throttle, bad requests/logout/legacy guard, scoped damage attribution, real/conditional timer and public scope");
     }
 }

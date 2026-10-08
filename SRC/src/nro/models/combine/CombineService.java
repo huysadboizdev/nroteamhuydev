@@ -82,6 +82,18 @@ public class CombineService {
      * @param index
      */
     public void showInfoCombine(Player player, int[] index) {
+        if (player != null && player.combineNew != null
+                && player.combineNew.typeCombine == CHE_TAO_TRANG_BI_THIEN_SU) {
+            synchronized (player) {
+                player.combineNew.clearItemCombine();
+                if (player.inventory == null || player.inventory.itemsBag == null || index == null || index.length != 4) return;
+                java.util.Set<Integer> slots = new java.util.HashSet<>();
+                for (int slot : index) if (slot < 0 || slot >= player.inventory.itemsBag.size() || !slots.add(slot)) return;
+                for (int slot : index) player.combineNew.itemsCombine.add(player.inventory.itemsBag.get(slot));
+                CheTaoTrangBiThienSu.showInfoCombine(player);
+            }
+            return;
+        }
         if (player == null || player.inventory == null || index == null || index.length > player.inventory.itemsBag.size()) return;
         java.util.Set<Integer> unique = new java.util.HashSet<>();
         for (int slot : index) if (slot < 0 || slot >= player.inventory.itemsBag.size() || !unique.add(slot)) return;
@@ -259,7 +271,7 @@ public class CombineService {
                 break;
             case CHE_TAO_TRANG_BI_THIEN_SU:
                 CheTaoTrangBiThienSu.CheTaoTS(player);
-                break;
+                return;
             case DUI_DUC:
                 CheTaoDuiDuc.CheTaoDuiDuc(player);
                 break;
@@ -725,9 +737,10 @@ public class CombineService {
                 return "vào hành trang\nChọn trang bị\n(Áo, quần, găng, giày hoặc rađa)\nChọn loại đá để phân rã\n"
                         + "Sau đó chọn 'Phân Rã'";
             case CHE_TAO_TRANG_BI_THIEN_SU:
-                return "vào hành trang\nChọn 1 công thức và công thức Vip\nkèm 1 đá nâng, 1 đá may mắn\n và 999 mảnh thiên sứ\n "
-                        + "Ta sẽ cho ra đồ thiên sứ từ 0-15% chỉ số\n"
-                        + "Sau đó chọn 'Nâng Cấp'";
+                return "Chọn đúng 4 nhóm trong túi:\n999 mảnh Thiên Sứ cùng loại, 1 công thức thường hoặc VIP,\n"
+                        + "1 đá nâng cấp và 1 đá may mắn. Phí: 50 hồng ngọc.\n"
+                        + "Mặc đủ 5 món Hủy Diệt; mất món đang mặc tương ứng kể cả thất bại theo tỷ lệ.\n"
+                        + "Chỉ số chính +1–30% so với nền Thiên Sứ; dòng phụ 1–7%.\nSau đó chọn 'Chế tạo'";
             case NANG_CAP_BONG_TAI:
                 return "Vào hành trang\nChọn bông tai Porata\nChọn mảnh bông tai để nâng cấp, Số lượng 9999 cái"
                         + "\nSau đó chọn 'Nâng cấp'";

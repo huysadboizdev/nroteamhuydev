@@ -26,6 +26,7 @@ public class OngGiaNoel extends Boss {
 
     @Override
     public void joinMap() {
+        if (!seasonalAllowed()) return;
         if (zoneFinal != null) {
             joinMapByZone(zoneFinal);
             this.notifyJoinMap();
@@ -91,29 +92,24 @@ public class OngGiaNoel extends Boss {
     }
 
     private void giftBox() {
+        if (!seasonalAllowed()) return;
         if (Util.canDoWithTime(lastTimeDrop, 60000)) {
-            this.chat("Hô hô hô");
-            ItemMap item = new ItemMap(zone, 648, 1, this.location.x, this.zone.map.yPhysicInTop(this.location.x,
-                    this.location.y - 24), -1);
-            ItemMap item2 = new ItemMap(zone, 648, 1, this.location.x + Util.nextInt(50), this.zone.map.yPhysicInTop(this.location.x,
-                    this.location.y - 24), -1);
-            ItemMap item3 = new ItemMap(zone, 648, 1, this.location.x - Util.nextInt(50), this.zone.map.yPhysicInTop(this.location.x,
-                    this.location.y - 24), -1);
-            if (Util.isTrue(1, 3)) {
-                Service.gI().dropItemMap(this.zone, item);
-            }
-            if (Util.isTrue(1, 5)) {
-                Service.gI().dropItemMap(this.zone, item2);
-            }
-            if (Util.isTrue(1, 7)) {
-                Service.gI().dropItemMap(this.zone, item3);
-            }
-            lastTimeDrop = System.currentTimeMillis();
+            this.chat("Ho ho ho");
+            if(Util.isTrue(1,3))dropGift(this.location.x);
+            if(Util.isTrue(1,5))dropGift(this.location.x+Util.nextInt(50));
+            if(Util.isTrue(1,7))dropGift(this.location.x-Util.nextInt(50));
+            lastTimeDrop=System.currentTimeMillis();
         }
+    }
+    private void dropGift(int x) {
+        if(!seasonalAllowed()||zone==null)return;
+        ItemMap gift=new ItemMap(zone,648,1,x,zone.map.yPhysicInTop(this.location.x,this.location.y-24),-1);
+        nro.models.event.EventRuntimeService.dropSeasonal(zone,gift,"christmas");
     }
 
     @Override
     public void active() {
+        if (!seasonalAllowed()) return;
         this.attack();
     }
 
@@ -134,6 +130,7 @@ public class OngGiaNoel extends Boss {
 
     @Override
     public void attack() {
+        if (!seasonalAllowed()) return;
         if (Util.canDoWithTime(this.lastTimeAttack, 100)) {
             this.lastTimeAttack = System.currentTimeMillis();
             try {
@@ -166,10 +163,18 @@ public class OngGiaNoel extends Boss {
 
     @Override
     public synchronized int injured(Player plAtt, long damage, boolean piercing, boolean isMobAttack) {
+        try (nro.models.event.EventItemPolicy.Permit permit=nro.models.event.EventItemPolicy.admit()) {
+        if (!seasonalAllowed()) return 0;
         return 0;
+    
+        }
     }
 
     @Override
     public void reward(Player plKill) {
+        try (nro.models.event.EventItemPolicy.Permit permit=nro.models.event.EventItemPolicy.admit()) {
+        if (!seasonalAllowed()) return;
+    
+        }
     }
 }

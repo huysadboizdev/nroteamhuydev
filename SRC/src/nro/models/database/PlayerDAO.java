@@ -29,6 +29,24 @@ import nro.models.utils.Util;
 import com.google.gson.Gson;
 
 public class PlayerDAO {
+    private static final ThreadLocal<DeferredRubySave> EVENT_LOGOUT_SAVE=new ThreadLocal<>();
+    public static boolean savePendingEventLogout(Player player){
+        if(player==null||EVENT_LOGOUT_SAVE.get()!=null||!nro.models.event.EventCleanupLogoutService.finalizing(player))return false;
+        DeferredRubySave context=new DeferredRubySave(player);EVENT_LOGOUT_SAVE.set(context);
+        try{updatePlayer(player);return context.saved;}finally{EVENT_LOGOUT_SAVE.remove();}
+    }
+    private static final ThreadLocal<DeferredRubySave> GIFT_LOGOUT_SAVE=new ThreadLocal<>();
+    public static boolean savePendingGiftLogout(Player player) {
+        if(player==null||GIFT_LOGOUT_SAVE.get()!=null||!nro.models.services.GiftCodeService.isFinalizingLogout(player))return false;
+        DeferredRubySave context=new DeferredRubySave(player);GIFT_LOGOUT_SAVE.set(context);
+        try{updatePlayer(player);return context.saved;}finally{GIFT_LOGOUT_SAVE.remove();}
+    }
+    private static final ThreadLocal<DeferredRubySave> LIVE_COMMAND_SAVE=new ThreadLocal<>();
+    public static boolean saveLiveCommandLogout(Player player) {
+        if(player==null||!player.beforeDispose||!Thread.holdsLock(player)||LIVE_COMMAND_SAVE.get()!=null)return false;
+        DeferredRubySave context=new DeferredRubySave(player);LIVE_COMMAND_SAVE.set(context);
+        try{updatePlayer(player);return context.saved;}finally{LIVE_COMMAND_SAVE.remove();}
+    }
     private static final ThreadLocal<DeferredRubySave> CHECKED_SAVE = new ThreadLocal<>();
     private static final ThreadLocal<DeferredRubySave> CONSIGN_LOGOUT_SAVE = new ThreadLocal<>();
     public static boolean savePendingConsignLogout(Player player) {
@@ -62,6 +80,12 @@ public class PlayerDAO {
     }
 
     private static final ThreadLocal<DeferredRubySave> KOL_LOGOUT_SAVE=new ThreadLocal<>();
+    private static final ThreadLocal<DeferredRubySave> WALLET_LOGOUT_SAVE=new ThreadLocal<>();
+    public static boolean savePendingWalletLogout(Player player) {
+        if(player==null||WALLET_LOGOUT_SAVE.get()!=null||!nro.models.services.WalletPurchaseService.isFinalizingLogout(player))return false;
+        DeferredRubySave context=new DeferredRubySave(player);WALLET_LOGOUT_SAVE.set(context);
+        try{updatePlayer(player);return context.saved;}finally{WALLET_LOGOUT_SAVE.remove();}
+    }
     public static boolean savePendingKolLogout(Player player) {
         if(player==null||KOL_LOGOUT_SAVE.get()!=null||!nro.models.services.KolQuestService.isFinalizingProgressLogout(player))return false;
         DeferredRubySave context=new DeferredRubySave(player);KOL_LOGOUT_SAVE.set(context);
@@ -410,6 +434,22 @@ public class PlayerDAO {
 
     public static void updatePlayer(Player player) {
         if (player == null) return;
+        DeferredRubySave eventSave=EVENT_LOGOUT_SAVE.get();
+        boolean finalizingEvent=eventSave!=null&&eventSave.player==player;
+        if(!finalizingEvent&&(nro.models.event.EventCleanupService.pending(player.id)||nro.models.event.EventCleanupLogoutService.pending(player.id)))return;
+        if(player.beforeDispose&&(player.liveLogoutCompleted||player.giftLogoutSaved))return;
+        if(nro.models.services.LiveSyncCommandGate.hasPendingId(player.id)&&LIVE_COMMAND_SAVE.get()==null)return;
+        DeferredRubySave walletSave=WALLET_LOGOUT_SAVE.get();
+        boolean finalizingWallet=walletSave!=null&&walletSave.player==player;
+        if(!finalizingWallet){
+            synchronized(player){
+                if(player.beforeDispose&&(player.liveLogoutCompleted||player.walletLogoutSaved))return;
+                if(nro.models.services.WalletPurchaseService.hasPendingId(player.id)&&!nro.models.services.WalletPurchaseService.hasPending(player))return;
+                boolean hadWalletPending=player.walletPurchasePending!=null||nro.models.services.WalletPurchaseService.hasPending(player);
+                if(!nro.models.services.WalletPurchaseService.gI().reconcilePending(player))return;
+                if(hadWalletPending&&player.beforeDispose)return;
+            }
+        }
         DeferredRubySave consignSave=CONSIGN_LOGOUT_SAVE.get();
         boolean finalizingConsign=consignSave!=null && consignSave.player==player;
         if (!finalizingConsign) {
@@ -434,11 +474,23 @@ public class PlayerDAO {
         if (!finalizingRuby && nro.models.services.RubyGiftService.hasPendingId(player.id)
                 && !nro.models.services.RubyGiftService.hasPending(player)) return;
         if (!finalizingRuby && !nro.models.services.RubyGiftService.gI().reconcilePending(player)) return;
+        DeferredRubySave giftSave=GIFT_LOGOUT_SAVE.get();
+        boolean finalizingGift=giftSave!=null&&giftSave.player==player;
+        if(!finalizingGift){
+            synchronized(player){
+                boolean hadGift=nro.models.services.GiftCodeService.hasPending(player);
+                if(!nro.models.services.GiftCodeService.gI().reconcilePending(player))return;
+                if(hadGift&&player.beforeDispose)return;
+            }
+        }
         synchronized (player) {
+        if(player.beforeDispose&&(player.liveLogoutCompleted||player.giftLogoutSaved))return;
         if (nro.models.services.CommesonChallengeService.hasPending(player)) return;
+        if(nro.models.services.LiveSyncCommandGate.hasPendingId(player.id)&&LIVE_COMMAND_SAVE.get()==null)return;
+        if(!finalizingGift&&nro.models.services.GiftCodeService.hasPendingId(player.id))return;
         if (!finalizingConsign && nro.models.shop_ky_gui.ConsignTransactions.hasPendingId(player.id)) return;
         if (!finalizingRuby && nro.models.services.RubyGiftService.hasPendingId(player.id)) return;
-        if (player.walletPurchasePending != null && !nro.models.services.WalletPurchaseService.gI().reconcilePending(player)) return;
+        if (!finalizingWallet && (player.walletPurchasePending != null || nro.models.services.WalletPurchaseService.hasPendingId(player.id))) return;
         if (player.kolProgressPending && !nro.models.services.KolQuestService.gI().reconcileProgressPending(player)) return;
         if (player.kolRewardPending && !nro.models.services.KolQuestService.gI().reconcilePending(player)) return;
         if (player != null && player.idMark.isLoadedAllDataPlayer()) {
@@ -1036,7 +1088,7 @@ public class PlayerDAO {
                 String dataDailyGift = JSONValue.toJSONString(player.dailyGiftData);
                 String query = "update player set head = ?, have_tennis_space_ship = ?, "
                         + "clan_id = ?, data_inventory = ?, data_location = ?, data_point = ?, data_magic_tree = ?, "
-                        + "items_body = ?, items_bag = ?, items_box = ?, items_box_lucky_round = ?, items_daban = ?, friends = ?, "
+                        + "items_body = ?, items_bag = ?, items_box = ?, items_collection = ?, items_box_lucky_round = ?, items_daban = ?, friends = ?, "
                         + "enemies = ?, data_intrinsic = ?, data_item_time = ?, data_task = ?, data_mabu_egg = ?, pet = ?, "
                         + "data_black_ball = ?, data_side_task = ?, data_charm = ?, skills = ?, skills_shortcut = ?, notify = ?, "
                         + "baovetaikhoan = ?, data_card = ?, lasttimepkcommeson = ?, bandokhobau = ?, doanhtrai = ?, conduongrandoc = ?, masterDoesNotAttack = ?, "
@@ -1054,6 +1106,7 @@ public class PlayerDAO {
                         itemsBody,
                         itemsBag,
                         itemsBox,
+                        nro.models.item.CollectionChestCodec.encode(player.inventory.itemsCollection),
                         itemsBoxLuckyRound,
                         itemsDaBan,
                         friend,
@@ -1107,17 +1160,21 @@ public class PlayerDAO {
                         player.point_sukien2,
                         player.id);
                 if (updated != 1) throw new SQLException("Full player save updated no row");
+                if(finalizingEvent)eventSave.saved=true;
                 // The main row is already durable; an auxiliary ranking failure must not undo RAM.
                 DeferredRubySave checkedSave = CHECKED_SAVE.get();
+                DeferredRubySave liveSave=LIVE_COMMAND_SAVE.get();if(liveSave!=null&&liveSave.player==player)liveSave.saved=true;
                 if (checkedSave != null && checkedSave.player == player) checkedSave.saved = true;
                 if (finalizingConsign) consignSave.saved = true;
                 SuperRankDAO.updateData(player);
                 if (finalizingRuby) rubySave.saved = true;
                 if (finalizingKol) kolSave.saved = true;
                 if (finalizingRename) renameSave.saved = true;
+                if (finalizingWallet) walletSave.saved = true;
+                if (finalizingGift) giftSave.saved = true;
                 if (player.isOffline) {
                     Logger.log(Logger.PURPLE, TimeUtil.getCurrHour() + "h" + TimeUtil.getCurrMin() + "m: Player " + player.name + " updated successfully! " + (System.currentTimeMillis() - st) + "ms\n");
-                    if (!finalizingConsign && !finalizingRuby && !finalizingKol && !finalizingRename) player.dispose();
+                    if (!finalizingEvent && !finalizingConsign && !finalizingRuby && !finalizingKol && !finalizingRename && !finalizingWallet && !finalizingGift) player.dispose();
                 } else {
                     Logger.success(Logger.PURPLE + TimeUtil.getCurrHour() + "h" + TimeUtil.getCurrMin() + "m: Player " + player.name + " save successfully! " + (System.currentTimeMillis() - st) + "ms\n");
                 }
@@ -1125,6 +1182,8 @@ public class PlayerDAO {
                 if (finalizingRuby) rubySave.saved = false;
                 if (finalizingKol) kolSave.saved = false;
                 if (finalizingRename) renameSave.saved = false;
+                if (finalizingWallet) walletSave.saved = false;
+                if (finalizingGift) giftSave.saved = false;
                 Logger.logException(PlayerDAO.class, e, "Lỗi save player " + player.name);
             }
 

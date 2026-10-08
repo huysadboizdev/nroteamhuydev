@@ -320,6 +320,7 @@ public class Pet extends Player {
 
     @Override
     public void update() {
+        if(master!=null&&(nro.models.services.LiveSyncCommandGate.hasPendingId(master.id)||nro.models.services.GiftCodeService.hasPendingId(master.id)))return;
         try {
             if (this.master != null && this.master.zone != null) {
                 super.update();

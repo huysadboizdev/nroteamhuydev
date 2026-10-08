@@ -409,6 +409,14 @@ public class BossManager implements Runnable {
         }
     }
     public final void updateBosses(){
+        if (getClass() == BossManager.class) {
+            try { nro.models.boss.Mabu.FatMabuService.gI().tick(); }
+            catch (Exception failure) { Logger.logException(BossManager.class, failure, "Fat Mabu tick"); }
+            try { nro.models.boss.HuntingTrio.HuntingTrioService.gI().tick(); }
+            catch (Exception failure) { Logger.logException(BossManager.class, failure, "Hunting trio tick"); }
+            try { nro.models.services.QuestSupportService.gI().tick(); }
+            catch (Exception failure) { Logger.logException(BossManager.class, failure, "Quest support tick"); }
+        }
         for(Boss boss:bosses){
             try{boss.ensureDeathTransition();boss.update();}
             catch(Exception failure){boss.reportLifecycleError(failure);boss.ensureDeathTransition();}

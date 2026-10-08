@@ -41,6 +41,7 @@ public class RedRibbonHQ implements Runnable {
 
     private long lastTimeOpen;
     public volatile boolean isOpened;
+    public volatile boolean isInitializing;
     public volatile boolean isClosing;
     private boolean achievementRecorded;
     private boolean bossesRetired;
@@ -81,13 +82,14 @@ public class RedRibbonHQ implements Runnable {
     }
 
     public void openDoanhTrai(Player player) {
+        Clan owner = this.clan != null ? this.clan : player.clan;
         try {
             this.lastTimeOpen = System.currentTimeMillis();
-            this.clan = player.clan;
-            player.clan.doanhTrai = this;
-            player.clan.playerOpenDoanhTrai = player;
-            player.clan.lastTimeOpenDoanhTrai = this.lastTimeOpen;
-            player.clan.haveGoneDoanhTrai = false;
+            this.clan = owner;
+            owner.doanhTrai = this;
+            owner.playerOpenDoanhTrai = player;
+            owner.lastTimeOpenDoanhTrai = this.lastTimeOpen;
+            owner.haveGoneDoanhTrai = false;
             sendTextDoanhTrai();
             //Khởi tạo quái, boss
             this.isClosing = false;
@@ -96,18 +98,24 @@ public class RedRibbonHQ implements Runnable {
             for (Zone zone : zones) if (zone != null) zone.dungeonClosing = false;
             this.isOpened = true;
             this.init();
+            this.isInitializing = false;
         } catch (Exception e) {
             e.printStackTrace();
-            player.clan.lastTimeOpenDoanhTrai = 0;
-            player.clan.haveGoneDoanhTrai = false;
-            this.dispose();
+            owner.lastTimeOpenDoanhTrai = 0;
+            owner.haveGoneDoanhTrai = false;
+            synchronized (this) {
+                this.isClosing = true;
+                this.isInitializing = false;
+                this.dispose();
+            }
             return;
         }
+        if (player.clan != owner) return;
         List<Player> plJoinDT = new ArrayList();
         //Đưa thành viên vào doanh trại
         for (Player pl : snapshotPlayers(player.zone)) {
             if (pl != null && !pl.equals(player) && pl.clan != null
-                    && pl.clan.equals(player.clan) && pl.location.x >= 1285
+                    && pl.clan.equals(owner) && pl.location.x >= 1285
                     && pl.location.x <= 1645) {
                 plJoinDT.add(pl);
             }
@@ -218,6 +226,7 @@ public class RedRibbonHQ implements Runnable {
     }
 
     public synchronized void update() {
+        if (isInitializing) return;
         if (isOpened) {
             if (isClosing || (!isTimePicking && Util.canDoWithTime(lastTimeOpen, TIME_DOANH_TRAI)) || (isTimePicking && Util.canDoWithTime(lastTimePick, TIME_PICK_DOANH_TRAI))) {
                 isClosing = true;
@@ -482,10 +491,13 @@ public class RedRibbonHQ implements Runnable {
         }
         this.bosses.clear();
         this.winDT = false;
+        synchronized (nro.models.services_dungeon.DungeonAllocationLock.LOCK) {
         this.isOpened = false;
         if (this.clan != null) this.clan.haveGoneDoanhTrai = true;
         if (this.clan != null && this.clan.doanhTrai == this) this.clan.doanhTrai = null;
         this.clan = null;
         this.isTimePicking = false;
+        this.isInitializing = false;
+        }
     }
 }

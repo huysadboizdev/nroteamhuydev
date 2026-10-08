@@ -66,7 +66,10 @@ public class MrBlue {
             rs = LocalManager.executeQuery("select * from account where username = ? and password = ?", session.uu, session.pp);
             if (rs.first()) {
                 session.userId = rs.getInt("account.id");
-                if ((nro.models.shop_ky_gui.ConsignTransactions.hasPendingAccount(session.userId) || nro.models.services.RubyGiftService.hasPendingAccount(session.userId) || nro.models.services.KolQuestService.hasProgressPendingAccount(session.userId) || nro.models.services.AdminPlayerActions.hasRenamePendingAccount(session.userId))) {
+                if(nro.models.services.LiveSyncCommandGate.hasPendingAccount(session.userId)||nro.models.services.LiveSyncCommandGate.isRetiringAccount(session.userId)||nro.models.services.GiftCodeService.hasPendingAccount(session.userId)) {
+                    Service.gI().sendThongBaoOK(session,"Dữ liệu đang được đồng bộ. Vui lòng đăng nhập lại sau.");return null;
+                }
+                if ((nro.models.shop_ky_gui.ConsignTransactions.hasPendingAccount(session.userId) || nro.models.services.WalletPurchaseService.hasPendingAccount(session.userId) || nro.models.services.RubyGiftService.hasPendingAccount(session.userId) || nro.models.services.KolQuestService.hasProgressPendingAccount(session.userId) || nro.models.services.AdminPlayerActions.hasRenamePendingAccount(session.userId))) {
                     Service.gI().sendThongBaoOK(session, "Dữ liệu nhân vật đang chờ đối chiếu. Vui lòng đăng nhập lại sau.");
                     return null;
                 }
@@ -119,6 +122,7 @@ public class MrBlue {
                                 Client.gI().kickSession(plInGame.getSession());
                             }
                             // Kicking the old session can leave an uncertain gift receipt.
+                            if(nro.models.services.LiveSyncCommandGate.hasPendingAccount(session.userId)||nro.models.services.LiveSyncCommandGate.isRetiringAccount(session.userId))return null;
                             if ((nro.models.shop_ky_gui.ConsignTransactions.hasPendingAccount(session.userId) || nro.models.services.RubyGiftService.hasPendingAccount(session.userId) || nro.models.services.KolQuestService.hasProgressPendingAccount(session.userId) || nro.models.services.AdminPlayerActions.hasRenamePendingAccount(session.userId))) {
                                 Service.gI().sendThongBaoOK(session, "Dữ liệu nhân vật đang chờ đối chiếu. Vui lòng đăng nhập lại sau.");
                                 return null;
@@ -127,10 +131,15 @@ public class MrBlue {
                             // All subsequent inventory and profile reads must use its final save.
                             rs = LocalManager.executeQuery("select * from player where account_id = ? limit 1", session.userId);
                             if (!rs.first()) return null;
-                            if (nro.models.services.CommesonChallengeService.hasPendingId(rs.getLong("id"))) {
+                            if (nro.models.services.CommesonChallengeService.hasPendingId(rs.getLong("id"))
+                                    || nro.models.services.LiveSyncCommandGate.hasPendingId(rs.getLong("id"))
+                                    || nro.models.services.LiveSyncCommandGate.isRetiringId(rs.getLong("id"))) {
                                 Service.gI().sendThongBaoOK(session, "Dữ liệu nhân vật đang chờ đối chiếu. Vui lòng đăng nhập lại sau.");
                                 return null;
                             }
+                            nro.models.event.EventCleanupService.beforeLogin(rs.getLong("id"));
+                            rs = LocalManager.executeQuery("select * from player where account_id = ? limit 1", session.userId);
+                            if(!rs.first())return null;
                             if ((player = loadPlayer(rs, false)) != null) {
                                 player.isPlayer = true;
                                 player.deltaTime = deltaTime;
@@ -172,6 +181,7 @@ public class MrBlue {
     }
 
     public static Player loadById(long id) {
+        if(nro.models.services.LiveSyncCommandGate.hasPendingId(id)||nro.models.services.LiveSyncCommandGate.isRetiringId(id)||nro.models.services.GiftCodeService.hasPendingId(id))return null;
         if (nro.models.services.CommesonChallengeService.hasPendingId(id) || nro.models.shop_ky_gui.ConsignTransactions.hasPendingId(id) || nro.models.services.RubyGiftService.hasPendingId(id) || nro.models.services.KolQuestService.hasProgressPendingId(id) || nro.models.services.AdminPlayerActions.hasRenamePendingId(id)) return null;
         Player player = null;
         LocalResultSet rs = null;
@@ -294,6 +304,10 @@ public class MrBlue {
                 player.location.x = Integer.parseInt(String.valueOf(dataArray.get(1)));
                 player.location.y = Integer.parseInt(String.valueOf(dataArray.get(2)));
                 player.location.lastTimeplayerMove = System.currentTimeMillis();
+                if (mapId == 126) {
+                    mapId = nro.models.services.HirudegarnEventService.normalizeSavedMap(mapId);
+                    player.location.x = 1000; player.location.y = 360;
+                }
                 if (mapId == 51 || MapService.gI().isMapDoanhTrai(mapId) || MapService.gI().isMapBlackBallWar(mapId) || MapService.gI().isMapSieuThanhThuy(mapId) || MapService.gI().isMapMabu2H(mapId)) {
                     mapId = player.gender + 21;
                     player.location.x = 300;
@@ -469,6 +483,7 @@ public class MrBlue {
                 player.inventory.itemsBox.add(item);
             }
             nro.models.player.Inventory.padSlots(player.inventory.itemsBox, nro.models.player.Inventory.MAX_ITEMS_BOX);
+            player.inventory.itemsCollection = nro.models.item.CollectionChestCodec.decode(rs.getString("items_collection"));
             dataArray.clear();
 
             //data box lucky round
@@ -855,8 +870,8 @@ public class MrBlue {
                 player.joinCDRD = Boolean.parseBoolean(dataArray.get(0).toString());
                 player.lastTimeJoinCDRD = Long.parseLong(dataArray.get(1).toString());
                 player.talkToThuongDe = Boolean.parseBoolean(dataArray.get(2).toString());
-                player.talkToThanMeo = Boolean.parseBoolean(dataArray.get(2).toString());
-                if (player.clan.ConDuongRanDoc == null || player.lastTimeJoinCDRD != player.clan.lastTimeOpenConDuongRanDoc) {
+                player.talkToThanMeo = Boolean.parseBoolean(dataArray.get(3).toString());
+                if (player.clan == null || player.clan.ConDuongRanDoc == null || player.lastTimeJoinCDRD != player.clan.lastTimeOpenConDuongRanDoc) {
                     player.joinCDRD = false;
                     player.talkToThuongDe = false;
                     player.talkToThanMeo = false;

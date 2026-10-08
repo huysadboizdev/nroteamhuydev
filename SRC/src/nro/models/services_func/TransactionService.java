@@ -34,6 +34,9 @@ public class TransactionService implements Runnable {
     public static boolean isTrading(Player player) {
         return PLAYER_TRADE.containsKey(player);
     }
+    public static void cancelDisabledEventTrades(){
+        for(Trade trade:new java.util.HashSet<>(PLAYER_TRADE.values()))trade.cancelForDisabledEvent();
+    }
 
     private static final byte SEND_INVITE_TRADE = 0;
     private static final byte ACCEPT_TRADE = 1;
@@ -56,6 +59,7 @@ public class TransactionService implements Runnable {
     }
 
     public void controller(Player pl, Message msg) {
+        if(nro.models.services.LiveSyncMutationGate.blocked(pl))return;
         try {
             byte action = msg.reader().readByte();
             int playerId = -1;

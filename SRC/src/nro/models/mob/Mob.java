@@ -36,6 +36,7 @@ public class Mob {
     public int id;
     public Zone zone;
     public int tempId;
+    public long catalogGeneration;
     public String name;
     public byte level;
     private int mapId;
@@ -76,6 +77,9 @@ public class Mob {
         this.pDame = mob.pDame;
         this.pTiemNang = mob.pTiemNang;
         this.type = mob.type;
+        this.catalogGeneration=mob.catalogGeneration;
+        nro.models.services.LiveSyncCatalogCommands.applyMobRespawn(this);
+        this.point.sethp(this.point.getHpFull());
         this.setTiemNang();
         if (this.tempId == 118) {
             this.type = 1; // loại mob thường
@@ -115,8 +119,17 @@ public class Mob {
     }
 
     private boolean kolDeathCounted;
+    private boolean equipmentFarmDeathCounted;
+    private long equipmentFarmGeneration;
+    public synchronized long equipmentFarmGeneration() {return equipmentFarmGeneration;}
+    public synchronized nro.models.services.EquipmentFarmDropService.DeathClaim claimEquipmentFarmDeath(long generation) {
+        if(generation!=equipmentFarmGeneration || equipmentFarmDeathCounted)return null;
+        equipmentFarmDeathCounted=true;
+        return new nro.models.services.EquipmentFarmDropService.DeathClaim();
+    }
     private synchronized boolean claimKolDeath() { if(kolDeathCounted)return false;kolDeathCounted=true;return true; }
     public void injured(Player plAtt, long damage, boolean dieWhenHpFull) {
+        long farmGeneration=equipmentFarmGeneration();
         if (!this.isDie()) {
             if (damage >= this.point.hp) {
                 damage = this.point.hp;
@@ -162,12 +175,13 @@ public class Mob {
             this.point.hp -= damage;
             addTemporaryEnemies(plAtt);
             if (this.isDie()) {
+                var farmDeath=claimEquipmentFarmDeath(farmGeneration);
                 if(claimKolDeath()) nro.models.services.KolQuestService.gI().onMobKilled(plAtt,this);
                 this.status = 0;
                 this.setDie();
                 this.temporaryEnemies.clear();
                 if (plAtt != null) {
-                    this.sendMobDieAffterAttacked(plAtt, (int) damage);
+                    this.sendMobDieAffterAttacked(plAtt, (int) damage, farmDeath);
                     TaskService.gI().checkDoneTaskKillMob(plAtt, this);
                     TaskService.gI().checkDoneSideTaskKillMob(plAtt, this);
                     TaskService.gI().checkDoneClanTaskKillMob(plAtt, this);
@@ -246,7 +260,7 @@ public class Mob {
             tiemNang = 1;
         }
         if (pl.nPoint != null) {
-            tiemNang = (int) pl.nPoint.calSucManhTiemNang(tiemNang);
+            tiemNang = pl.nPoint.calSucManhTiemNang(tiemNang);
         } else {
             return 0;
         }
@@ -464,7 +478,8 @@ public class Mob {
     }
 
     public void hoiSinh() {
-        synchronized(this) { kolDeathCounted=false; }
+        nro.models.services.LiveSyncCatalogCommands.applyMobRespawn(this);
+        synchronized(this) { kolDeathCounted=false; equipmentFarmDeathCounted=false; equipmentFarmGeneration++; }
         this.status = 5;
         this.point.hp = this.point.maxHp;
         this.setTiemNang();
@@ -542,14 +557,14 @@ public class Mob {
         }
     }
 
-    private void sendMobDieAffterAttacked(Player plKill, int dameHit) {
+    private void sendMobDieAffterAttacked(Player plKill, int dameHit, nro.models.services.EquipmentFarmDropService.DeathClaim farmDeath) {
         Message msg;
         try {
             msg = new Message(-12);
             msg.writer().writeByte(this.id);
             msg.writer().writeInt(dameHit);
             msg.writer().writeBoolean(plKill.nPoint.isCrit); // crit
-            List<ItemMap> items = mobReward(plKill, this.dropItemTask(plKill), msg);
+            List<ItemMap> items = mobReward(plKill, this.dropItemTask(plKill), msg, farmDeath);
             Service.gI().sendMessAllPlayerInMap(this.zone, msg);
             msg.cleanup();
             hutItem(plKill, items);
@@ -582,11 +597,11 @@ public class Mob {
         }
     }
 
-    private List<ItemMap> mobReward(Player player, ItemMap itemTask, Message msg) {
+    private List<ItemMap> mobReward(Player player, ItemMap itemTask, Message msg, nro.models.services.EquipmentFarmDropService.DeathClaim farmDeath) {
         List<ItemMap> itemReward = new ArrayList<>();
         try {
             itemReward = this.getItemMobReward(player, this.location.x + Util.nextInt(-10, 10),
-                    this.zone.map.yPhysicInTop(this.location.x, this.location.y));
+                    this.zone.map.yPhysicInTop(this.location.x, this.location.y), farmDeath);
             if (itemTask != null) {
                 itemReward.add(itemTask);
             }
@@ -605,6 +620,10 @@ public class Mob {
     }
 
     public List<ItemMap> getItemMobReward(Player player, int x, int yEnd) {
+        return getItemMobReward(player,x,yEnd,claimEquipmentFarmDeath(equipmentFarmGeneration()));
+    }
+
+    private List<ItemMap> getItemMobReward(Player player,int x,int yEnd,nro.models.services.EquipmentFarmDropService.DeathClaim farmDeath) {
         List<ItemMap> list = new ArrayList<>();
         if (player.isBoss) {
             return list;
@@ -614,6 +633,7 @@ public class Mob {
             return list;
         }
         int mapid = player.zone.map.mapId;
+        list.addAll(nro.models.services.EquipmentFarmDropService.rewards(this,player,x,yEnd,farmDeath));
         //========================Capsul Kì Bí========================
         if (player.itemTime.isUseMayDo
                 && (isLuckyDrop(player, 20, 100))
@@ -694,7 +714,8 @@ public class Mob {
                 player.event.luotNhanNgocMienPhi = 0;
             }
         }
-        if (MapService.gI().AllMap(mapid)) {
+        try(var summerPermit=nro.models.event.EventItemPolicy.admit()) {
+        if (nro.models.event.EventItemPolicy.isEnabled("summer") && MapService.gI().AllMap(mapid)) {
             if (isLuckyDrop(player, 5, 100)) {
                 ItemMap it = new ItemMap(zone, 1798, 1, x, yEnd, player.id);
                 list.add(it);
@@ -721,6 +742,7 @@ public class Mob {
             }
         }
 
+        }
         if (MapService.gI().isMapCold(mapid)) {
             if (isLuckyDrop(player, 30, 100)) {
                 int vang = Util.nextInt(150000, 250000);
@@ -904,12 +926,6 @@ public class Mob {
         if (player.itemTime.isUseCoBonLa) {
             rate1 = (int) (rate1 * 1.15);
         }
-        if (isLuckyDrop(player, 3, 333)) {
-            if (player.setClothes.checkSetGod()) {
-                ItemMap it = new ItemMap(zone, Util.nextInt(663, 667), 1, x, yEnd, player.id);
-                list.add(it);
-            }
-        }
 
         if (MapService.gI().isMapCold(mapid)) {
             if (isLuckyDrop(player, 20, 100)) {
@@ -944,11 +960,6 @@ public class Mob {
                 list.add(it);
             }
         }
-        if (player.setClothes.checkSetDes() && MapService.gI().isMapNgucTu(mapid)) {
-            if ((player.isActive() && isLuckyDrop(player, 2, 555)) || isLuckyDrop(player, 10, 100)) {
-                list.add(new ItemMap(zone, Util.nextInt(1066, 1070), 1, x, yEnd, player.id));
-            }
-        }
         if ((isLuckyDrop(player, 10, 100) || (player.isActive() && player.setClothes.checkSetDes() && isLuckyDrop(player, 20, 100))) && MapService.gI().isMapNgucTu(mapid)) {
             list.add(new ItemMap(zone, 1229, 1, x, yEnd, player.id));
         }
@@ -979,6 +990,7 @@ public class Mob {
             }
         }
 
+        list.removeIf(drop -> drop==null || drop.itemTemplate==null || nro.models.event.EventItemPolicy.isBlocked(drop.itemTemplate.id));
         return list;
 
     }
@@ -1044,7 +1056,8 @@ public class Mob {
     }
 
     public void hoiSinhMobPhoBan() {
-        synchronized(this) { kolDeathCounted=false; }
+        nro.models.services.LiveSyncCatalogCommands.applyMobRespawn(this);
+        synchronized(this) { kolDeathCounted=false; equipmentFarmDeathCounted=false; equipmentFarmGeneration++; }
         this.point.hp = this.point.maxHp;
         this.setTiemNang();
         Message msg;
@@ -1062,7 +1075,8 @@ public class Mob {
     }
 
     public void hoiSinhMobTayKarin() {
-        synchronized(this) { kolDeathCounted=false; }
+        nro.models.services.LiveSyncCatalogCommands.applyMobRespawn(this);
+        synchronized(this) { kolDeathCounted=false; equipmentFarmDeathCounted=false; equipmentFarmGeneration++; }
         this.point.hp = this.point.maxHp;
         this.maxTiemNang = 1;
         Message msg;

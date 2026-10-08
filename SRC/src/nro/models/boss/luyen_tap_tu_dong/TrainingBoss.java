@@ -72,7 +72,8 @@ public abstract class TrainingBoss extends Boss {
 
     public void buffPea() {
         if (Util.canDoWithTime(lastTimeBuff, 30000)) {
-            this.nPoint.hp += this.nPoint.hpMax / 5;
+            this.nPoint.hp = (int) Math.min(this.nPoint.hpMax,
+                    (long) this.nPoint.hp + this.nPoint.hpMax / 5L);
             this.nPoint.mp = this.nPoint.mpMax;
             Service.gI().sendInfoPlayerEatPea(this);
             lastTimeBuff = System.currentTimeMillis();
@@ -171,7 +172,7 @@ public abstract class TrainingBoss extends Boss {
                 die(plAtt);
             }
 
-            return (int) damage;
+            return (int) Math.min(Integer.MAX_VALUE, Math.max(0L, damage));
         } else {
             return 0;
         }
@@ -196,7 +197,10 @@ public abstract class TrainingBoss extends Boss {
     }
 
     @Override
-    public void leaveMap() {
+    public synchronized void leaveMap() {
+        if (this.zone == null && this.bossStatus == BossStatus.REST) {
+            return;
+        }
         nro.models.map.Zone trainingZone=this.zone;
         try {
             Player npc=TrainingService.gI().getNonInteractiveNPC(trainingZone,(int)this.id);

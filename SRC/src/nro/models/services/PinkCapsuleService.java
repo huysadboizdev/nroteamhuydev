@@ -48,6 +48,10 @@ public final class PinkCapsuleService {
                 notifyRejected(player, "Hồng ngọc đã đạt giới hạn, hãy sử dụng bớt trước khi mở Capsule.");
                 return false;
             }
+            if ((long)balance+VipRewardCatalog.reservedRuby(player)>Integer.MAX_VALUE) {
+                notifyRejected(player,"Cần chừa chỗ cho hồng ngọc của gói VIP đang chờ đối soát.");
+                return false;
+            }
             // Prepare on copies; a full bag must never consume the capsule or ruby.
             List<Item> resultBag = InventoryService.gI().copyItemsBag(player);
             if (capsule.quantity == 1) resultBag.set(slot, ItemService.gI().createItemNull());

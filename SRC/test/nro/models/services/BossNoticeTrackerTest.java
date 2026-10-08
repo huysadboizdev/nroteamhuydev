@@ -15,7 +15,10 @@ public final class BossNoticeTrackerTest {
         t.appear(first,1,1,"Fide 2","Núi");check(events.size()==5&&t.history().size()==3,"next form new cycle");
         t.depart(second);check(t.current().stream().anyMatch(r->r.status().equals("DEPARTED")&&r.killerName().isEmpty()),"despawn never fake defeat");
         t.rest(first,0,"CONDITION");check(t.current().stream().anyMatch(r->r.etaKind().equals("CONDITION")&&r.nextSpawnAt()==0),"unknown ETA remains unknown");
-        check(java.util.Arrays.stream(BossNoticeRow.class.getRecordComponents()).noneMatch(c->c.getName().toLowerCase().contains("zone")),"public model has no zone field");
+        Object support=new Object();t.appear(support,-999999,0,"Kuku","N?i",nro.models.boss.BossID.KUKU,true,7);
+        var quest=t.current().stream().filter(r->r.bossId()==-999999).findFirst().orElseThrow();check(quest.category()==1&&quest.questSupport()&&quest.zoneId()==7,"support semantic category and zone");
+        t.appear(support,-999999,0,"Kuku","N?i",nro.models.boss.BossID.KUKU,true,8);quest=t.current().stream().filter(r->r.bossId()==-999999).findFirst().orElseThrow();check(quest.zoneId()==8&&quest.version()==2,"move snapshot persists zone");
+        t.defeat(support,"admin");quest=t.current().stream().filter(r->r.bossId()==-999999).findFirst().orElseThrow();check(quest.category()==1&&quest.questSupport()&&quest.zoneId()==8,"classification survives transition");
         System.out.println("PASS BossNotice tracker: cycle/instance dedup, killer, forms, disappearance, runtime ETA, no zones");
     }
 }

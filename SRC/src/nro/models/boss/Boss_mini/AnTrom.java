@@ -22,13 +22,21 @@ import nro.models.utils.Util;
 
 public class AnTrom extends Boss {
 
+    private nro.models.services.MiniBossPinkCapsuleDrop capsuleReward;
+
+    @Override
+    protected synchronized void resetBase() {
+        super.resetBase();
+        if (capsuleReward != null) capsuleReward.reset();
+    }
+
     private long goldAnTrom;
     private long lastTimeAnTrom;
     private long lastTimeJoinMap;
     private static final long timeChangeMap = 1000;
 
     public AnTrom() throws Exception {
-        super(BossID.AN_TROM, new BossData(
+        super(MiniBossIdentity.nextId(), new BossData(
                 "Ăn Trộm ",
                 ConstPlayer.TRAI_DAT,
                 new short[]{201, 202, 203, -1, -1, -1},
@@ -56,13 +64,14 @@ public class AnTrom extends Boss {
     }
 
     @Override
-    public int injured(Player plAtt, long damage, boolean piercing, boolean isMobAttack) {
-        if (!this.isDie()) {
+    public synchronized int injured(Player plAtt, long damage, boolean piercing, boolean isMobAttack) {
+        if (damage > 0 && !this.isDie()) {
             damage = 1;
             this.nPoint.subHP(damage);
             if (isDie()) {
                 this.setDie(plAtt);
                 die(plAtt);
+                return (int) damage;
             }
             this.playerSkill.skillSelect = this.playerSkill.skills.get(Util.nextInt(0, this.playerSkill.skills.size() - 1));
             SkillService.gI().useSkill(this, plAtt, null, -1, null);
@@ -130,13 +139,16 @@ public class AnTrom extends Boss {
 
     @Override
     public void die(Player plKill) {
-        BadgesTaskService.updateCountBagesTask(plKill, ConstTaskBadges.BI_MOC_SACH_TUI, 1);
-        this.reward(plKill);
-        this.changeStatus(BossStatus.DIE);
+        try { this.reward(plKill); }
+        finally { this.changeStatus(BossStatus.DIE); }
     }
 
     @Override
-    public void reward(Player plKill) {
+    public synchronized void reward(Player plKill) {
+        plKill = nro.models.services.MiniBossPinkCapsuleDrop.creditedPlayer(plKill);
+        if (capsuleReward == null) capsuleReward = new nro.models.services.MiniBossPinkCapsuleDrop();
+        if (!capsuleReward.drop(this, plKill)) return;
+        BadgesTaskService.updateCountBagesTask(plKill, ConstTaskBadges.BI_MOC_SACH_TUI, 1);
         if (goldAnTrom != 0) {
             goldAnTrom = goldAnTrom * 8 / 10;
             for (byte i = 0; i < 5; i++) {
@@ -177,7 +189,7 @@ public class AnTrom extends Boss {
     @Override
     public void joinMap() {
         this.name = "Ăn Trộm " + Util.nextInt(1, 49);
-        this.nPoint.hpMax = Util.nextInt(100);
+        this.nPoint.hpMax = Util.nextInt(1, 100);
         this.nPoint.hp = this.nPoint.hpMax;
         this.nPoint.dameg = this.nPoint.hpMax / 10;
         goldAnTrom = 0;

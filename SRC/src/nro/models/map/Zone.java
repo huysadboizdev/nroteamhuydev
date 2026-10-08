@@ -40,17 +40,16 @@ public class Zone {
     public Map map;
     public int zoneId;
     public int maxPlayer;
+    // Separate from the zone monitor used for items; moving a held ball may touch the old zone.
+    public final Object playerAdmissionLock = new Object();
     /** Clan dungeon admission stays closed after disposal until the next valid opening. */
     public volatile boolean dungeonClosing;
     public int shenronType = -1;
 
     @Getter
     private final List<Player> nonInteractiveNPCs; //npc
-    @Getter
     private final List<Player> humanoids; //player, boss, pet
-    @Getter
     private final List<Player> notBosses; //player, pet
-    @Getter
     public final List<Player> players; //player
     @Getter
     private final List<Player> bosses; //boss
@@ -131,7 +130,8 @@ public class Zone {
     private void udMob() {
         for (int i = this.mobs.size() - 1; i >= 0; i--) {
             try {
-                mobs.get(i).update();
+                Mob mob = mobs.get(i);
+                if (map.mapId != 126 || !(mob instanceof nro.models.mob_bigboss.Hirudegarn)) mob.update();
             } catch (Exception e) {
                 Logger.logException(Zone.class, e, "Lỗi update mobs");
             }
@@ -156,29 +156,14 @@ public class Zone {
     }
 
     private void udItem() {
-        if (this.items.isEmpty()) {
-            return;
+        List<ItemMap> snapshot = getItemsSnapshot();
+        for (int i = snapshot.size() - 1; i >= 0; i--) {
+            ItemMap item = snapshot.get(i);
+            try {
+                if (item != null && item.itemTemplate != null) item.update();
+                else removeItemMap(item);
+            } catch (Exception e) { Logger.logException(Zone.class, e, "Lỗi update item"); }
         }
-        try {
-            for (int i = this.items.size() - 1; i >= 0; i--) {
-                try {
-                    if (i < this.items.size()) {
-                        ItemMap item = this.items.get(i);
-                        if (item != null && item.itemTemplate != null) {
-                            item.update();
-                        } else {
-                            items.remove(i);
-                            System.err.println("Remove item " + i);
-                        }
-                    }
-                } catch (Exception e) {
-                    Logger.logException(Zone.class, e, "Lỗi item");
-                }
-            }
-        } catch (Exception e) {
-            Logger.logException(Zone.class, e, "Lỗi update items");
-        }
-
     }
 
     public void update() {
@@ -192,17 +177,27 @@ public class Zone {
         this.map = map;
         this.zoneId = zoneId;
         this.maxPlayer = maxPlayer;
-        this.nonInteractiveNPCs = new ArrayList<>();
-        this.humanoids = new ArrayList<>();
-        this.notBosses = new ArrayList<>();
-        this.players = new ArrayList<>();
-        this.bosses = new ArrayList<>();
-        this.pets = new ArrayList<>();
+        this.nonInteractiveNPCs = new java.util.concurrent.CopyOnWriteArrayList<>();
+        this.humanoids = new java.util.concurrent.CopyOnWriteArrayList<>();
+        this.notBosses = new java.util.concurrent.CopyOnWriteArrayList<>();
+        this.players = map.mapId == 126 ? new java.util.concurrent.CopyOnWriteArrayList<>()
+                : java.util.Collections.synchronizedList(new ArrayList<>());
+        this.bosses = new java.util.concurrent.CopyOnWriteArrayList<>();
+        this.pets = new java.util.concurrent.CopyOnWriteArrayList<>();
         this.mobs = new ArrayList<>();
-        this.items = new ArrayList<>();
+        this.items = map.mapId == 126 ? new java.util.concurrent.CopyOnWriteArrayList<>() : new ArrayList<>();
         this.trapMaps = new ArrayList<>();
         this.maBuHolds = new ArrayList<>();
     }
+
+    public List<Player> getPlayers() { return map.mapId == 126 ? new ArrayList<>(players) : players; }
+    public List<Player> getPlayersSnapshot() {
+        synchronized (players) { return new ArrayList<>(players); }
+    }
+
+    public synchronized List<ItemMap> getItemsSnapshot() { return new ArrayList<>(items); }
+    public List<Player> getHumanoids() { return map.mapId == 126 ? new ArrayList<>(humanoids) : humanoids; }
+    public List<Player> getNotBosses() { return map.mapId == 126 ? new ArrayList<>(notBosses) : notBosses; }
 
     public int getNumOfPlayers() {
         return this.players.size();
@@ -223,11 +218,12 @@ public class Zone {
 
     public void addPlayer(Player player) {
         if (player != null) {
+          synchronized (player) {
             if (!this.humanoids.contains(player)) {
                 this.humanoids.add(player);
             }
 
-            if (player instanceof NonInteractiveNPC) {
+            if (player instanceof NonInteractiveNPC && !this.nonInteractiveNPCs.contains(player)) {
                 this.nonInteractiveNPCs.add(player);
             }
 
@@ -239,32 +235,36 @@ public class Zone {
                 this.players.add(player);
             }
 
-            if (player.isBoss) {
+            if (player.isBoss && !this.bosses.contains(player)) {
                 this.bosses.add(player);
             }
-            if (player.isPet || player.isNewPet) {
+            if ((player.isPet || player.isNewPet) && !this.pets.contains(player)) {
                 this.pets.add(player);
             }
-
+          }
         }
     }
 
     private void udPlayer() {
-        for (int i = this.notBosses.size() - 1; i >= 0; i--) {
-            Player pl = this.notBosses.get(i);
+        List<Player> current = getNotBosses();
+        for (int i = current.size() - 1; i >= 0; i--) {
+            Player pl = current.get(i);
             if (!pl.isPet && !pl.isBot && !pl.isNewPet) {
-                this.notBosses.get(i).update();
+                pl.update();
             }
         }
     }
 
     public void removePlayer(Player player) {
+      synchronized (player) {
+        player.zoneExitSequence++;
         this.nonInteractiveNPCs.remove(player);
         this.humanoids.remove(player);
         this.notBosses.remove(player);
         this.players.remove(player);
         this.bosses.remove(player);
         this.pets.remove(player);
+      }
     }
 
     public ItemMap getItemMapByItemMapId(int itemId) {
@@ -325,15 +325,17 @@ public class Zone {
     }
 
     public void pickItem(Player player, int itemMapId) {
-        ItemMap requested=getItemMapByItemMapId(itemMapId);
-        if(requested!=null && requested.commesonMatchId!=null){synchronized(player){pickItemInternal(player,itemMapId);}return;}
-        pickItemInternal(player,itemMapId);
+        if(player==null)return;
+        synchronized(player){pickItemInternal(player,itemMapId);}
     }
 
     private void pickItemInternal(Player player, int itemMapId) {
         ItemMap itemMap = getItemMapByItemMapId(itemMapId);
         if (itemMap != null && !itemMap.isPickedUp) {
             synchronized (itemMap) {
+                try(var eventPermit=nro.models.event.EventItemPolicy.admit()) {
+                if(!nro.models.event.EventRuntimeService.canPick(itemMap))return;
+
                 if (!itemMap.isPickedUp) {
                     if (itemMap.itemTemplate != null) {
                         if (itemMap.itemTemplate.type == 22) {
@@ -428,13 +430,18 @@ public class Zone {
                         Service.gI().sendThongBao(player, "Không thể thực hiện");
                     }
                 }
+            
+                }
             }
         }
     }
 
     public synchronized void addItem(ItemMap itemMap) {
+        try(var eventPermit=nro.models.event.EventItemPolicy.admit()) {
+        if(itemMap!=null && itemMap.itemTemplate!=null && nro.models.event.EventItemPolicy.isBlocked(itemMap.itemTemplate.id))return;
         if (itemMap != null && !items.contains(itemMap)) {
             items.add(0, itemMap);
+        }
         }
     }
 
@@ -460,6 +467,7 @@ public class Zone {
     }
 
     public void load_Me_To_Another(Player player) {
+        List<Player> currentPlayers = getPlayers();
         try {
             if (player.zone != null) {
                 if (this.map.mapId == 164) {
@@ -469,16 +477,16 @@ public class Zone {
                 if (MapService.gI().isMapOffline(this.map.mapId)) {
                     // Load boss
                     if (player instanceof TrainingBoss || player instanceof NonInteractiveNPC) {
-                        for (int i = players.size() - 1; i >= 0; i--) {
-                            Player pl = players.get(i);
+                        for (int i = currentPlayers.size() - 1; i >= 0; i--) {
+                            Player pl = currentPlayers.get(i);
                             if (!player.equals(pl) && (player instanceof NonInteractiveNPC || ((TrainingBoss) player).playerAtt.equals(pl))) {
                                 infoPlayer(pl, player);
                             }
                         }
                     }
                 } else {
-                    for (int i = players.size() - 1; i >= 0; i--) {
-                        Player pl = players.get(i);
+                    for (int i = currentPlayers.size() - 1; i >= 0; i--) {
+                        Player pl = currentPlayers.get(i);
                         if (!player.equals(pl)) {
                             infoPlayer(pl, player);
                         }
@@ -669,7 +677,7 @@ public class Zone {
                 msg.writer().writeByte(mobs.size());
                 for (Mob mob : mobs) {
                     msg.writer().writeBoolean(false); //is disable
-                    msg.writer().writeBoolean(false); //is dont move
+                    msg.writer().writeBoolean(mob.tempId == ConstMob.MAY_DO_SUC_MANH); //is dont move
                     msg.writer().writeBoolean(false); //is fire
                     msg.writer().writeBoolean(false); //is ice
                     msg.writer().writeBoolean(false); //is wind

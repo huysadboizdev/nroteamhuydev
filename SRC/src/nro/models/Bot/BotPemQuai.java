@@ -149,8 +149,8 @@ public class BotPemQuai {
         if (this.bot.charms != null && this.bot.charms.tdThuHut > System.currentTimeMillis()) {
             List<ItemMap> itemsToPick = new ArrayList<>();
 
-            for (ItemMap item : new ArrayList<>(this.bot.zone.items)) {
-                if (!item.isPickedUp
+            for (ItemMap item : this.bot.zone.getItemsSnapshot()) {
+                if (item != null && item.itemTemplate != null && item.itemTemplate.type != 22 && !item.isPickedUp
                         && Util.getDistance(this.bot.location.x, this.bot.location.y, item.x, item.y) < 500) {
                     itemsToPick.add(item);
                     if (itemsToPick.size() >= 3) {
@@ -169,7 +169,7 @@ public class BotPemQuai {
                 try {
                     ItemMapService.gI().pickItem(bot, item.itemMapId, true);
                     item.isPickedUp = true;
-                    this.bot.zone.items.remove(item);
+                    if (item.zone != null) item.zone.removeItemMap(item);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

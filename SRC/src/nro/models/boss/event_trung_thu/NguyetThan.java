@@ -37,15 +37,20 @@ public class NguyetThan extends Boss {
 
     @Override
     public void reward(Player plKill) {
+        try (nro.models.event.EventItemPolicy.Permit permit=nro.models.event.EventItemPolicy.admit()) {
+        if (!seasonalAllowed()) return;
         for (Boss boss : this.getCompanionBosses()) {
             if(boss==null)continue;
             boss.playerReward = plKill;
             boss.enterDefeatedWait();
         }
+    
+        }
     }
 
     @Override
     public void afk() {
+        if (!seasonalAllowed()) return;
         if (playerReward!=null && playerReward.isPl() && !isReward && this.zone != null) {
             ItemMap it = new ItemMap(this.zone, 1276, 1, this.location.x, this.zone.map.yPhysicInTop(this.location.x,
                     this.location.y - 24), playerReward.id);
@@ -56,7 +61,7 @@ public class NguyetThan extends Boss {
             it.options.add(new Item.ItemOption(14, Util.nextInt(1, 10)));
             it.options.add(new Item.ItemOption(154, 0));
             it.options.add(new Item.ItemOption(93, Util.nextInt(1, 15)));
-            Service.gI().dropItemMap(this.zone, it);
+            nro.models.event.EventRuntimeService.dropSeasonal(this.zone, it, "trung_thu");
             isReward = true;
             lastTimeReward = System.currentTimeMillis();
             this.chat("Được! hảo hán!");
@@ -68,6 +73,8 @@ public class NguyetThan extends Boss {
 
     @Override
     public synchronized int injured(Player plAtt, long damage, boolean piercing, boolean isMobAttack) {
+        try (nro.models.event.EventItemPolicy.Permit permit=nro.models.event.EventItemPolicy.admit()) {
+        if (!seasonalAllowed()) return 0;
         if (!this.isDie()) {
             if (!piercing && Util.isTrue(this.nPoint.tlNeDon, 1000)) {
                 this.chat("Xí hụt");
@@ -91,10 +98,13 @@ public class NguyetThan extends Boss {
         } else {
             return 0;
         }
+    
+        }
     }
 
     @Override
     public void joinMap() {
+        if (!seasonalAllowed()) return;
         super.joinMap(); //To change body of generated methods, choose Tools | Templates.
         st = System.currentTimeMillis();
         Service.gI().changeFlag(this, 1);
@@ -114,6 +124,7 @@ public class NguyetThan extends Boss {
 
     @Override
     public void active() {
+        if (!seasonalAllowed()) return;
         this.attack();
     }
 
@@ -139,6 +150,7 @@ public class NguyetThan extends Boss {
 
     @Override
     public void attack() {
+        if (!seasonalAllowed()) return;
         if (this.effectSkill.isCharging) {
             return;
         }

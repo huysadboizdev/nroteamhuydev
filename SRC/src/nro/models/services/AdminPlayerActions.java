@@ -93,7 +93,7 @@ public final class AdminPlayerActions {
         return false;
     }
     public static boolean hasPending(Player p) {
-        return CommesonChallengeService.hasPendingId(p.id) || nro.models.shop_ky_gui.ConsignTransactions.hasPendingId(p.id) || nro.models.shop_ky_gui.ConsignTransactions.hasPendingAccount(p.session.userId) || hasRenamePending(p) || RubyGiftService.hasPending(p) || RubyGiftService.hasPendingId(p.id)
+        return GiftCodeService.hasPendingId(p.id) || GiftCodeService.hasPendingAccount(p.session.userId) || LiveSyncCommandGate.hasPendingId(p.id) || CommesonChallengeService.hasPendingId(p.id) || nro.models.shop_ky_gui.ConsignTransactions.hasPendingId(p.id) || nro.models.shop_ky_gui.ConsignTransactions.hasPendingAccount(p.session.userId) || hasRenamePending(p) || RubyGiftService.hasPending(p) || RubyGiftService.hasPendingId(p.id)
                 || RubyGiftService.hasPendingAccount(p.session.userId) || p.kolRewardPending
                 || p.walletPurchasePending != null || p.kolProgressPending
                 || KolQuestService.hasProgressPendingId(p.id)

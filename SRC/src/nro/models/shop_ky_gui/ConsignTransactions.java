@@ -59,10 +59,12 @@ public final class ConsignTransactions {
         return PENDING.values().stream().anyMatch(p -> (p.before!=null && p.before.id==id)
                 || (p.after!=null && p.after.id==id));
     }
+    public static boolean isListingPending(int id){return reserved(id);}
     private String validate(Player p) {
         return validate(p,true);
     }
     private String validate(Player p,boolean requireMember) {
+        if(LiveSyncMutationGate.blocked(p))return "Web command is awaiting commit reconciliation.";
         if(p==null || p.inventory==null || p.session==null || !online.test(p)
                 || p.beforeDispose || p.isOffline || p.id<=0 || p.id>Integer.MAX_VALUE)
             return "Nhân vật không sẵn sàng ký gửi.";
@@ -77,7 +79,9 @@ public final class ConsignTransactions {
         return null;
     }
     public static boolean eligible(Item item) {
+        if(nro.models.event.EventItemPolicy.isBlocked(item))return false;
         if(item==null || !item.isNotNullItem() || item.quantity<=0 || item.itemOptions==null)return false;
+        if(nro.models.item.ItemDefaultOptions.isLockedHighTier(item.template.id))return false;
         int type=item.template.type;
         if(type==9 || type==10 || type==34 || item.template.id==517 || item.template.id==518)return false;
         boolean seal=SealedEquipment.hasSeal(item),permission=seal || type==14 || type==15 || type==6
@@ -180,7 +184,8 @@ public final class ConsignTransactions {
     }
     public Result post(Player p,int slot,int price,byte currency,int quantity) {
         if(p==null)return fail("Không tìm thấy nhân vật.");
-        synchronized(p) {synchronized(ConsignShopManager.gI()) {
+        synchronized(p) {
+        try(var eventPermit=nro.models.event.EventItemPolicy.admit()) {synchronized(ConsignShopManager.gI()) {
             String invalid=validate(p);if(invalid!=null)return fail(invalid);
             if(currency!=1 || price<=0 || price>MAX_PRICE || quantity<=0 || quantity>99
                     || slot<0 || slot>=p.inventory.itemsBag.size())return fail("Chỉ ký gửi bằng hồng ngọc, giá 1–1.000.000, số lượng 1–99.");
@@ -196,11 +201,14 @@ public final class ConsignTransactions {
             ConsignItem after=new ConsignItem(0,source.template.id,(int)p.id,tab,-1,price,quantity,(byte)0,offered.itemOptions,false);
             after.currency="ruby";after.createTime=source.createTime;
             return commit(p,"post",null,after,bag,p.inventory.ruby-POST_FEE,"Đăng bán bằng hồng ngọc thành công.");
-        }}
+        }
+        }
+}
     }
     public Result buy(Player p,int id) {
         if(p==null)return fail("Không tìm thấy nhân vật.");
-        synchronized(p) {synchronized(ConsignShopManager.gI()) {
+        synchronized(p) {
+        try(var eventPermit=nro.models.event.EventItemPolicy.admit()) {synchronized(ConsignShopManager.gI()) {
             String invalid=validate(p);if(invalid!=null)return fail(invalid);
             ConsignItem before=find(id);
             if(before==null || before.isBuy || before.player_sell==p.id)return fail("Vật phẩm đã bán, không tồn tại hoặc do bạn đăng.");
@@ -213,11 +221,14 @@ public final class ConsignTransactions {
             if(!InventoryService.gI().addItemList(bag,incoming))return fail("Hành trang không đủ chỗ; chưa trừ hồng ngọc.");
             ConsignItem after=copyListing(before);after.isBuy=true;
             return commit(p,"buy",before,after,bag,p.inventory.ruby-before.gemSell,"Mua vật phẩm bằng hồng ngọc thành công.");
-        }}
+        }
+        }
+}
     }
     public Result claimOrCancel(Player p,byte action,int id) {
         if(p==null)return fail("Không tìm thấy nhân vật.");
-        synchronized(p) {synchronized(ConsignShopManager.gI()) {
+        synchronized(p) {
+        try(var eventPermit=nro.models.event.EventItemPolicy.admit()) {synchronized(ConsignShopManager.gI()) {
             String invalid=validate(p);if(invalid!=null)return fail(invalid);
             ConsignItem before=find(id);
             if(before==null || before.player_sell!=p.id)return fail("Không tìm thấy tin đăng của bạn.");
@@ -232,7 +243,9 @@ public final class ConsignTransactions {
             long ruby=(long)p.inventory.ruby+net;
             if(ruby>Integer.MAX_VALUE)return fail("Hồng ngọc vượt giới hạn, chưa nhận tiền.");
             return commit(p,"claim",before,null,copyBag(p.inventory.itemsBag),(int)ruby,"Đã nhận hồng ngọc, phí bán 10%.");
-        }}
+        }
+        }
+}
     }
     public Result top(Player p,int id) {
         if(p==null)return fail("Không tìm thấy nhân vật.");

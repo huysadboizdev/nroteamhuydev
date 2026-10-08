@@ -17,6 +17,7 @@ public class Combine {
     public NangSKHVip.Selection skhVipSelection;
     public NangSKHThuong.Selection skhThuongSelection;
     public ChuyenHoaTrangBiRules.Selection chuyenHoaSelection;
+    public ThienSuCraftRecipe.Selection thienSuSelection;
 
     public void setTypeCombine(int type) {
         clearItemCombine();
@@ -35,6 +36,7 @@ public class Combine {
     }
 
     public void clearItemCombine() {
+        this.thienSuSelection = null;
         this.chuyenHoaSelection = null;
         this.skhVipSelection = null;
         this.skhThuongSelection = null;
@@ -51,6 +53,7 @@ public class Combine {
     }
 
     public void dispose() {
+        this.thienSuSelection = null;
         this.chuyenHoaSelection = null;
         this.skhVipSelection = null;
         this.skhThuongSelection = null;

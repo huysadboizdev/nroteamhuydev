@@ -24,7 +24,8 @@ public final class DungeonExitService {
                 nro.models.map.Map map=MapService.gI().getMapById(mapId);
                 if(map==null || map.zones.isEmpty())return false;
                 Zone destination=map.zones.get(0);
-                for(Zone z:map.zones)if(z.getNumOfPlayers()<destination.getNumOfPlayers())destination=z;
+                // Forced evacuation must still succeed if every home zone is full.
+                for(Zone z:map.zones)if(z!=null && z.getNumOfPlayers()<z.maxPlayer){destination=z;break;}
                 ChangeMapService.gI().forcedDungeonShip(player,destination,x,y);
                 return player.zone!=null && player.zone!=origin && player.zone.map.mapId==mapId;
             } catch(Exception e){nro.models.utils.Logger.logException(DungeonExitService.class,e);return false;}

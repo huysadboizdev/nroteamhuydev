@@ -211,18 +211,26 @@ public final class GoldEconomyTest {
     }
 
     private static void giftcode() throws Exception {
-        GiftCode code = new GiftCode();
-        code.detail.put(-1, 1_000_000);
-        code.datecreate = new Timestamp(0);
-        code.dateexpired = new Timestamp(Long.MAX_VALUE);
-        replace(GiftCodeManager.class, "instance", new GiftCodeManager() {
-            @Override public GiftCode checkUseGiftCode(Player p, String input) { return code; }
-        });
+        var dao = new nro.models.database.GiftCodeClaimDAO() {
+            @Override public Receipt claim(long player, int account, String code, String token, Stage stage) throws Exception {
+                stage.prepare(new Catalog(1, code, 10, "[{\"id\":-1,\"quantity\":1000000}]"));
+                return new Receipt(1, 9);
+            }
+        };
+        var service = new GiftCodeService(dao, ignored -> true);
         Player p = player(500_000_000_000L, 0);
-        GiftCodeService.gI().giftCode(p, "test");
+        p.isPlayer = true;
+        p.id = 99001;
+        var unsafeField = sun.misc.Unsafe.class.getDeclaredField("theUnsafe");
+        unsafeField.setAccessible(true);
+        var unsafe = (sun.misc.Unsafe) unsafeField.get(null);
+        p.session = (nro.models.network.MySession) unsafe.allocateInstance(nro.models.network.MySession.class);
+        p.session.userId = 99001;
+        p.session.player = p;
+        check(service.claim(p, "test"), "Giftcode must commit successfully");
         check(p.inventory.gold == 500_001_000_000L, "Giftcode must not reset a high balance to 2 billion");
         p.inventory.gold = CAP - 1;
-        GiftCodeService.gI().giftCode(p, "test");
+        check(service.claim(p, "test_cap"), "Distinct giftcode must commit successfully");
         check(p.inventory.gold == CAP, "Giftcode must obey the new cap");
     }
 

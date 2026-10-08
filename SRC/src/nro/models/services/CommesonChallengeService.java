@@ -204,6 +204,7 @@ public final class CommesonChallengeService {
     /** Reserve durably before adding to inventory; a crash cannot replay a bottle. */
     public boolean beforePickup(Player p,ItemMap it) {
         if(it.commesonMatchId==null)return true;
+        if(p.walletPurchasePending!=null)return false;
         Match m=matches.get(p.id);
         if(m==null || m.owner!=p || m.bottle!=it || !m.attempt.matchId.equals(it.commesonMatchId) || p.zone!=m.origin || m.attempt.state!=State.WON || m.attempt.due(System.currentTimeMillis()))return false;
         try{m.beforeBag=new ArrayList<>();for(Item item:p.inventory.itemsBag)m.beforeBag.add(ItemService.gI().copyItem(item));m.attempt.state=State.PICKING;if(dao.transition(m.attempt,State.WON))return true;m.attempt.state=State.WON;}

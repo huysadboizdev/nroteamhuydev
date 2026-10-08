@@ -29,6 +29,7 @@ public class XenBoHung extends Boss {
 
     @Override
     public void reward(Player plKill) {
+        if (questSupportReward(plKill)) return;
         BadgesTaskService.updateCountBagesTask(plKill, ConstTaskBadges.TRUM_SAN_BOSS, 1);
         int diem = 5;
         plKill.event.addEventPoint(diem);
@@ -63,8 +64,10 @@ public class XenBoHung extends Boss {
             return;
         }
         ChangeMapService.gI().changeMapYardrat(this, this.zone, pl.location.x, pl.location.y);
-        this.nPoint.dameg += (pl.nPoint.dame * 5 / 100);
-        this.nPoint.hpg += (pl.nPoint.hp * 2 / 100);
+        this.nPoint.dameg = (int) Math.min(Integer.MAX_VALUE,
+                (long) this.nPoint.dameg + pl.nPoint.dame * 5L / 100);
+        this.nPoint.hpg = (int) Math.min(Integer.MAX_VALUE,
+                (long) this.nPoint.hpg + pl.nPoint.hp * 2L / 100);
         this.nPoint.critg++;
         this.nPoint.calPoint();
         PlayerService.gI().hoiPhuc(this, pl.nPoint.hp, 0);
@@ -78,6 +81,7 @@ public class XenBoHung extends Boss {
 
     @Override
     public synchronized int injured(Player plAtt, long damage, boolean piercing, boolean isMobAttack) {
+        if (isQuestSupportRetired()) return 0;
         if (!this.isDie()) {
             if (!piercing && Util.isTrue(this.nPoint.tlNeDon, 1000)) {
                 this.chat("Xí hụt");
@@ -90,12 +94,13 @@ public class XenBoHung extends Boss {
                 }
                 damage = damage / 4;
             }
+            markQuestSupportCombat(plAtt, damage);
             this.nPoint.subHP(damage);
             if (isDie()) {
                 this.setDie(plAtt);
                 die(plAtt);
             }
-            return (int) damage;
+            return (int) Math.min(Integer.MAX_VALUE, Math.max(0L, damage));
         } else {
             return 0;
         }

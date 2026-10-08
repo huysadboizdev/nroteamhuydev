@@ -187,7 +187,7 @@ public class NonInteractiveNPC extends Player {
                         pl.nPoint.hpg = 500;
                         pl.nPoint.hp = 500;
                         pl.nPoint.setFullHpMp();
-                        pl.location.x = z.zoneId > 0 ? 301 : 373;
+                        pl.location.x = 373;
                         pl.location.y = 336;
                         joinMap(z, pl);
                         z.setNpc(pl);

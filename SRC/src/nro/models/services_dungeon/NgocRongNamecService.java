@@ -132,10 +132,10 @@ public class NgocRongNamecService implements Runnable {
             Zone zone = Manager.MAPS.get(mapNrNamec[i]).zones.get(zoneNrNamec[i]);
             int idItem = (int) (i + 353);
             int idItem2 = 362;
-            for (byte j = 0; j < zone.items.size(); j++) {
-                if (zone.items.get(j).itemTemplate.id == idItem
-                        || zone.items.get(j).itemTemplate.id == idItem2) {
-                    ItemMapService.gI().removeItemMapAndSendClient(zone.items.remove(j));
+            for (ItemMap item : zone.getItemsSnapshot()) {
+                if (item != null && item.itemTemplate != null && (item.itemTemplate.id == idItem
+                        || item.itemTemplate.id == idItem2)) {
+                    ItemMapService.gI().removeItemMapAndSendClient(item);
                 }
             }
         }

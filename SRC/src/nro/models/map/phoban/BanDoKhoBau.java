@@ -33,6 +33,7 @@ public class BanDoKhoBau implements Runnable {
     public final List<Zone> zones;
     public Clan clan;
     public volatile boolean isOpened;
+    public volatile boolean isInitializing;
     public volatile boolean isClosing;
     private boolean achievementRecorded;
     private boolean bossesRetired;
@@ -66,6 +67,7 @@ public class BanDoKhoBau implements Runnable {
     }
 
     public synchronized void update() {
+        if (isInitializing) return;
         if (isOpened) {
             if (isClosing || Util.canDoWithTime(lastTimeOpen, TIME_BAN_DO_KHO_BAU) || (kickoutbdkb && Util.canDoWithTime(timeKickOutBDKB, 60000))) {
                 isClosing = true;
@@ -124,6 +126,10 @@ public class BanDoKhoBau implements Runnable {
     }
 
     public void openBanDoKhoBau(Player plOpen, Clan clan, byte level) {
+        openBanDoKhoBau(plOpen, clan, level, () -> true);
+    }
+
+    public boolean openBanDoKhoBau(Player plOpen, Clan clan, byte level, java.util.function.BooleanSupplier charge) {
         try {
             this.level = level;
             this.lastTimeOpen = System.currentTimeMillis();
@@ -139,13 +145,25 @@ public class BanDoKhoBau implements Runnable {
             this.isOpened = true;
             this.allCharactersDead = false;
             this.init();
-            ChangeMapService.gI().goToDBKB(plOpen);
-            sendTextBanDoKhoBau();
+            if (!charge.getAsBoolean()) throw new IllegalStateException("Treasure admission payment was not committed");
+            this.isInitializing = false;
         } catch (Exception e) {
             e.printStackTrace();
-            plOpen.clan.lastTimeOpenBanDoKhoBau = 0;
-            this.dispose();
+            clan.lastTimeOpenBanDoKhoBau = 0;
+            synchronized (this) {
+                this.isClosing = true;
+                this.isInitializing = false;
+                this.dispose();
+            }
+            return false;
         }
+        try {
+            if (plOpen.clan == clan) ChangeMapService.gI().goToDBKB(plOpen);
+            sendTextBanDoKhoBau();
+        } catch (Exception failure) {
+            nro.models.utils.Logger.logException(BanDoKhoBau.class, failure);
+        }
+        return true;
     }
 
     public void sendThanhTichBanDoKhoBau(Player pl) {
@@ -204,7 +222,7 @@ public class BanDoKhoBau implements Runnable {
             if (zone.map.mapId == 137) {
                 try {
                     long bossDamage = (200000 * level);
-                    long bossMaxHealth = (20000000 * level);
+                    long bossMaxHealth = (20_000_000L * level);
                     bossDamage = Math.min(bossDamage, 200000000L);
                     bossMaxHealth = Math.min(bossMaxHealth, 2000000000L);
                     boss = new TrungUyXanhLo(
@@ -323,9 +341,12 @@ public class BanDoKhoBau implements Runnable {
         this.removeTextBanDoKhoBau();
         this.allCharactersDead = false;
         this.boss = null;
+        synchronized (nro.models.services_dungeon.DungeonAllocationLock.LOCK) {
         this.isOpened = false;
         if (this.clan != null && this.clan.BanDoKhoBau == this) this.clan.BanDoKhoBau = null;
         this.clan = null;
         this.kickoutbdkb = false;
+        this.isInitializing = false;
+        }
     }
 }

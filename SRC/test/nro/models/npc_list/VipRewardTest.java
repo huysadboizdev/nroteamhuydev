@@ -1,78 +1,37 @@
 package nro.models.npc_list;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 import nro.models.item.Item;
-import nro.models.player.Player;
-import nro.models.player_system.Template;
-import nro.models.services.InventoryService;
-import nro.models.services.ItemService;
-import nro.models.services.PetService;
-import sun.misc.Unsafe;
-
-/** Offline exercise of the real VIP reward handlers; captures inventory grants. */
+import nro.models.player.*;
+import nro.models.services.*;
+import static nro.models.services.PinkFixture.*;
+/** Preserve existing VIP gear, pet and duration while extending reward packages. */
 public final class VipRewardTest {
-    private static final Map<Short, Integer> rewards = new LinkedHashMap<>();
-    private static int sidekickGrants;
-    private static void replace(Class<?> type, String name, Object value) throws Exception {
-        Field f = type.getDeclaredField(name);
-        f.setAccessible(true);
-        f.set(null, value);
-    }
-    public static void main(String[] args) throws Exception {
-        replace(ItemService.class, "i", new ItemService() {
-            @Override public Item createNewItem(short id, int quantity) {
-                Item item = new Item();
-                item.template = new Template.ItemTemplate();
-                item.template.id = id;
-                item.quantity = quantity;
-                return item;
-            }
-            @Override public Template.ItemOptionTemplate getItemOptionTemplate(int id) {
-                Template.ItemOptionTemplate option = new Template.ItemOptionTemplate();
-                option.id = id;
-                return option;
-            }
-        });
-        replace(InventoryService.class, "I", new InventoryService() {
-            @Override public boolean addItemBag(Player player, Item item) {
-                rewards.merge(item.template.id, item.quantity, Integer::sum);
-                return true;
-            }
-            @Override public void sendItemBags(Player player) {}
-        });
-        replace(PetService.class, "instance", new PetService() {
-            @Override public void createNormalPet(Player player, byte... limit) {
-                sidekickGrants++;
-            }
-        });
-        Field f = Unsafe.class.getDeclaredField("theUnsafe");
-        f.setAccessible(true);
-        Unsafe unsafe = (Unsafe) f.get(null);
-        ToriBot npc = (ToriBot) unsafe.allocateInstance(ToriBot.class);
-        Player player = (Player) unsafe.allocateInstance(Player.class);
-        boolean hasSidekick = args.length > 1 && args[1].equals("existing");
-        if (hasSidekick) player.pet = (nro.models.player.Pet) unsafe.allocateInstance(nro.models.player.Pet.class);
-        nro.models.player.Pet previousSidekick = player.pet;
-        int level = Integer.parseInt(args[0]);
-        Method handler = ToriBot.class.getDeclaredMethod("VIP" + level, Player.class);
-        handler.setAccessible(true);
-        handler.invoke(npc, player);
-        if (sidekickGrants != 0 || player.pet != previousSidekick)
-            throw new AssertionError("VIP " + level + " must not grant or replace a sidekick");
-        Map<Short, Integer> expected = new LinkedHashMap<>();
-        int[][] entries = switch (level) {
-            case 1 -> new int[][]{{457,200},{459,10},{1252,1},{1256,1},{987,5}};
-            case 2 -> new int[][]{{457,500},{459,10},{1252,1},{1254,1},{987,10},{584,1}};
-            case 3 -> new int[][]{{457,700},{459,10},{1252,1},{1254,1},{987,30},{584,1},{956,10}};
-            case 4 -> new int[][]{{457,1000},{459,10},{987,50},{1554,1},{1772,1},{1557,1},{1204,20}};
-            default -> throw new AssertionError("Invalid VIP level");
-        };
-        for (int[] entry : entries) expected.put((short) entry[0], entry[1]);
-        if (!rewards.equals(expected)) throw new AssertionError("VIP " + level + ": expected " + expected + ", received " + rewards);
-        if (player.timevip <= System.currentTimeMillis()) throw new AssertionError("VIP duration missing");
-        System.out.println("PASS VIP " + level + " sidekick=" + hasSidekick + " grants: " + rewards);
-    }
+ public static void main(String[] args)throws Exception {
+  install(); replace(InventoryService.class,"I",new InventoryService());
+  for(int level=1;level<=4;level++)for(boolean existing:new boolean[]{false,true}) {
+   Player p=player(900+level); if(existing)p.pet=blank(Pet.class);Pet previous=p.pet;
+   for(int slot=0;slot<20;slot++)p.inventory.itemsBag.add(new Item());
+   long before=System.currentTimeMillis();var pack=VipRewardCatalog.prepare(level);pack.grant(p);
+   check(p.pet==previous,"VIP must preserve pet");
+   check(p.vip==level&&p.vipPurchaseCount==1,"level and purchase count");
+   check(p.timevip>=before+30L*24*3600*1000,"30 days");
+   int[][] gear=level==1?new int[][]{{1252,10},{1256,10}}:level<=3?new int[][]{{1252,12},{1254,12}}:new int[][]{{1554,15},{1772,15}};
+   for(int[] spec:gear) {
+    Item i=p.inventory.itemsBag.stream().filter(it->it.isNotNullItem()&&it.template.id==spec[0]).findFirst().orElseThrow();
+    for(int id:new int[]{50,77,103})check(option(i,id)==spec[1],"gear stat preserved");
+    check(option(i,93)==(level<=2?30:0),"gear expiry preserved");
+   }
+   if(level>=2) {
+    int id=level==4?1557:584;Item i=p.inventory.itemsBag.stream().filter(it->it.isNotNullItem()&&it.template.id==id).findFirst().orElseThrow();
+    check(option(i,50)==(level==4?25:24)&&option(i,77)==(level==4?25:24),"costume HP/SD preserved");
+    check(option(i,117)==(level==4?25:15)&&option(i,93)==(level==2?30:0),"costume crit/expiry");
+   }
+   if(level==3)check(count(p,956)==10,"captain cards");
+   if(level==4)check(count(p,1204)==20,"existing Namek bonus");
+   check(count(p,987)==new int[]{5,10,30,50}[level-1],"stones preserved");
+  }
+  System.out.println("VipRewardTest PASS four tiers, pet preservation, duration and original gear options");
+ }
+ static int option(Item i,int id){return i.itemOptions.stream().filter(o->o.optionTemplate.id==id).mapToInt(o->o.param).sum();}
+ static int count(Player p,int id){return p.inventory.itemsBag.stream().filter(i->i.isNotNullItem()&&i.template.id==id).mapToInt(i->i.quantity).sum();}
 }

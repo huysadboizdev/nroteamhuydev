@@ -1890,9 +1890,10 @@ public class Service {
             session.version = Integer.parseInt(arrPlatform[1].replaceAll("\\.", ""));
             session.itemOptionsInt32 = false;
             session.inventory200 = false;
-            session.bossNoticeBoard = false;
+            session.bossNoticeBoard = false; session.bossNoticeCategories = false;
             for (int i = 2; i < arrPlatform.length; i++) {
                 if ("BOSS1".equals(arrPlatform[i])) session.bossNoticeBoard = true;
+                if ("BOSS2".equals(arrPlatform[i])) {session.bossNoticeBoard=true;session.bossNoticeCategories=true;}
                 if (nro.models.network.InventoryWire.CAPABILITY.equals(arrPlatform[i])) session.inventory200 = true;
                 if (nro.models.network.ItemOptionWire.CAPABILITY.equals(arrPlatform[i])) {
                     session.itemOptionsInt32 = true;
@@ -1916,12 +1917,16 @@ public class Service {
     }
 
     public void dropSatellite(Player pl, Item item, Zone map, int x, int y) {
-        ItemMap itemMap = new ItemMap(map, item.template, item.quantity, x, y, pl.id);
-        itemMap.options = item.itemOptions;
+        ItemMap itemMap = new ItemMap(map, item.template, 1, x, y, pl.id);
+        if (item.itemOptions != null) {
+            for (Item.ItemOption option : item.itemOptions) {
+                if (option != null && option.optionTemplate != null)
+                    itemMap.options.add(new Item.ItemOption(option.optionTemplate, option.param));
+            }
+        }
         if (pl.clan != null) {
             itemMap.clanId = pl.clan.id;
         }
-        map.addItem(itemMap);
         Message msg = null;
         try {
             msg = new Message(68);

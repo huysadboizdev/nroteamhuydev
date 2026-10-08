@@ -20,6 +20,33 @@ import nro.models.server.Maintenance;
 
 public class ChatGlobalService implements Runnable {
 
+    public static final int SYSTEM_NOTICE_MAX_LENGTH = 100;
+    public static void validateSystemNotice(String text) {
+        if(text==null||text.isBlank()||text.length()>SYSTEM_NOTICE_MAX_LENGTH)
+            throw new IllegalArgumentException("World notice must contain 1..100 characters");
+    }
+    /** No Player instance, wallet charge or global-chat worker is required. */
+    public static Message systemNoticeMessage(String text) throws java.io.IOException {
+        validateSystemNotice(text);
+        Message msg=new Message(92);
+        msg.writer().writeUTF("Hệ thống");
+        msg.writer().writeUTF("|5|"+text);
+        msg.writer().writeInt(0);
+        msg.writer().writeShort(64);
+        msg.writer().writeShort(-1);
+        msg.writer().writeShort(57);
+        msg.writer().writeShort(-1);
+        msg.writer().writeShort(58);
+        msg.writer().writeByte(0);
+        return msg;
+    }
+    public static void sendSystemNotice(String text) {
+        Message msg=null;
+        try {msg=systemNoticeMessage(text);Service.gI().sendMessAllPlayer(msg);}
+        catch(java.io.IOException e){throw new IllegalStateException("Cannot encode world notice",e);}
+        finally {if(msg!=null)msg.cleanup();}
+    }
+
     private static final int COUNT_CHAT = 100;
     private static final int COUNT_WAIT = 100;
     private static ChatGlobalService i;

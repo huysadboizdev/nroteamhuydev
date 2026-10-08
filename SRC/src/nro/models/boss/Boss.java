@@ -63,6 +63,64 @@ import nro.models.interfaces.IBoss;
 import java.io.IOException;
 
 public class Boss extends Player implements IBoss {
+    private boolean questSupport, questSupportCredit;
+    private volatile boolean questSupportRetired;
+    private int questSupportSemanticId;
+    private volatile boolean questSupportCombat;
+    public final void setQuestSupportIdentity(int semanticId, int networkId) {
+        if (questSupport) throw new IllegalStateException("Identity already assigned");
+        questSupport = true; questSupportSemanticId = semanticId; this.id = networkId;
+    }
+    public final boolean isQuestSupport() { return questSupport; }
+    public final int questBossId() { return questSupport ? questSupportSemanticId : (int) id; }
+    public final boolean isQuestSupportRetired() { return questSupportRetired; }
+    public final synchronized boolean claimQuestSupportCredit() {
+        if (!questSupport || questSupportRetired || questSupportCredit || currentLevel < 0
+                || nPoint == null || nPoint.hp > 0) return false;
+        questSupportCredit = true; return true;
+    }
+    public final void markQuestSupportCombat(Player attacker, long damage) {
+        if (questSupport && attacker != null && !attacker.isBoss && damage > 0) questSupportCombat = true;
+    }
+    public final boolean hadQuestSupportCombat() { return questSupportCombat; }
+    public final void clearQuestSupportCombat() { questSupportCombat = false; }
+    public final Boss questParent() { return parentBoss; }
+    public final long questLastRest() { return lastTimeRest; }
+    public final int questBaseRestSeconds() { return secondsRest; }
+    public final synchronized void retireQuestSupport() {
+        if (!questSupport) return;
+        questSupportRetired = true; bossStatus = BossStatus.REST;
+        try {
+            if (zone != null) ChangeMapService.gI().exitMap(this);
+        } finally {
+            zoneFinal = null; lastZone = null; parentBoss = null; playerTarger = null; playerReward = null;
+            bossAppearTogether = new Boss[0][];
+            nro.models.services.BossNoticeService.gI().departed(this);
+        }
+    }
+    /** Direct reward callbacks use the same task-only guard as the normal death path. */
+    protected final boolean questSupportReward(Player killer) {
+        if (!questSupport) return false;
+        TaskService.gI().checkDoneTaskKillBoss(killer, this); return true;
+    }
+
+    private volatile String seasonalEvent;
+    private volatile boolean seasonalRetired;
+    public final void bindSeasonalEvent(String key) {
+        if (seasonalEvent != null && !seasonalEvent.equals(key)) throw new IllegalStateException("Seasonal ownership changed");
+        seasonalEvent = key;
+    }
+    public final boolean seasonalAllowed() {
+        return !seasonalRetired && (seasonalEvent == null || nro.models.event.EventItemPolicy.isEnabled(seasonalEvent));
+    }
+    public final synchronized void retireSeasonalEvent() {
+        seasonalRetired = true;
+        bossStatus = BossStatus.REST;
+        prepareBom = false;
+        if (zone != null) ChangeMapService.gI().exitMap(this);
+        zoneFinal = null; lastZone = null; playerTarger = null; playerReward = null;
+        nro.models.services.BossNoticeService.gI().departed(this);
+    }
 
     public int currentLevel = -1;
     public final BossData[] data;
@@ -150,6 +208,7 @@ public class Boss extends Player implements IBoss {
     private BossType noticeBossType;
 
     public boolean noticePublic() {
+        if (questSupport && questSupportRetired) return false;
         if(isNotifyDisabled||zone==null||zone.map==null)return false;
         if(noticeBossType==BossType.PLAYERAO||noticeBossType==BossType.CADIC||noticeBossType==BossType.MANAGER_DEBUG
                 ||this instanceof nro.models.boss.luyen_tap_tu_dong.TrainingBoss||this instanceof nro.models.boss.sieu_hang.SuperRank
@@ -164,7 +223,7 @@ public class Boss extends Player implements IBoss {
             int next=(currentLevel+1)%data.length;
             if(bossStatus!=REST||parentBoss!=null||getClass().getMethod("rest").getDeclaringClass()!=Boss.class
                     ||data[next].getTypeAppear()!=AppearType.DEFAULT_APPEAR||lastTimeRest<=0)return 0;
-            return lastTimeRest+Math.max(0,(long)secondsRest)*1000;
+            return Math.max(0L, nro.models.services.QuestSupportService.gI().originalRespawnAt(this));
         }catch(Exception ignored){return 0;}
     }
     @Override protected void setDie(Player killer) {
@@ -186,6 +245,7 @@ public class Boss extends Player implements IBoss {
 
     public Boss(int id, BossData... data) throws Exception {
         this.id = id;
+        QuestSupportIdentity.initialize(this, id);
         this.isBoss = true;
         if (data == null || data.length == 0) {
             throw new Exception("Dữ liệu boss không hợp lệ");
@@ -213,6 +273,15 @@ public class Boss extends Player implements IBoss {
 
     public Boss(BossType bossType, int id, BossData... data) throws Exception {
         this.noticeBossType=bossType;
+        this.seasonalEvent = switch (bossType) {
+            case HUNGVUONG_EVENT -> "hung_vuong";
+            case HALLOWEEN_EVENT -> "halloween";
+            case CHRISTMAS_EVENT -> "christmas";
+            case TET_EVENT -> "lunar_new_year";
+            case TRUNGTHU_EVENT -> "trung_thu";
+            default -> null;
+        };
+
         this.id = id;
         this.isBoss = true;
         if (data == null || data.length == 0) {
@@ -240,16 +309,9 @@ public class Boss extends Player implements IBoss {
                 SnakeWayManager.gI().addBoss(this);
             case PHOBANKGHD ->
                 GasDestroyManager.gI().addBoss(this);
-            case TRUNGTHU_EVENT ->
-                TrungThuEventManager.gI().addBoss(this);
-            case HALLOWEEN_EVENT ->
-                HalloweenEventManager.gI().addBoss(this);
-            case CHRISTMAS_EVENT ->
-                ChristmasEventManager.gI().addBoss(this);
-            case HUNGVUONG_EVENT ->
-                HungVuongEventManager.gI().addBoss(this);
-            case TET_EVENT ->
-                LunarNewYearEventManager.gI().addBoss(this);
+            // Runtime owns seasonal instances after the entire constructor tree returns.
+            case TRUNGTHU_EVENT, HALLOWEEN_EVENT, CHRISTMAS_EVENT, HUNGVUONG_EVENT, TET_EVENT -> { }
+
         }
 
         this.bossAppearTogether = new Boss[this.data.length][];
@@ -276,6 +338,7 @@ public class Boss extends Player implements IBoss {
         this.nPoint.dameg = data.getDame();
         this.nPoint.hpg = data.getHp()[Util.nextInt(0, data.getHp().length - 1)];
         this.nPoint.hp = nPoint.hpg;
+        nro.models.services.BossLiveReload.applyAtSpawn(this);
         this.nPoint.calPoint();
         this.initSkill();
         this.resetBase();
@@ -300,6 +363,7 @@ public class Boss extends Player implements IBoss {
     private boolean kolDeathCounted;
     private synchronized boolean claimKolDeath() { if(kolDeathCounted)return false;kolDeathCounted=true;return true; }
     protected void resetBase() {
+        synchronized (this) { questSupportCredit = false; questSupportCombat = false; }
         synchronized(this) { kolDeathCounted=false;defeatedWait=false;deathPhaseStarted=0;defeatedSinceSpawn=false;defeatConsumed=false; }
         this.lastTimeChatS = 0;
         this.lastTimeChatE = 0;
@@ -367,6 +431,7 @@ public class Boss extends Player implements IBoss {
 
     @Override
     public void changeStatus(BossStatus status) {
+        if (questSupportRetired) return;
         // Late callbacks from companion bosses cannot wake a defeated boss.
         // Keep its death/leave/rest phase; RESPAWN still restores HP normally.
         if(status==BossStatus.RESPAWN)nro.models.services.BossNoticeService.gI().departed(this);
@@ -418,6 +483,8 @@ public class Boss extends Player implements IBoss {
 
     @Override
     public void update() {
+        if (!seasonalAllowed()) return;
+        if (questSupportRetired) return;
         super.update();
         if(updateDeathLifecycle())return;
         boolean combatPhase=bossStatus==ACTIVE||bossStatus==CHAT_S||bossStatus==AFK&&!(nPoint!=null&&nPoint.hp<=0);
@@ -468,8 +535,14 @@ public class Boss extends Player implements IBoss {
         if (nextLevel >= this.data.length) {
             nextLevel = 0;
         }
+        if (questSupport) {
+            if (parentBoss == null && nro.models.services.QuestSupportService.gI().canRespawn(this))
+                this.changeStatus(BossStatus.RESPAWN);
+            return;
+        }
+        long readyAt = nro.models.services.QuestSupportService.gI().originalRespawnAt(this);
         if (this.data[nextLevel].getTypeAppear() == AppearType.DEFAULT_APPEAR
-                && Util.canDoWithTime(lastTimeRest, secondsRest * 1000)) {
+                && readyAt >= 0 && System.currentTimeMillis() >= readyAt) {
             this.changeStatus(BossStatus.RESPAWN);
         }
     }
@@ -481,6 +554,7 @@ public class Boss extends Player implements IBoss {
 
     @Override
     public void respawn() {
+        if (!seasonalAllowed()) return;
         this.currentLevel++;
         if (this.currentLevel >= this.data.length) {
             this.currentLevel = 0;
@@ -491,6 +565,18 @@ public class Boss extends Player implements IBoss {
 
     @Override
     public void joinMap() {
+        if (!seasonalAllowed()) return;
+        if (questSupport) {
+            synchronized (this) {
+                if (questSupportRetired) return;
+                joinMapInternal();
+            }
+        } else {
+            joinMapInternal();
+        }
+    }
+
+    private void joinMapInternal() {
         if (zoneFinal != null) {
             joinMapByZone(zoneFinal);
             this.notifyJoinMap();
@@ -574,11 +660,24 @@ public class Boss extends Player implements IBoss {
     }
 
     public void joinMapByZone(Zone zone) {
+        if (!seasonalAllowed()) return;
+        if (questSupport) {
+            synchronized (this) {
+                if (questSupportRetired) return;
+                joinMapByZoneInternal(zone);
+            }
+        } else {
+            joinMapByZoneInternal(zone);
+        }
+    }
+
+    private void joinMapByZoneInternal(Zone zone) {
         if (zone != null) {
-            this.zone = zone;
-            int x = this.zone.map.mapWidth > 100 ? Util.nextInt(100, this.zone.map.mapWidth - 100) : Util.nextInt(100);
-            int y = this.zone.map.yPhysicInTop(x, 100);
-            ChangeMapService.gI().changeMap(this, this.zone, x, y);
+            // Initial spawn needs a target; a live move must retain its origin until commit.
+            if (this.zone == null) this.zone = zone;
+            int x = zone.map.mapWidth > 100 ? Util.nextInt(100, zone.map.mapWidth - 100) : Util.nextInt(100);
+            int y = zone.map.yPhysicInTop(x, 100);
+            ChangeMapService.gI().changeMap(this, zone, x, y);
         }
     }
 
@@ -589,7 +688,7 @@ public class Boss extends Player implements IBoss {
     }
 
     private boolean canSendNotify() {
-        return !(this.isNotifyDisabled || this.zone.map.mapId == 140
+        return !questSupport && !(this.isNotifyDisabled || this.zone.map.mapId == 140
                 || this.zone.map.mapId == 111
                 || MapService.gI().isMapPhoBan(this.zone.map.mapId)
                 || MapService.gI().isMapMaBu(this.zone.map.mapId)
@@ -704,6 +803,12 @@ public class Boss extends Player implements IBoss {
 
     @Override
     public void die(Player plKill) {
+        if (!seasonalAllowed()) return;
+        if (questSupport) {
+            if (!questSupportRetired && plKill != null && !plKill.isBot) questSupportReward(plKill);
+            this.changeStatus(BossStatus.DIE);
+            return;
+        }
         nro.models.services.BossNoticeService.gI().defeated(this,plKill);
         if(claimKolDeath()) nro.models.services.KolQuestService.gI().onBossKilled(plKill,this);
 
@@ -773,6 +878,7 @@ public class Boss extends Player implements IBoss {
 
     @Override
     public synchronized int injured(Player plAtt, long damage, boolean piercing, boolean isMobAttack) {
+        if (questSupportRetired) return 0;
         if (!this.isDie()) {
             if (!piercing && Util.isTrue(this.nPoint.tlNeDon, 1000)) {
                 this.chat("Xí hụt");
@@ -782,6 +888,7 @@ public class Boss extends Player implements IBoss {
             if (plAtt != null && plAtt.idNRNM != -1) {
                 return 1;
             }
+            markQuestSupportCombat(plAtt, damage);
             this.nPoint.subHP(damage);
 
             if (isDie()) {

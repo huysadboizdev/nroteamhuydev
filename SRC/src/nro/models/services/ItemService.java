@@ -51,6 +51,7 @@ public class ItemService {
     }
 
     public Item createItemFromItemShop(ItemShop itemShop) {
+        nro.models.item.DisabledItemRules.requireEnabled(itemShop.temp.id);
         Item item = new Item();
         item.template = itemShop.temp;
         item.quantity = 1;
@@ -86,6 +87,7 @@ public class ItemService {
     }
 
     public Item createNewItem(short tempId, int quantity) {
+        nro.models.item.DisabledItemRules.requireEnabled(tempId);
         Item item = createItemForRestore(tempId, quantity);
         nro.models.item.ItemDefaultOptions.complete(item);
         item.info = item.getInfo();
@@ -673,7 +675,8 @@ public class ItemService {
 
     public Item randomRac2() {
         short[] racs = {585, 704, 2048, 379, 384, 385, 381, 828, 829, 830, 831, 832, 833, 834, 835, 836, 837, 838, 839, 840, 841, 842, 934, 935};
-        int idItem = racs[Util.nextInt(racs.length - 1)];
+        int[] available=java.util.stream.IntStream.range(0,racs.length).map(i->racs[i]).filter(id->!nro.models.event.EventItemPolicy.isBlocked(id)).toArray();
+        int idItem = available[Util.nextInt(available.length - 1)];
         if (Util.isTrue(1, 100)) {
             idItem = 956;
         }

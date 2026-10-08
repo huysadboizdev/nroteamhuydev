@@ -10,6 +10,8 @@ import nro.models.consts.ConstPlayer;
 import nro.models.map.Zone;
 import nro.models.player.Player;
 import nro.models.services.PetService;
+import nro.models.services.MabuRareLoot;
+import nro.models.services.MiniBossPinkCapsuleDrop;
 import nro.models.services.SkillService;
 import nro.models.map.service.ChangeMapService;
 import nro.models.skill.Skill;
@@ -18,6 +20,12 @@ import nro.models.utils.SkillUtil;
 import nro.models.utils.Util;
 
 public class SuperBroly extends Boss {
+    private BrolyZoneCoordinator.Lease lease;
+    private boolean joined;
+    private boolean retired;
+    private boolean rewardGiven;
+    private MabuRareLoot rareLoot;
+    private boolean handoff;
 
     public SuperBroly(Zone zone, int x, int y) throws Exception {
 
@@ -46,12 +54,50 @@ public class SuperBroly extends Boss {
         this.zone = zone;
         this.location.x = x;
         this.location.y = y;
+        currentLevel=0;
+        initBase();
+        this.name = "Super Broly " + Util.nextInt(10, 100);
+        this.nPoint.hpMax = Util.nextInt(1_500_000, 16_070_777);
+        this.nPoint.hp = this.nPoint.hpMax;
+        this.nPoint.dame = this.nPoint.hpMax / 100;
+        this.nPoint.crit = Util.nextInt(50);
+    }
+
+    void acceptLease(BrolyZoneCoordinator.Lease lease) {this.lease=lease;this.handoff=true;}
+    private BrolyZoneCoordinator coordinator() {return BrolyManager.gI().zones();}
+    public synchronized void claimExistingZone() {
+        if(zone!=null){lease=coordinator().reserve(zone,this);joined=coordinator().owns(lease);st=System.currentTimeMillis();}
+    }
+    protected void enterZone(Zone target,int x,int y) {
+        if(zone==null)zone=target;
+        ChangeMapService.gI().changeMap(this,target,x,y);
+    }
+    protected void exitZone() {ChangeMapService.gI().exitMap(this);}
+    protected void createCompanion() {PetService.gI().createNormalPet(this);}
+    protected void clearCompanion() {
+        if(pet!=null) {try {ChangeMapService.gI().exitMap(pet);} finally {if(pet.zone!=null)pet.zone.removePlayer(pet);pet.zone=null;pet.dispose();pet=null;}}
+    }
+    /** Failure cleanup keeps the handoff lease until the caller restores its owner. */
+    synchronized void abortSpawn() {
+        Zone old=zone;
+        try {exitZone();} catch(Exception error) {nro.models.utils.Logger.logException(getClass(),error,"Super Broly abort map exit");}
+        finally {
+            if(old!=null)old.removePlayer(this);zone=null;
+            try {clearCompanion();} catch(Exception error) {nro.models.utils.Logger.logException(getClass(),error,"Super Broly companion cleanup");}
+            BrolyManager.gI().removeBoss(this);joined=false;retired=true;bossStatus=BossStatus.REST;
+        }
     }
 
     @Override
-    public void reward(Player plKill) {
-        if (plKill.pet == null) {
-            PetService.gI().createNormalPet(plKill);
+    public synchronized void reward(Player plKill) {
+        if(rewardGiven || retired)return;
+        Player owner = MiniBossPinkCapsuleDrop.creditedPlayer(plKill);
+        if (owner == null) return;
+        rewardGiven=true;
+        if (rareLoot == null) rareLoot = new MabuRareLoot();
+        rareLoot.drop(this,owner,5,3);
+        if (owner.pet == null) {
+            PetService.gI().createNormalPet(owner);
         }
     }
 
@@ -61,38 +107,45 @@ public class SuperBroly extends Boss {
     }
 
     @Override
-    public void joinMap() {
-        this.name = "Super Broly " + Util.nextInt(10, 100);
-        this.nPoint.hpMax = Util.nextInt(1_500_000, 16_070_777);
-        this.nPoint.hp = this.nPoint.hpMax;
-        this.nPoint.dame = this.nPoint.hpMax / 100;
-        this.nPoint.crit = Util.nextInt(50);
-        if (this.zone != null) {
-            ChangeMapService.gI().changeMap(this, this.zone, this.location.x, this.location.y);
-            this.changeStatus(BossStatus.CHAT_S);
-            this.notifyJoinMap();
-        } else {
-            super.joinMap();
-        }
-        PetService.gI().createNormalPet(this);
-        st = System.currentTimeMillis();
+    public synchronized void joinMap() {
+        if(joined || retired)return;
+        Zone target=zone;
+        if(lease==null)lease=coordinator().reserve(target,this);
+        if(!coordinator().owns(lease))throw new IllegalStateException("Super Broly zone unavailable");
+        try {
+            createCompanion();
+            enterZone(target,location.x,location.y);
+            if(zone!=target || !target.getBosses().contains(this))throw new IllegalStateException("Super Broly map admission rejected");
+            joined=true;st=System.currentTimeMillis();
+            changeStatus(BossStatus.CHAT_S);
+            notifyJoinMap();
+            BrolyManager.gI().publish(this);
+        } catch(RuntimeException failure) {abortSpawn();if(!handoff){coordinator().release(lease);lease=null;}throw failure;}
     }
 
     private long st;
 
     @Override
-    public void autoLeaveMap() {
-        if (Util.canDoWithTime(st, 300_000)) {
-            this.leaveMap();
-        }
+    public synchronized void autoLeaveMap() {
         if (this.zone != null && this.zone.getNumOfPlayers() > 0) {
             st = System.currentTimeMillis();
+        } else if (Util.canDoWithTime(st, 300_000)) {
+            this.leaveMap();
         }
     }
 
     @Override
     public synchronized int injured(Player plAtt, long damage, boolean piercing, boolean isMobAttack) {
-        if (!this.isDie()) {
+        if(damage<=0||plAtt==null||plAtt.beforeDispose||zone==null||plAtt.zone!=zone||isMobAttack)return 0;
+        boolean reflected=plAtt==this&&piercing;
+        Skill executing=plAtt.playerSkill==null?null:plAtt.playerSkill.skillSelect;
+        if(!reflected&&plAtt.newSkill!=null&&plAtt.newSkill.isStartSkillSpecial)executing=plAtt.newSkill.skillSelect;
+        Integer attributedSkill=nro.models.services.BossNoticeService.damageSkillFor(this);
+        int skillId=attributedSkill!=null?attributedSkill:executing!=null&&executing.template!=null?executing.template.id:-1;
+        boolean suicide=!reflected&&skillId==Skill.TU_SAT;
+        boolean melee=switch(skillId){case Skill.DRAGON,Skill.DEMON,Skill.GALICK,Skill.LIEN_HOAN,Skill.KAIOKEN -> true;default -> false;};
+        if(!reflected&&!suicide&&!melee)return 0;
+        if (!retired && joined && !this.isDie()) {
             if (!piercing && Util.isTrue(this.nPoint.tlNeDon, 1000)) {
                 this.chat("Xí hụt");
                 return 0;
@@ -102,10 +155,11 @@ public class SuperBroly extends Boss {
                 this.tangChiSo();
                 SkillService.gI().useSkill(this, null, null, -1, null);
             }
-            damage = this.nPoint.subDameInjureWithDeff(damage);
-            if (!piercing && plAtt.playerSkill.skillSelect.template.id != Skill.TU_SAT && damage > this.nPoint.hpMax / 100) {
+            damage = suicide ? 10_000 : this.nPoint.subDameInjureWithDeff(damage);
+            if (!piercing && !suicide && damage > this.nPoint.hpMax / 100) {
                 damage = this.nPoint.hpMax / 100;
             }
+            damage=Math.min(damage,this.nPoint.hp);
             this.nPoint.subHP(damage);
             if (isDie()) {
                 this.setDie(plAtt);
@@ -166,15 +220,12 @@ public class SuperBroly extends Boss {
     }
 
     @Override
-    public void leaveMap() {
-        ChangeMapService.gI().exitMap(this);
-        if (this.pet != null) {
-            ChangeMapService.gI().exitMap(this.pet);
+    public synchronized void leaveMap() {
+        if(retired)return;
+        try {abortSpawn();} finally {
+            coordinator().release(lease);lease=null;
+            lastZone=null;lastTimeRest=System.currentTimeMillis();changeStatus(BossStatus.REST);
         }
-        this.lastZone = null;
-        this.lastTimeRest = System.currentTimeMillis();
-        this.changeStatus(BossStatus.REST);
-        BrolyManager.gI().removeBoss(this);
-        this.dispose();
     }
+    @Override public synchronized void dispose() {leaveMap();BrolyManager.gI().removeBoss(this);super.dispose();}
 }

@@ -10,7 +10,7 @@ import nro.models.utils.Logger;
 
 public class DuaHauEgg {
 
-    private static final long TIME_DONE = 86400000L;
+    private static final long TIME_DONE = 6 * 60 * 60 * 1000L;
     private Player player;
     public long lastTimeCreate;
     public long timeDone;
@@ -29,6 +29,15 @@ public class DuaHauEgg {
     }
 
     public void sendDuaHauEgg() {
+        var owner=player;if(owner==null)return;synchronized(owner) {
+        try(var eventPermit=nro.models.event.EventItemPolicy.admit()) {
+        if(player==null||player.beforeDispose||nro.models.services.LiveSyncMutationGate.blocked(player))return;
+
+        if(player==null||player.zone==null)return;
+        if(!nro.models.event.EventItemPolicy.isEnabled("hung_vuong")) {
+            Service.gI().sendHideNpc(player,51,true);
+            return;
+        }
         Message msg;
         try {
             msg = new Message(-122);
@@ -51,12 +60,14 @@ public class DuaHauEgg {
             msg.writer().writeShort(iconId);
             msg.writer().writeByte(0);
             msg.writer().writeInt(secondsLeft);
-            Service.gI().sendMessAllPlayerInMap(player, msg);
+            player.sendMessage(msg);
             msg.cleanup();
         } catch (Exception e) {
             Logger.logException(DuaHauEgg.class, e);
         }
-    }
+    
+        }}
+}
 
     public int getSecondDone() {
         int seconds = (int) ((lastTimeCreate + timeDone - System.currentTimeMillis()) / 1000);
@@ -64,6 +75,12 @@ public class DuaHauEgg {
     }
 
     public void openEgg() {
+        var owner=player;if(owner==null)return;synchronized(owner) {
+        try(var eventPermit=nro.models.event.EventItemPolicy.admit()) {
+        if(player==null||player.beforeDispose||nro.models.services.LiveSyncMutationGate.blocked(player))return;
+
+        if(nro.models.services.LiveSyncMutationGate.blocked(player))return;
+        if (!nro.models.event.EventItemPolicy.isEnabled("hung_vuong") || InventoryService.gI().getCountEmptyBag(player) < 1) return;
         try {
             if (getSecondDone() == 0) {
                 Item dua = ItemService.gI().createNewItem((short) 569);
@@ -79,7 +96,9 @@ public class DuaHauEgg {
         } catch (Exception e) {
             Logger.logException(DuaHauEgg.class, e);
         }
-    }
+    
+        }}
+}
 
     public void subTimeDone(int d, int h, int m, int s) {
         this.timeDone -= ((d * 24 * 60 * 60 * 1000) + (h * 60 * 60 * 1000) + (m * 60 * 1000) + (s * 1000));
