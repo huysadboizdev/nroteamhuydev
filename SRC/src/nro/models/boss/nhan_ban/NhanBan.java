@@ -33,7 +33,7 @@ public class NhanBan extends Boss {
     }
 
     @Override
-    public void reward(Player killer) {
+    public void rewardDefault(Player killer) {
         if(killer==playerAtt)nro.models.services.CommesonChallengeService.gI().won(playerAtt,this);
     }
     @Override

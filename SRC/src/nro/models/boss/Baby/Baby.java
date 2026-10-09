@@ -21,7 +21,7 @@ public class Baby extends Boss {
     }
 
     @Override
-    public void reward(Player plKill) {
+    public void rewardDefault(Player plKill) {
         int x = this.location.x; // đâyyyy
         int y = this.zone.map.yPhysicInTop(x, this.location.y - 24);
         int drop = 190; // 100% rơi item ID 190

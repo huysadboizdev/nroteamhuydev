@@ -83,6 +83,14 @@ public class BossID {
     public static final int DRABURA_3 = -343;
 
     public static final int BLACK_GOKU = -203;
+    public static final int ZAMASU = -928;
+    public static final int HEART = -929;
+    public static final int KAMIN = -930;
+    public static final int OREN = -931;
+    public static final int BEERUS_BATTLE = -932;
+    public static final int WHIS_BATTLE = -933;
+    public static final int CHAMPA_BATTLE = -934;
+    public static final int VADOS_BATTLE = -935;
     public static final int CUMBER = -203999;
 
     public static final int TAU_PAY_PAY_DONG_NAM_KARIN = -308;

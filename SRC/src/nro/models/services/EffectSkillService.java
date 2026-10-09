@@ -268,37 +268,45 @@ public class EffectSkillService {
     }
 
     public void startUseSkillMonkey(Player player) {
+        if (player.effectSkill.isUseSkillMonkey) return;
         sendEffectMonkey(player);
         if (player.isBoss) {
             setIsMonkey(player);
             return;
         }
         Service.gI().sendSpeedPlayer(player, 0);
-        player.effectSkill.isUseSkillMonkey = true;
+        player.effectSkill.pendingMonkeyPoint = player.playerSkill.skillSelect.point;
         player.effectSkill.timeUseSkillMonkey = 1500;
         player.effectSkill.lastTimeUseSkillMonkey = System.currentTimeMillis();
+        player.effectSkill.isUseSkillMonkey = true;
     }
 
     public void finishUseMonkey(Player player) {
-        if (player.effectSkill != null) {
+        if (player.effectSkill != null && player.effectSkill.isUseSkillMonkey) {
+            int point = player.effectSkill.pendingMonkeyPoint;
             player.effectSkill.isUseSkillMonkey = false;
+            player.effectSkill.pendingMonkeyPoint = 0;
             Service.gI().sendSpeedPlayer(player, -1);
             if (!player.isDie()) {
-                setIsMonkey(player);
+                setIsMonkey(player, point);
             }
         }
     }
 
     public void setIsMonkey(Player player) {
+        setIsMonkey(player, player.playerSkill.skillSelect.point);
+    }
+
+    private void setIsMonkey(Player player, int point) {
         EffectSkillService.gI().sendEffectMonkey(player);
-        int timeMonkey = SkillUtil.getTimeMonkey(player.playerSkill.skillSelect.point);
+        int timeMonkey = SkillUtil.getTimeMonkey(point);
         if (player.setClothes.cadic == 5) {
             timeMonkey *= 5;
         }
         player.effectSkill.isMonkey = true;
         player.effectSkill.timeMonkey = timeMonkey;
         player.effectSkill.lastTimeUpMonkey = System.currentTimeMillis();
-        player.effectSkill.levelMonkey = (byte) player.playerSkill.skillSelect.point;
+        player.effectSkill.levelMonkey = (byte) point;
         player.nPoint.setHp((long) player.nPoint.hp * 2);
         Service.gI().Send_Caitrang(player);
         if (!player.isPet) {
@@ -326,16 +334,37 @@ public class EffectSkillService {
     }
 
     public void setIntrinsic(Player player, int skillId, int cooldown, long lastTimeUseSkill) {
-        player.effectSkill.isIntrinsic = true;
-        player.effectSkill.skillID = skillId;
-        player.effectSkill.cooldown = cooldown;
-        player.effectSkill.lastTimeUseSkill = lastTimeUseSkill;
+        synchronized (player) {
+            queueIntrinsicCooldownLocked(player, skillId, cooldown, lastTimeUseSkill);
+        }
+    }
+
+    private void queueIntrinsicCooldownLocked(Player player, int skillId, int cooldown, long lastTimeUseSkill) {
+        if (player.effectSkill == null || player.playerSkill == null || player.playerSkill.skills == null) return;
+        for (Skill skill : player.playerSkill.skills) {
+            if (skill != null && skill.template != null && skill.template.id == skillId) {
+                player.effectSkill.queueIntrinsicCooldown(skill, cooldown, lastTimeUseSkill);
+                break;
+            }
+        }
     }
 
     public void releaseCooldownSkillByIntrinsic(Player player) {
-        player.effectSkill.isIntrinsic = false;
-        Skill skill = SkillUtil.getSkillbyId(player, player.effectSkill.skillID);
-        Service.gI().releaseCooldownSkill(player, skill);
+        synchronized (player) {
+            releaseIntrinsicCooldownsLocked(player);
+        }
+    }
+
+    private void releaseIntrinsicCooldownsLocked(Player player) {
+        if (player.effectSkill == null) return;
+        for (var pending : player.effectSkill.takeReadyIntrinsicCooldowns(System.currentTimeMillis())) {
+            Skill skill = pending.skill();
+            if (player.playerSkill != null && player.playerSkill.skills != null
+                    && player.playerSkill.skills.contains(skill) && skill.template != null
+                    && skill.lastTimeUseThisSkill == pending.castTime()) {
+                Service.gI().releaseCooldownSkill(player, skill);
+            }
+        }
     }
 
     public void setIsBinh(Player plAtt, Player player, int time) {

@@ -70,6 +70,7 @@ public class Whis extends TrainingBoss {
             this.nPoint.hpMax = (int) Math.min(Integer.MAX_VALUE, (long) this.nPoint.hpMax * level);
             this.nPoint.hp = this.nPoint.hpMax;
             this.nPoint.dame = (int) Math.min(Integer.MAX_VALUE, (long) this.nPoint.dame * level);
+            nro.models.services.BossAdminConfig.applyAfterNativeSpawn(this);
             this.name = "Whis [LV:" + level + "]";
             ChangeMapService.gI().changeMap(this, this.zone, 725, 312);
             this.chat("Ta sẽ dạy ngươi vài chiêu");
@@ -125,6 +126,7 @@ public class Whis extends TrainingBoss {
     public synchronized void die(Player plKill) {
         if ((plKill != null && plKill != playerAtt) || victoryHandled) return;
         victoryHandled = true;
+        nro.models.services.BossAdminDropService.rewardWithoutDefault(this, plKill);
         this.enterDefeatedWait();
         this.lastTimeAFK = System.currentTimeMillis();
 

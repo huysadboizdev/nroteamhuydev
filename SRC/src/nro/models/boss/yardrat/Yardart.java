@@ -82,7 +82,7 @@ public abstract class Yardart extends Boss {
     }
 
     @Override
-    public void reward(Player plKill) {
+    public void rewardDefault(Player plKill) {
         if (Util.isTrue(1, rewardRatio)) {
             ItemMap it = new ItemMap(zone, 590, 1, plKill.location.x + (Util.nextInt(-10, 10)), plKill.location.y, plKill.id);
             it.options.clear();
@@ -170,12 +170,12 @@ public abstract class Yardart extends Boss {
                             moveToPlayer(pl);
                         }
                     }
-                    this.nPoint.dame = (int) ((long) pl.nPoint.hpMax * Util.nextInt(1, 3) / 100) / (Util.nextInt(10, 30));
+                    this.nPoint.dame = nro.models.services.BossAdminConfig.nativeDamage(this, (int) ((int) ((long) pl.nPoint.hpMax * Util.nextInt(1, 3) / 100) / (Util.nextInt(10, 30))));
                     if (this.playerSkill.skillSelect.template.id == Skill.DICH_CHUYEN_TUC_THOI) {
                         if (Util.isTrue(3, 4)) {
                             this.playerSkill.skillSelect = this.playerSkill.skills.get(0);
                         } else {
-                            this.nPoint.dame = (int) ((long) pl.nPoint.hpMax * Util.nextInt(5, 10) / 100);
+                            this.nPoint.dame = nro.models.services.BossAdminConfig.nativeDamage(this, (int) ((int) ((long) pl.nPoint.hpMax * Util.nextInt(5, 10) / 100)));
                         }
                     }
                     SkillService.gI().useSkill(this, pl, null, -1, null);
@@ -240,8 +240,10 @@ public abstract class Yardart extends Boss {
             if (this.nPoint.hp > damage) {
                 this.nPoint.subHP(damage);
             } else {
+                int damageHpBefore=this.nPoint.hp;
                 Service.gI().hsChar(this, this.nPoint.hpMax, this.nPoint.mpMax);
                 this.nPoint.hp = 1;
+                nro.models.services.HighDamageNoticeService.hpRemoved(this.nPoint,Math.max(0L,(long)damageHpBefore-1));
                 if (Util.isTrue(1, 10)) {
                     Service.gI().Send_Info_NV(this);
                 }
@@ -249,6 +251,8 @@ public abstract class Yardart extends Boss {
                 //Service.gI().hsChar(this, this.nPoint.hpMax, this.nPoint.mpMax);
                 //this.changeToTypePK();
                 //this.changeStatus(BossStatus.AFK);
+                // Yardart remains alive at 1 HP: each native knockout is a separate reward event.
+                nro.models.services.BossAdminDropService.reset(this);
                 reward(plAtt);
             }
             return (int) damage;

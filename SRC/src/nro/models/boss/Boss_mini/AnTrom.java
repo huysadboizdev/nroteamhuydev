@@ -144,7 +144,7 @@ public class AnTrom extends Boss {
     }
 
     @Override
-    public synchronized void reward(Player plKill) {
+    public synchronized void rewardDefault(Player plKill) {
         plKill = nro.models.services.MiniBossPinkCapsuleDrop.creditedPlayer(plKill);
         if (capsuleReward == null) capsuleReward = new nro.models.services.MiniBossPinkCapsuleDrop();
         if (!capsuleReward.drop(this, plKill)) return;
@@ -192,6 +192,8 @@ public class AnTrom extends Boss {
         this.nPoint.hpMax = Util.nextInt(1, 100);
         this.nPoint.hp = this.nPoint.hpMax;
         this.nPoint.dameg = this.nPoint.hpMax / 10;
+        this.nPoint.dame = this.nPoint.dameg;
+        nro.models.services.BossAdminConfig.applyAfterNativeSpawn(this);
         goldAnTrom = 0;
         this.joinMap2();
         st = System.currentTimeMillis();

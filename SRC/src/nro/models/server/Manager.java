@@ -616,7 +616,7 @@ public final class Manager {
             Logger.success(Logger.RED + "Successfully loaded clan task (" + CLAN_TASKS_TEMPLATE.size() + ")\n");
 
             //load achievement template
-            ps = ConnectionDatabase.prepareStatement("select * from achievement_template");
+            ps = ConnectionDatabase.prepareStatement("select * from achievement_template order by id");
             rs = ps.executeQuery();
             while (rs.next()) {
                 ACHIEVEMENT_TEMPLATE.add(new AchievementTemplate(rs.getString("info1"), rs.getString("info2"), rs.getInt("money"), rs.getLong("max_count")));
@@ -658,7 +658,8 @@ public final class Manager {
                     offset += batchSize;
                 }
 
-                Logger.success(Logger.RED + "Successfully loaded map item template (" + ITEM_TEMPLATES.size() + " items)\n");
+                nro.models.item.ItemTemplateIndex.align(ITEM_TEMPLATES);
+                Logger.success(Logger.RED + "Successfully loaded map item template (" + ITEM_TEMPLATES.size() + " indexed slots)\n");
 
             } catch (SQLException e) {
                 Logger.error("Error loading item templates: " + e.getMessage());

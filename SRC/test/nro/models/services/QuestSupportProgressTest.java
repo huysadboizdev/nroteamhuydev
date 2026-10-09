@@ -105,7 +105,7 @@ public final class QuestSupportProgressTest {
         var notification = Boss.class.getDeclaredMethod("notifyJoinMap"); notification.setAccessible(true);
         Boss silentSupport = support(BossID.FIDE); silentSupport.currentLevel = 0; silentSupport.zone = zone();
         notification.invoke(silentSupport); check(publicMessages.isEmpty(), "support spawn does not spam public boss announcements");
-        notification.invoke(originalRewards); check(publicMessages.size()==1, "original spawn notice retained");
+        originalRewards.nPoint.hp=100; notification.invoke(originalRewards); check(publicMessages.size()==1, "original spawn notice retained");
         for (Boss b : List.copyOf(BossManager.gI().getBosses())) BossManager.gI().removeBoss(b);
         System.out.println("PASS QuestSupport progress: unique network IDs, every boss/form, actual task gates, duplicate and late callbacks");
     }

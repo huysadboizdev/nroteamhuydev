@@ -10,10 +10,61 @@ import nro.models.player_system.Template;
 public class ItemData {
 
     public static void updateItem(MySession session) {
-        updateItemOptionItemplate(session);
-        updateItemArrHead2FTemplate(session);
-        updateItemTemplate(session, 750);
-        updateItemTemplate(session, 750, Manager.ITEM_TEMPLATES.size());
+        try {
+            // Validate complete catalog before sending any partial cache update.
+            Message[] catalog = catalogMessages();
+            updateItemOptionItemplate(session);
+            updateItemArrHead2FTemplate(session);
+            for (Message message : catalog) {
+                session.doSendMessage(message);
+                message.cleanup();
+            }
+        } catch (java.io.IOException e) {
+            throw new IllegalStateException("Unable to encode item catalog", e);
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new IllegalStateException("Unable to send item catalog", e);
+        }
+    }
+
+    private static Message[] catalogMessages() throws java.io.IOException {
+        int count = Manager.ITEM_TEMPLATES.size();
+        if (count > Short.MAX_VALUE) throw new IllegalArgumentException("Item catalog exceeds ID range");
+        byte[][] rows = new byte[count][];
+        long[] prefix = new long[count + 1];
+        for (int i = 0; i < count; i++) {
+            var bytes = new java.io.ByteArrayOutputStream();
+            var out = new java.io.DataOutputStream(bytes);
+            writeTemplate(out, Manager.ITEM_TEMPLATES.get(i));
+            rows[i] = bytes.toByteArray();
+            prefix[i + 1] = prefix[i] + rows[i].length;
+        }
+        int split = -1;
+        long best = Long.MAX_VALUE;
+        for (int i = 0; i <= count; i++) {
+            long first = 5 + prefix[i], second = 7 + prefix[count] - prefix[i];
+            if (first <= 65535 && second <= 65535 && Math.max(first, second) < best) {
+                split = i;
+                best = Math.max(first, second);
+            }
+        }
+        if (split < 0) throw new IllegalArgumentException("Item catalog cannot fit two 65535-byte cache frames");
+        Message first = new Message(-28), second = new Message(-28);
+        first.writer().writeByte(8); first.writer().writeByte(DataGame.vsItem);
+        first.writer().writeByte(1); first.writer().writeShort(split);
+        for (int i = 0; i < split; i++) first.writer().write(rows[i]);
+        second.writer().writeByte(8); second.writer().writeByte(DataGame.vsItem);
+        second.writer().writeByte(2); second.writer().writeShort(split); second.writer().writeShort(count);
+        for (int i = split; i < count; i++) second.writer().write(rows[i]);
+        return new Message[]{first, second};
+    }
+
+    private static void writeTemplate(java.io.DataOutputStream out, Template.ItemTemplate t) throws java.io.IOException {
+        out.writeByte(t.type); out.writeByte(t.gender);
+        out.writeUTF(t.name); out.writeUTF(t.description);
+        out.writeByte(t.level); out.writeInt(t.strRequire);
+        out.writeShort(t.iconID); out.writeShort(t.part); out.writeBoolean(t.isUpToUp);
     }
 
     private static void updateItemOptionItemplate(MySession session) {
@@ -27,63 +78,6 @@ public class ItemData {
             for (ItemOptionTemplate io : Manager.ITEM_OPTION_TEMPLATES) {
                 msg.writer().writeUTF(io.name);
                 msg.writer().writeByte(io.type);
-            }
-            session.doSendMessage(msg);
-            msg.cleanup();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private static void updateItemTemplate(MySession session, int count) {
-        Message msg;
-        try {
-            msg = new Message(-28);
-            msg.writer().writeByte(8);
-
-            msg.writer().writeByte(DataGame.vsItem); //vcitem
-            msg.writer().writeByte(1); //reload itemtemplate
-            msg.writer().writeShort(count);
-            for (int i = 0; i < count; i++) {
-                Template.ItemTemplate itemTemplate = Manager.ITEM_TEMPLATES.get(i);
-                msg.writer().writeByte(itemTemplate.type);
-                msg.writer().writeByte(itemTemplate.gender);
-                msg.writer().writeUTF(itemTemplate.name);
-                msg.writer().writeUTF(itemTemplate.description);
-                msg.writer().writeByte(itemTemplate.level);
-                msg.writer().writeInt(itemTemplate.strRequire);
-                msg.writer().writeShort(itemTemplate.iconID);
-                msg.writer().writeShort(itemTemplate.part);
-                msg.writer().writeBoolean(itemTemplate.isUpToUp);
-            }
-            session.doSendMessage(msg);
-            msg.cleanup();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private static void updateItemTemplate(MySession session, int start, int end) {
-        Message msg;
-        try {
-            msg = new Message(-28);
-            msg.writer().writeByte(8);
-
-            msg.writer().writeByte(DataGame.vsItem); //vcitem
-            msg.writer().writeByte(2); //add itemtemplate
-            msg.writer().writeShort(start);
-            msg.writer().writeShort(end);
-            for (int i = start; i < end; i++) {
-//                System.out.println("start: " + start + " -> " + end + " id " + Manager.ITEM_TEMPLATES.get(i).id);
-                msg.writer().writeByte(Manager.ITEM_TEMPLATES.get(i).type);
-                msg.writer().writeByte(Manager.ITEM_TEMPLATES.get(i).gender);
-                msg.writer().writeUTF(Manager.ITEM_TEMPLATES.get(i).name);
-                msg.writer().writeUTF(Manager.ITEM_TEMPLATES.get(i).description);
-                msg.writer().writeByte(Manager.ITEM_TEMPLATES.get(i).level);
-                msg.writer().writeInt(Manager.ITEM_TEMPLATES.get(i).strRequire);
-                msg.writer().writeShort(Manager.ITEM_TEMPLATES.get(i).iconID);
-                msg.writer().writeShort(Manager.ITEM_TEMPLATES.get(i).part);
-                msg.writer().writeBoolean(Manager.ITEM_TEMPLATES.get(i).isUpToUp);
             }
             session.doSendMessage(msg);
             msg.cleanup();

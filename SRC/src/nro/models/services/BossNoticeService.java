@@ -32,6 +32,11 @@ public final class BossNoticeService {
         return injure(target,attacker,damage,piercing,mobAttack,null);
     }
     public static int injure(Player target,Player attacker,long damage,boolean piercing,boolean mobAttack,Integer skillId){
+        try(HighDamageNoticeService.Scope scope=HighDamageNoticeService.begin(attacker,target!=null?target.nPoint:null,mobAttack?null:skillId)){
+            return injureWithBossContext(target,attacker,damage,piercing,mobAttack,skillId);
+        }
+    }
+    private static int injureWithBossContext(Player target,Player attacker,long damage,boolean piercing,boolean mobAttack,Integer skillId){
         if(attacker instanceof nro.models.boss.HuntingTrio.HuntingTrioBoss){
             damage=nro.models.boss.HuntingTrio.HuntingTrioDamage.damageFor(attacker,target,damage);if(damage<=0)return 0;piercing=true;
         }
@@ -60,7 +65,11 @@ public final class BossNoticeService {
     }
     private static String clean(String s,int max){if(s==null)return "";s=s.replaceAll("[\\r\\n\\t]"," ").trim();return s.length()>max?s.substring(0,max):s;}
     public void appeared(Boss b){
-        try{if(b.noticePublic()&&b.zone!=null&&!b.isDie())tracker.appear(b,b.id,b.currentLevel,clean(b.name,100),clean(b.zone.map.mapName,100),b.questBossId(),b.isQuestSupport(),b.zone.zoneId);}
+        try{if(b.noticePublic()&&b.zone!=null&&!b.isDie()){
+            boolean fresh=tracker.appearNew(b,b.id,b.currentLevel,clean(b.name,100),clean(b.zone.map.mapName,100),b.questBossId(),b.isQuestSupport(),b.zone.zoneId);
+            if(fresh&&!b.isQuestSupport()&&!BossAnnouncementPolicy.grouped(b))
+                nro.models.server.ServerNotify.gI().notify("BOSS "+clean(b.name,100)+" vừa xuất hiện tại "+clean(b.zone.map.mapName,100));
+        }}
         catch(Exception failure){log(failure);}
     }
     public void defeated(Boss b,Player killer){
@@ -69,7 +78,9 @@ public final class BossNoticeService {
             if(killer instanceof Pet pet&&pet.master!=null)killer=pet.master;
             if(killer instanceof nro.models.player.NewPet pet&&pet.master!=null)killer=pet.master;
             String name=killer!=null&&killer.isPl()&&!killer.isBot?clean(killer.name,80):"Không xác định";
-            tracker.defeat(b,name);
+            boolean fresh=tracker.defeatNew(b,name);
+            if(fresh&&!b.isQuestSupport()&&killer!=null&&killer.isPl()&&!killer.isBot)
+                nro.models.server.ServerNotify.gI().notify(name+": Đã tiêu diệt được "+clean(b.name,100)+".");
         }catch(Exception failure){log(failure);}
     }
     public void departed(Boss b){try{tracker.depart(b);}catch(Exception failure){log(failure);}}
@@ -79,7 +90,7 @@ public final class BossNoticeService {
         Map<String,BossNoticeRow> rows=new HashMap<>();
         if(kind==1)for(var r:stored)if(r.appearedAt()>=since)rows.put(r.spawnId(),r);
         for(var r:kind==0?tracker.current():tracker.history())if(kind==0||r.appearedAt()>=since)rows.merge(r.spawnId(),r,(a,b)->a.version()>b.version()?a:b);
-        return rows.values().stream().filter(r->kind!=0||(r.serverRun().equals(run)&&r.status().equals("ALIVE"))).sorted(Comparator.comparingLong((BossNoticeRow r)->Math.max(r.appearedAt(),r.defeatedAt())).reversed().thenComparing(BossNoticeRow::spawnId)).limit(10_000).toList();
+        return rows.values().stream().filter(r->!BossAnnouncementPolicy.excludedHistory(r)).filter(r->kind!=0||(r.serverRun().equals(run)&&r.status().equals("ALIVE"))).sorted(Comparator.comparingLong((BossNoticeRow r)->Math.max(r.appearedAt(),r.defeatedAt())).reversed().thenComparing(BossNoticeRow::spawnId)).limit(10_000).toList();
     }
     public void request(MySession s,int request,int kind,int page){request(s,request,0,kind,page,false);}
     public void requestV2(MySession s,int request,int category,int kind,int page){request(s,request,category,kind,page,true);}

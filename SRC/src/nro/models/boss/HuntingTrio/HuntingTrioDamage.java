@@ -10,6 +10,6 @@ public final class HuntingTrioDamage {
         if(original<=0||!(attacker instanceof HuntingTrioBoss boss)||!boss.combatReady()
                 ||target==null||target==attacker||target.isBoss||target.beforeDispose||target.nPoint==null
                 ||target.isDie()||attacker.zone==null||target.zone!=attacker.zone)return 0;
-        return percent(target.nPoint.hpMax);
+        return nro.models.services.BossAdminConfig.nativeDamage(boss, (int) percent(target.nPoint.hpMax));
     }
 }

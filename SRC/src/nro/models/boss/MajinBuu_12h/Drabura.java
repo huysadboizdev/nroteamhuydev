@@ -88,6 +88,7 @@ public class Drabura extends Boss {
         }
         if (Util.canDoWithTime(lastTimeAfk, 60000)) {
             Service.gI().hsChar(this, this.nPoint.hpMax, this.nPoint.mpMax);
+            if (!this.isDie()) nro.models.services.BossAdminDropService.reset(this);
             this.changeStatus(BossStatus.CHAT_S);
         }
     }
@@ -149,7 +150,7 @@ public class Drabura extends Boss {
     }
 
     @Override
-    public void reward(Player plKill) {
+    public void rewardDefault(Player plKill) {
         int diem = 5;
         plKill.event.addEventPoint(diem);
         Service.gI().sendThongBao(plKill, "+5 Point");

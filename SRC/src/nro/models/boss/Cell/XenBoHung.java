@@ -28,7 +28,7 @@ public class XenBoHung extends Boss {
     }
 
     @Override
-    public void reward(Player plKill) {
+    public void rewardDefault(Player plKill) {
         if (questSupportReward(plKill)) return;
         BadgesTaskService.updateCountBagesTask(plKill, ConstTaskBadges.TRUM_SAN_BOSS, 1);
         int diem = 5;
@@ -64,10 +64,10 @@ public class XenBoHung extends Boss {
             return;
         }
         ChangeMapService.gI().changeMapYardrat(this, this.zone, pl.location.x, pl.location.y);
-        this.nPoint.dameg = (int) Math.min(Integer.MAX_VALUE,
-                (long) this.nPoint.dameg + pl.nPoint.dame * 5L / 100);
-        this.nPoint.hpg = (int) Math.min(Integer.MAX_VALUE,
-                (long) this.nPoint.hpg + pl.nPoint.hp * 2L / 100);
+        this.nPoint.dameg = nro.models.services.BossAdminConfig.nativeDamage(this, (int) Math.min(Integer.MAX_VALUE,
+                (long) this.nPoint.dameg + pl.nPoint.dame * 5L / 100));
+        this.nPoint.hpg = nro.models.services.BossAdminConfig.nativeHp(this, (int) Math.min(Integer.MAX_VALUE,
+                (long) this.nPoint.hpg + pl.nPoint.hp * 2L / 100));
         this.nPoint.critg++;
         this.nPoint.calPoint();
         PlayerService.gI().hoiPhuc(this, pl.nPoint.hp, 0);

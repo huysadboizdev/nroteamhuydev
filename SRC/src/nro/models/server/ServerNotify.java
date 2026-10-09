@@ -30,11 +30,11 @@ public class ServerNotify extends Thread {
     private static ServerNotify i;
 
     private ServerNotify() {
-        this.notifies = new ArrayList<>();
+        this.notifies = java.util.Collections.synchronizedList(new ArrayList<>());
         this.start();
     }
 
-    public static ServerNotify gI() {
+    public static synchronized ServerNotify gI() {
         if (i == null) {
             i = new ServerNotify();
         }

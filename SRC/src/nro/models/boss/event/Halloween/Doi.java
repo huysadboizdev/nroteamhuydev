@@ -21,7 +21,7 @@ public class Doi extends Boss {
     }
 
     @Override
-    public void reward(Player plKill) {
+    public void rewardDefault(Player plKill) {
         try (nro.models.event.EventItemPolicy.Permit permit=nro.models.event.EventItemPolicy.admit()) {
         if (!seasonalAllowed()) return;
         ItemMap it = new ItemMap(this.zone, 585, 1, this.location.x, this.zone.map.yPhysicInTop(this.location.x,
@@ -80,7 +80,7 @@ public class Doi extends Boss {
                 if (pl == null || pl.isDie()) {
                     return;
                 }
-                this.nPoint.dame = pl.nPoint.hpMax / Util.nextInt(30, 50);
+                this.nPoint.dame = nro.models.services.BossAdminConfig.nativeDamage(this, (int) (pl.nPoint.hpMax / Util.nextInt(30, 50)));
                 this.playerSkill.skillSelect = this.playerSkill.skills.get(Util.nextInt(0, this.playerSkill.skills.size() - 1));
                 if (Util.getDistance(this, pl) <= this.getRangeCanAttackWithSkillSelect()) {
                     if (Util.isTrue(5, 20)) {

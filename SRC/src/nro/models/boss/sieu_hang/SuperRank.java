@@ -123,11 +123,12 @@ public abstract class SuperRank extends Boss {
             if (this.pet != null) {
                 this.pet.setClothes.setup();
             }
-            this.nPoint = player.nPoint;
+            this.nPoint = nro.models.services.BossAdminConfig.config(this)==null ? player.nPoint : nro.models.services.BossAdminConfig.detachedPoints(this, player.nPoint);
             this.nPoint.setPlayer(this);
             this.fusion = player.fusion;
             this.fusion.setPlayer(this);
             this.nPoint.calPoint();
+            nro.models.services.BossAdminConfig.applyAfterNativeSpawn(this);
             ChangeMapService.gI().changeMap(this, this.zone, 434, 264);
         }
     }
@@ -325,6 +326,7 @@ public abstract class SuperRank extends Boss {
 
     @Override
     public void die(Player plKill) {
+        nro.models.services.BossAdminDropService.rewardWithoutDefault(this, plKill);
         this.changeStatus(BossStatus.DIE);
     }
 

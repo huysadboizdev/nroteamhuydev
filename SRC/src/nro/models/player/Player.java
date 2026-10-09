@@ -455,6 +455,7 @@ public class Player implements Runnable {
         if (nro.models.shop_ky_gui.ConsignTransactions.hasPending(this) || nro.models.services.RubyGiftService.hasPending(this)) return;
         if (!this.beforeDispose) {
             try {
+                if (isPl() && achievement != null) achievement.updateOnlineTime(System.currentTimeMillis());
                 nro.models.services.TimedBagCleanupService.gI().updateEquipped(this, System.currentTimeMillis());
                 if (this.zone != null || (!this.isPl() && this.zone == null)) {
                     if (itemTime != null) {
@@ -534,9 +535,6 @@ public class Player implements Runnable {
                             PlayerService.gI().sendInfoHp(this);
                         }
                         lastTimeUpdateChibi = System.currentTimeMillis();
-                    }
-                    if (this.isPl() && this.achievement != null) {
-                        this.achievement.done(ConstAchievement.HOAT_DONG_CHAM_CHI, 1000);
                     }
                     if (this.isPl()) {
                         TaskService.gI().checkCurrentTaskConditions(this);
@@ -1039,9 +1037,10 @@ public class Player implements Runnable {
                 return this.inventory.itemsBody.get(8).template.part;
             }
         }
-        if (this.isPet && this.inventory.itemsBody.size() >= 8) {
-            if (this.inventory.itemsBody.get(7).isNotNullItem()) {
-                return this.inventory.itemsBody.get(7).template.part;
+        if (this.isPet && this.inventory.itemsBody.size() >= 9) {
+            Item accessory = this.inventory.itemsBody.get(8);
+            if (accessory.isNotNullItem() && accessory.template.type == 11) {
+                return accessory.template.part;
             }
         }
         if (this.clan != null) {
@@ -1212,6 +1211,7 @@ public class Player implements Runnable {
                 }
             }
             damage = Math.min(damage, 2_147_483_647);
+            damage = nro.models.services.BossAdminConfig.limitDamage(plAtt, this, damage);
             if (isMobAttack && this.charms.tdBatTu > System.currentTimeMillis() && damage >= this.nPoint.hp) {
                 damage = this.nPoint.hp - 1;
             }
@@ -1356,287 +1356,25 @@ public class Player implements Runnable {
     }
 
     public void sendNewPet() {
-        if (isPl() && inventory != null && inventory.itemsBody.get(7) != null) {
-            Item it = inventory.itemsBody.get(7);
-            if (it != null && it.isNotNullItem() && newPet == null) {
-                switch (it.template.id) {
-                    case 892 -> {
-                        PetService.Pet2(this, 882, 883, 884);
-                        Service.gI().point(this);
-                    }
-                    case 893 -> {
-                        PetService.Pet2(this, 885, 886, 887);
-                        Service.gI().point(this);
-                    }
-                    case 908 -> {
-                        PetService.Pet2(this, 891, 892, 893);
-                        Service.gI().point(this);
-                    }
-                    case 909 -> {
-                        PetService.Pet2(this, 894, 895, 896);
-                        Service.gI().point(this);
-                    }
-                    case 910 -> {
-                        PetService.Pet2(this, 897, 898, 899);
-                        Service.gI().point(this);
-                    }
-                    case 916 -> {
-                        PetService.Pet2(this, 925, 926, 927);
-                        Service.gI().point(this);
-                    }
-                    case 917 -> {
-                        PetService.Pet2(this, 928, 929, 930);
-                        Service.gI().point(this);
-                    }
-                    case 918 -> {
-                        PetService.Pet2(this, 931, 932, 933);
-                        Service.gI().point(this);
-                    }
-                    case 919 -> {
-                        PetService.Pet2(this, 934, 935, 936);
-                        Service.gI().point(this);
-                    }
-                    case 936 -> {
-                        PetService.Pet2(this, 718, 719, 720);
-                        Service.gI().point(this);
-                    }
-                    case 942 -> {
-                        PetService.Pet2(this, 966, 967, 968);
-                        Service.gI().point(this);
-                    }
-                    case 943 -> {
-                        PetService.Pet2(this, 969, 970, 971);
-                        Service.gI().point(this);
-                    }
-                    case 944 -> {
-                        PetService.Pet2(this, 972, 973, 974);
-                        Service.gI().point(this);
-                    }
-                    case 967 -> {
-                        PetService.Pet2(this, 1050, 1051, 1052);
-                        Service.gI().point(this);
-                    }
-                    case 1008 -> {
-                        PetService.Pet2(this, 1074, 1075, 1076);
-                        Service.gI().point(this);
-                    }
-                    case 1039 -> {
-                        PetService.Pet2(this, 1089, 1090, 1091);
-                        Service.gI().point(this);
-                    }
-                    case 1040 -> {
-                        PetService.Pet2(this, 1092, 1093, 1094);
-                        Service.gI().point(this);
-                    }
-                    case 1046 -> {
-                        PetService.Pet2(this, -1, -1, -1);
-                        Service.gI().point(this);
-                    }
-                    case 1107 -> {
-                        PetService.Pet2(this, 1155, 1156, 1157);
-                        Service.gI().point(this);
-                    }
-                    case 1114 -> {
-                        PetService.Pet2(this, 1158, 1159, 1160);
-                        Service.gI().point(this);
-                    }
-                    case 1188 -> {
-                        PetService.Pet2(this, 1183, 1184, 1185);
-                        Service.gI().point(this);
-                    }
-                    case 1202 -> {
-                        PetService.Pet2(this, 1201, 1202, 1203);
-                        Service.gI().point(this);
-                    }
-                    case 1203 -> {
-                        PetService.Pet2(this, 1201, 1202, 1203);
-                        Service.gI().point(this);
-                    }
-                    case 1207 -> {
-                        PetService.Pet2(this, 1077, 1078, 1079);
-                        Service.gI().point(this);
-                    }
-                    case 1224 -> {
-                        PetService.Pet2(this, 1227, 1228, 1229);
-                        Service.gI().point(this);
-                    }
-                    case 1225 -> {
-                        PetService.Pet2(this, 1233, 1234, 1235);
-                        Service.gI().point(this);
-                    }
-                    case 1226 -> {
-                        PetService.Pet2(this, 1230, 1231, 1232);
-                        Service.gI().point(this);
-                    }
-                    case 1243 -> {
-                        PetService.Pet2(this, 1245, 1246, 1247);
-                        Service.gI().point(this);
-                    }
-                    case 1244 -> {
-                        PetService.Pet2(this, 1248, 1249, 1250);
-                        Service.gI().point(this);
-                    }
-                    case 1256 -> {
-                        PetService.Pet2(this, 1267, 1268, 1269);
-                        Service.gI().point(this);
-                    }
-                    case 1318 -> {
-                        PetService.Pet2(this, 1299, 1300, 1301);
-                        Service.gI().point(this);
-                    }
-                    case 1347 -> {
-                        PetService.Pet2(this, 1302, 1303, 1304);
-                        Service.gI().point(this);
-                    }
-                    case 1414 -> {
-                        PetService.Pet2(this, 1341, 1342, 1343);
-                        Service.gI().point(this);
-                    }
-                    case 1435 -> {
-                        PetService.Pet2(this, 1347, 1348, 1349);
-                        Service.gI().point(this);
-                    }
-                    case 1452 -> {
-                        PetService.Pet2(this, 1365, 1366, 1367);
-                        Service.gI().point(this);
-                    }
-                    case 1458 -> {
-                        PetService.Pet2(this, 1368, 1369, 1370);
-                        Service.gI().point(this);
-                    }
-                    case 1482 -> {
-                        PetService.Pet2(this, 1398, 1399, 1400);
-                        Service.gI().point(this);
-                    }
-                    case 1497 -> {
-                        PetService.Pet2(this, 1401, 1402, 1403);
-                        Service.gI().point(this);
-                    }
-                    case 1550 -> {
-                        PetService.Pet2(this, 1428, 1429, 1430);
-                        Service.gI().point(this);
-                    }
-                    case 1551 -> {
-                        PetService.Pet2(this, 1425, 1426, 1427);
-                        Service.gI().point(this);
-                    }
-                    case 1564 -> {
-                        PetService.Pet2(this, 1437, 1438, 1439);
-                        Service.gI().point(this);
-                    }
-                    case 1568 -> {
-                        PetService.Pet2(this, 1443, 1444, 1445);
-                        Service.gI().point(this);
-                    }
-                    case 1573 -> {
-                        PetService.Pet2(this, 1446, 1447, 1448);
-                        Service.gI().point(this);
-                    }
-                    case 1596 -> {
-                        PetService.Pet2(this, 1473, 1474, 1475);
-                        Service.gI().point(this);
-                    }
-                    case 1597 -> {
-                        PetService.Pet2(this, 1473, 1474, 1475);
-                        Service.gI().point(this);
-                    }
-                    case 1611 -> {
-                        PetService.Pet2(this, 1488, 1494, 1495);
-                        Service.gI().point(this);
-                    }
-                    case 1620 -> {
-                        PetService.Pet2(this, 1496, 1497, 1498);
-                        Service.gI().point(this);
-                    }
-                    case 1621 -> {
-                        PetService.Pet2(this, 1496, 1497, 1498);
-                        Service.gI().point(this);
-                    }
-                    case 1622 -> {
-                        PetService.Pet2(this, 1488, 1489, 1490);
-                        Service.gI().point(this);
-                    }
-                    case 1629 -> {
-                        PetService.Pet2(this, 1505, 1506, 1507);
-                        Service.gI().point(this);
-                    }
-                    case 1630 -> {
-                        PetService.Pet2(this, 1508, 1509, 1510);
-                        Service.gI().point(this);
-                    }
-                    case 1631 -> {
-                        PetService.Pet2(this, 1513, 1516, 1517);
-                        Service.gI().point(this);
-                    }
-                    case 1633 -> {
-                        PetService.Pet2(this, 1523, 1524, 1525);
-                        Service.gI().point(this);
-                    }
-                    case 1654 -> {
-                        PetService.Pet2(this, 1526, 1529, 1530);
-                        Service.gI().point(this);
-                    }
-                    case 1668 -> {
-                        PetService.Pet2(this, 1550, 1551, 1552);
-                        Service.gI().point(this);
-                    }
-                    case 1682 -> {
-                        PetService.Pet2(this, 1558, 1559, 1560);
-                        Service.gI().point(this);
-                    }
-                    case 1683 -> {
-                        PetService.Pet2(this, 1561, 1562, 1563);
-                        Service.gI().point(this);
-                    }
-                    case 1686 -> {
-                        PetService.Pet2(this, 1572, 1573, 1574);
-                        Service.gI().point(this);
-                    }
-                    case 1750 -> {
-                        PetService.Pet2(this, 1464, 1465, 1466);
-                        Service.gI().point(this);
-                    }
-                    case 1765 -> {
-                        PetService.Pet2(this, 1662, 1663, 1664);
-                        Service.gI().point(this);
-                    }
-                    case 1729 -> {
-                        PetService.Pet2(this, 1621, 1622, 1623);
-                        Service.gI().point(this);
-                    }
-                    case 1727 -> {
-                        PetService.Pet2(this, 1616, 1617, 1618);
-                        Service.gI().point(this);
-                    }
-                    case 1789 -> {
-                        PetService.Pet2(this, 1724, 1725, 1726);
-                        Service.gI().point(this);
-                    }
-                    case 1766 -> {
-                        PetService.Pet2(this, 1665, 1666, 1667);
-                        Service.gI().point(this);
-                    }
-                    case 1767 -> {
-                        PetService.Pet2(this, 1668, 1669, 1670);
-                        Service.gI().point(this);
-                    }
-                    case 1768 -> {
-                        PetService.Pet2(this, 1671, 1672, 1673);
-                        Service.gI().point(this);
-                    }
-                    case 1769 -> {
-                        PetService.Pet2(this, 1674, 1675, 1676);
-                        Service.gI().point(this);
-                    }
-                    case 1770 -> {
-                        PetService.Pet2(this, 1677, 1678, 1679);
-                        Service.gI().point(this);
-                    }
-                    case 1771 -> {
-                        PetService.Pet2(this, 1680, 1681, 1682);
-                        Service.gI().point(this);
-                    }
-                }
+        Player owner = this instanceof Pet disciple ? disciple.master : this;
+        if (owner == null) {
+            return;
+        }
+        synchronized (owner) {
+            if ((!isPl() && !isPet) || inventory == null || inventory.itemsBody.size() <= 7 || newPet != null) {
+                return;
+            }
+            if (this instanceof Pet disciple && (disciple.typePet < 2 || disciple.typePet > 4)) {
+                return;
+            }
+            Item item = inventory.itemsBody.get(7);
+            if (item == null || !item.isNotNullItem() || item.template.type != 27) {
+                return;
+            }
+            short[] parts = nro.models.item.CompanionCatalog.parts(item.template.id);
+            if (parts != null) {
+                PetService.Pet2(this, parts[0], parts[1], parts[2]);
+                Service.gI().point(this);
             }
         }
     }

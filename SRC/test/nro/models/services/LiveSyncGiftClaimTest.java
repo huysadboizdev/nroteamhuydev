@@ -113,7 +113,7 @@ public final class LiveSyncGiftClaimTest {
   sql("INSERT INTO player VALUES(4,40,'[0,0,0,0,0,888]','[]','[]')");
   String payload="[{\"id\":-1,\"quantity\":10},{\"id\":457,\"quantity\":1},{\"id\":-2,\"quantity\":2147483647}]";
   sql("INSERT INTO giftcode(code,count_left,detail,expired) VALUES('ENDTOEND',5,'"+payload+"','2037-12-31'),('FULLBAG',5,'"+payload+"','2037-12-31')");
-  Player live=player(4);live.isPlayer=true;live.inventory.itemsBag.add(new Item());live.session=blank(nro.models.network.MySession.class);live.session.userId=40;live.session.player=live;
+  Player live=player(4);live.inventory.ruby=0;live.isPlayer=true;live.inventory.itemsBag.add(new Item());live.session=blank(nro.models.network.MySession.class);live.session.userId=40;live.session.player=live;
   var service=new GiftCodeService(dao,p->true);
   check(service.claim(live," endtoend "),"end-to-end service claim refused");
   check(live.inventory.gold==12&&live.inventory.gem==200000000&&live.inventory.itemsBag.get(0).template.id==457,"committed rewards not published");
@@ -121,6 +121,16 @@ public final class LiveSyncGiftClaimTest {
   check(scalar("SELECT JSON_EXTRACT(JSON_UNQUOTE(JSON_EXTRACT(items_bag,'$[0]')),'$[0]') FROM player WHERE id=4")==457,"item457 not persisted");
   check(!service.claim(live,"FULLBAG")&&live.inventory.gold==12&&live.giftCode.rewards.size()==1,"failed staged item published partial money/history");
   check(scalar("SELECT count_left FROM giftcode WHERE code='FULLBAG'")==5&&scalar("SELECT COUNT(*) FROM giftcode_claim WHERE canonical_code='FULLBAG'")==0,"full bag consumed durable quota/claim");
+  String supplement="[{\"id\":-1,\"quantity\":15},{\"id\":457,\"quantity\":2},{\"id\":-2,\"quantity\":2147483647},{\"id\":-3,\"quantity\":2}]";
+  sql("UPDATE giftcode SET count_left=0,detail='"+supplement+"' WHERE code='ENDTOEND'");
+  check(!service.claim(live,"ENDTOEND")&&live.inventory.gold==12,"supplement full bag published partial rewards");
+  check(scalar("SELECT COUNT(*) FROM giftcode_claim_request WHERE canonical_code='ENDTOEND'")==1,"failed supplement wrote receipt");
+  live.inventory.itemsBag.add(new Item());
+  check(service.claim(live," endtoend "),"existing history blocked supplemental claim");
+  check(live.inventory.gold==17&&live.inventory.ruby==2&&live.inventory.itemsBag.size()==2,"service must publish delta only");
+  check(live.giftCode.rewards.size()==1&&scalar("SELECT count_left FROM giftcode WHERE code='ENDTOEND'")==0,"supplement duplicated history or consumed quota");
+  check(scalar("SELECT JSON_EXTRACT(data_inventory,'$[0]') FROM player WHERE id=4")==17,"supplement not durably published");
+  check(!service.claim(live,"ENDTOEND")&&live.inventory.gold==17&&live.inventory.ruby==2,"repeat supplement regranted");
   System.out.println("LiveSyncGiftClaimTest isolated SQL PASS");
  }
  static Connection wrap(Connection inner,String fault,boolean committed){return (Connection)Proxy.newProxyInstance(LiveSyncGiftClaimTest.class.getClassLoader(),new Class[]{Connection.class},(o,m,args)->{

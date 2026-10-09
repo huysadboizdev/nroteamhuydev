@@ -1,6 +1,7 @@
 package nro.models.map;
 
 import nro.models.consts.ConstMap;
+import nro.models.consts.ConstNpc;
 import nro.models.player_system.Template;
 import nro.models.boss.Boss;
 import nro.models.boss.BossID;
@@ -173,12 +174,19 @@ public class Map implements Runnable {
 
     public void initNpc(byte[] npcId, short[] npcX, short[] npcY) {
         for (int i = 0; i < npcId.length; i++) {
+            if (npcId[i] == ConstNpc.BO_MONG
+                    && (mapId == 21 || mapId == 22 || mapId == 23)) {
+                continue;
+            }
             // Heart has no original part set in this release. Keep its template slot,
             // but do not spawn it until the real assets are restored.
             if (npcId[i] == 108) {
                 continue;
             }
-            this.npcs.add(NpcFactory.createNPC(this.mapId, 1, npcX[i], npcY[i], npcId[i]));
+            Npc npc = NpcFactory.createNPC(this.mapId, 1, npcX[i], npcY[i], npcId[i]);
+            if (npc != null) {
+                this.npcs.add(npc);
+            }
         }
     }
 

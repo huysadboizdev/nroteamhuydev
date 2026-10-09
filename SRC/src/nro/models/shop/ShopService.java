@@ -988,8 +988,10 @@ public class ShopService {
                 || row.iconSpec != 7743 || (itemTempId != 710 && itemTempId != 711
                 && itemTempId != 1710 && itemTempId != 1869 && itemTempId != 1775
                 && itemTempId != 880 && itemTempId != 881 && itemTempId != 882
+                && !nro.models.item.AnimeEquipment.contains(itemTempId)
                 && nro.models.shop_ky_gui.ConsignTransactions.rubyMaterialPrice(itemTempId)==0)) return;
         if ((itemTempId >= 880 && itemTempId <= 882) && row.cost != 5) return;
+        if(nro.models.item.AnimeEquipment.contains(itemTempId)&&row.cost!=200)return;
         int materialPrice=nro.models.shop_ky_gui.ConsignTransactions.rubyMaterialPrice(itemTempId);
         if(materialPrice>0) {
             if(row.cost!=materialPrice)return;
@@ -1018,6 +1020,7 @@ public class ShopService {
             return;
         }
         Item prepared = ItemService.gI().createItemFromItemShop(row);
+        nro.models.item.AnimeEquipment.freshPurchase(prepared, java.util.concurrent.ThreadLocalRandom.current());
         if (!InventoryService.gI().canAddItemBag(player, prepared)) {
             Service.gI().sendThongBao(player, "Hành trang đã đầy.");
             return;
@@ -1329,7 +1332,7 @@ public class ShopService {
             if ("BUNMA".equals(pl.idMark.getTagNameShop())
                     || "DENDE".equals(pl.idMark.getTagNameShop())
                     || "APPULE".equals(pl.idMark.getTagNameShop())) {
-                AchievementService.gI().checkDoneTask(pl, ConstAchievement.TRUM_NHAT_VE_CHAI);
+                AchievementService.gI().checkDoneTask(pl, ConstAchievement.TRUM_NHAT_VE_CHAI, quantity);
             }
         } else {
             Service.gI().sendThongBao(pl, "Không thể thực hiện");

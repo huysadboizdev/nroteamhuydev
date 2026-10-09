@@ -224,7 +224,7 @@ private boolean isPlayerChatThang(Player plAtt) {
 }
 
     @Override
-    public void reward(Player plKill) {
+    public void rewardDefault(Player plKill) {
         try (nro.models.event.EventItemPolicy.Permit permit=nro.models.event.EventItemPolicy.admit()) {
         if (!seasonalAllowed()) return;
     

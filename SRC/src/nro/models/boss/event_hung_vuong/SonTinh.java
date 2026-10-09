@@ -34,7 +34,7 @@ public class SonTinh extends Boss {
     }
 
     @Override
-    public void reward(Player plKill) {
+    public void rewardDefault(Player plKill) {
         try (nro.models.event.EventItemPolicy.Permit permit=nro.models.event.EventItemPolicy.admit()) {
         if (!seasonalAllowed()) return;
         int diem = 5;
@@ -184,9 +184,9 @@ public class SonTinh extends Boss {
                         move(pl.location.x + (Util.nextInt(0, 1) == 1 ? move : -move), this.location.y);
                     }
                     if (pl.isPl()) {
-                        this.nPoint.dame = pl.nPoint.hpMax / 30;
+                        this.nPoint.dame = nro.models.services.BossAdminConfig.nativeDamage(this, (int) (pl.nPoint.hpMax / 30));
                     } else {
-                        this.nPoint.dame = 10000;
+                        this.nPoint.dame = nro.models.services.BossAdminConfig.nativeDamage(this, (int) (10000));
                     }
                     SkillService.gI().useSkill(this, pl, null, -1, null);
                     checkPlayerDie(pl);

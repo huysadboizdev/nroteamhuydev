@@ -184,6 +184,7 @@ public abstract class TrainingBoss extends Boss {
 
     @Override
     public void die(Player plKill) {
+        nro.models.services.BossAdminDropService.rewardWithoutDefault(this, plKill);
         this.enterDefeatedWait();
         this.lastTimeAFK = System.currentTimeMillis();
 

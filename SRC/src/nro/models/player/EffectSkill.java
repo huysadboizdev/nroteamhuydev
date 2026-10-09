@@ -1,6 +1,11 @@
 package nro.models.player;
 
 import lombok.Setter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import nro.models.skill.Skill;
 import nro.models.mob.Mob;
 import nro.models.services.EffectSkillService;
 import nro.models.services.ItemTimeService;
@@ -30,6 +35,7 @@ public class EffectSkill {
     //biến khỉ
     public boolean isMonkey;
     public byte levelMonkey;
+    public int pendingMonkeyPoint;
     public long lastTimeUpMonkey;
     public int timeMonkey;
 
@@ -124,10 +130,43 @@ public class EffectSkill {
     public int timeUseSkillMonkey;
 
     //Intrinsic
-    public boolean isIntrinsic;
+    public volatile boolean isIntrinsic;
     public long lastTimeUseSkill;
     public int skillID;
     public int cooldown;
+    private Map<Integer, IntrinsicCooldown> intrinsicCooldowns;
+    private boolean intrinsicDisposed;
+
+    public record IntrinsicCooldown(Skill skill, long castTime, long deadline) {}
+
+    public synchronized void queueIntrinsicCooldown(Skill skill, int duration, long adjustedStart) {
+        if (intrinsicDisposed) return;
+        if (intrinsicCooldowns == null) intrinsicCooldowns = new HashMap<>();
+        intrinsicCooldowns.put((int) skill.template.id,
+                new IntrinsicCooldown(skill, skill.lastTimeUseThisSkill, adjustedStart + Math.max(0, duration)));
+        skillID = skill.template.id;
+        cooldown = duration;
+        lastTimeUseSkill = adjustedStart;
+        isIntrinsic = true;
+    }
+
+    public synchronized List<IntrinsicCooldown> takeReadyIntrinsicCooldowns(long now) {
+        List<IntrinsicCooldown> ready = new ArrayList<>();
+        if (intrinsicCooldowns != null) {
+            var entries = intrinsicCooldowns.values().iterator();
+            while (entries.hasNext()) {
+                IntrinsicCooldown pending = entries.next();
+                if (pending.skill().template == null || pending.skill().lastTimeUseThisSkill != pending.castTime()) {
+                    entries.remove();
+                } else if (now >= pending.deadline()) {
+                    ready.add(pending);
+                    entries.remove();
+                }
+            }
+        }
+        isIntrinsic = intrinsicCooldowns != null && !intrinsicCooldowns.isEmpty();
+        return ready;
+    }
 
     //Dame Buff
     public boolean isDameBuff;
@@ -242,7 +281,7 @@ public class EffectSkill {
         if (isUseSkillMonkey && Util.canDoWithTime(lastTimeUseSkillMonkey, timeUseSkillMonkey)) {
             EffectSkillService.gI().finishUseMonkey(player);
         }
-        if (isIntrinsic && Util.canDoWithTime(lastTimeUseSkill, cooldown)) {
+        if (isIntrinsic) {
             EffectSkillService.gI().releaseCooldownSkillByIntrinsic(player);
         }
         if (isDameBuff && Util.canDoWithTime(lastTimeDameBuff, timeDameBuff)) {
@@ -254,7 +293,10 @@ public class EffectSkill {
         return (isStun || isBlindDCTT || anTroi || isThoiMien || isStone || isMabuHold || isUseSkillMonkey) && !player.isDie();
     }
 
-    public void dispose() {
+    public synchronized void dispose() {
+        intrinsicDisposed = true;
+        isIntrinsic = false;
+        if (intrinsicCooldowns != null) intrinsicCooldowns.clear();
         this.player = null;
         this.plAnTroi = null;
         this.plTroi = null;

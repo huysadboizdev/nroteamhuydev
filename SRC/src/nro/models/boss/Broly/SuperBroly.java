@@ -61,6 +61,7 @@ public class SuperBroly extends Boss {
         this.nPoint.hp = this.nPoint.hpMax;
         this.nPoint.dame = this.nPoint.hpMax / 100;
         this.nPoint.crit = Util.nextInt(50);
+        nro.models.services.BossAdminConfig.applyAfterNativeSpawn(this);
     }
 
     void acceptLease(BrolyZoneCoordinator.Lease lease) {this.lease=lease;this.handoff=true;}
@@ -89,7 +90,10 @@ public class SuperBroly extends Boss {
     }
 
     @Override
-    public synchronized void reward(Player plKill) {
+    protected boolean rewardAllowed(Player killer) { return !retired && super.rewardAllowed(killer); }
+
+    @Override
+    public synchronized void rewardDefault(Player plKill) {
         if(rewardGiven || retired)return;
         Player owner = MiniBossPinkCapsuleDrop.creditedPlayer(plKill);
         if (owner == null) return;
@@ -215,8 +219,8 @@ public class SuperBroly extends Boss {
         int hpMax = this.nPoint.hpMax;
         int rand = Util.nextInt(80, 100);
         hpMax = hpMax + hpMax / rand < 16_070_777 ? hpMax + hpMax / rand : 16_070_777;
-        this.nPoint.hpMax = hpMax;
-        this.nPoint.dame = hpMax / 10;
+        this.nPoint.hpMax = nro.models.services.BossAdminConfig.nativeHp(this, hpMax);
+        this.nPoint.dame = nro.models.services.BossAdminConfig.nativeDamage(this, this.nPoint.hpMax / 10);
     }
 
     @Override

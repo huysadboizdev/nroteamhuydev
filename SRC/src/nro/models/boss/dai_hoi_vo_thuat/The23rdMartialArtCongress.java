@@ -130,6 +130,7 @@ public abstract class The23rdMartialArtCongress extends Boss {
 
     @Override
     public void die(Player plKill) {
+        nro.models.services.BossAdminDropService.rewardWithoutDefault(this, plKill);
         this.changeStatus(BossStatus.DIE);
     }
 

@@ -33,7 +33,7 @@ public class DeathBeam3 extends Boss {
         super(SKILLSUMMONED, BossID.DEATH_BEAM_3, BossesData.DEATH_BEAM);
     }
     @Override
-    public void reward(Player plKill) {
+    public void rewardDefault(Player plKill) {
         int diem = 5;
         plKill.event.addEventPoint(diem);
         Service.gI().sendThongBao(plKill, "+5 Point");

@@ -127,7 +127,7 @@ public class MatTroi extends Boss {
     }
 
     @Override
-    public synchronized void reward(Player plKill) {
+    public synchronized void rewardDefault(Player plKill) {
         plKill = nro.models.services.MiniBossPinkCapsuleDrop.creditedPlayer(plKill);
         if (capsuleReward == null) capsuleReward = new nro.models.services.MiniBossPinkCapsuleDrop();
         if (!capsuleReward.drop(this, plKill)) return;
@@ -157,6 +157,8 @@ public class MatTroi extends Boss {
         this.nPoint.hpMax = 100;
         this.nPoint.hp = this.nPoint.hpMax;
         this.nPoint.dameg = 1;
+        this.nPoint.dame = 1;
+        nro.models.services.BossAdminConfig.applyAfterNativeSpawn(this);
         this.joinMap2();
         st = System.currentTimeMillis();
     }

@@ -279,7 +279,7 @@ public class TaskService {
                     Service.gI().sendFlagBag(player);
                     break;
                 case 77:
-                    AchievementService.gI().checkDoneTask(player, ConstAchievement.TRUM_NHAT_NGOC);
+                    AchievementService.gI().checkDoneTask(player, ConstAchievement.TRUM_NHAT_NGOC, item.quantity);
                     break;
             }
         }

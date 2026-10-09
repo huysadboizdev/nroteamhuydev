@@ -64,6 +64,7 @@ public final class ItemDefaultOptions {
 
     public static void complete(Item item) {
         if(item==null||!item.isNotNullItem())return;
+        AnimeEquipment.complete(item);
         // Divine templates store zero; requirement lives in option21. Repair old rewards after decoding.
         if(item.template.id>=555&&item.template.id<=567){
             if(item.itemOptions==null)item.itemOptions=new ArrayList<>();

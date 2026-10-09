@@ -1,0 +1,5286 @@
+[
+  {
+    "key": "id:-32",
+    "boss_id": -32,
+    "class_name": "nro.models.boss.Android.Android13",
+    "name": "Android 13",
+    "quest": true,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Android 13",
+        "hp": 3000000,
+        "hp_range": [
+          3000000
+        ],
+        "damage": 12055,
+        "maps": [
+          104
+        ]
+      }
+    ],
+    "dynamic_stats": false,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/Android/Android13.java"
+  },
+  {
+    "key": "id:-33",
+    "boss_id": -33,
+    "class_name": "nro.models.boss.Android.Android14",
+    "name": "Android 14",
+    "quest": true,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Android 14",
+        "hp": 4000000,
+        "hp_range": [
+          4000000
+        ],
+        "damage": 12000,
+        "maps": [
+          104
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/Android/Android14.java"
+  },
+  {
+    "key": "id:-34",
+    "boss_id": -34,
+    "class_name": "nro.models.boss.Android.Android15",
+    "name": "Android 15",
+    "quest": true,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Android 15",
+        "hp": 5000000,
+        "hp_range": [
+          5000000
+        ],
+        "damage": 12200,
+        "maps": [
+          104
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/Android/Android15.java"
+  },
+  {
+    "key": "id:-30",
+    "boss_id": -30,
+    "class_name": "nro.models.boss.Android.Android19",
+    "name": "Android 19",
+    "quest": true,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Android 19",
+        "hp": 1000000,
+        "hp_range": [
+          1000000
+        ],
+        "damage": 12200,
+        "maps": [
+          96,
+          94,
+          93
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/Android/Android19.java"
+  },
+  {
+    "key": "id:-31",
+    "boss_id": -31,
+    "class_name": "nro.models.boss.Android.DrKore",
+    "name": "Dr.Kôrê",
+    "quest": true,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Dr.Kôrê",
+        "hp": 2000000,
+        "hp_range": [
+          2000000
+        ],
+        "damage": 12000,
+        "maps": [
+          96,
+          94,
+          93
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/Android/DrKore.java"
+  },
+  {
+    "key": "id:-37",
+    "boss_id": -37,
+    "class_name": "nro.models.boss.Android.KingKong",
+    "name": "King Kong",
+    "quest": true,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "King Kong",
+        "hp": 20000000,
+        "hp_range": [
+          20000000
+        ],
+        "damage": 12000,
+        "maps": [
+          97,
+          98,
+          99
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/Android/KingKong.java"
+  },
+  {
+    "key": "id:-35",
+    "boss_id": -35,
+    "class_name": "nro.models.boss.Android.Pic",
+    "name": "Pic",
+    "quest": true,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Pic",
+        "hp": 10000000,
+        "hp_range": [
+          10000000
+        ],
+        "damage": 17022,
+        "maps": [
+          97,
+          98,
+          99
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/Android/Pic.java"
+  },
+  {
+    "key": "id:-36",
+    "boss_id": -36,
+    "class_name": "nro.models.boss.Android.Poc",
+    "name": "Poc",
+    "quest": true,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Poc",
+        "hp": 15000000,
+        "hp_range": [
+          15000000
+        ],
+        "damage": 18000,
+        "maps": [
+          97,
+          98,
+          99
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/Android/Poc.java"
+  },
+  {
+    "key": "id:-925",
+    "boss_id": -925,
+    "class_name": "nro.models.boss.Baby.Baby",
+    "name": "Baby",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Baby",
+        "hp": 2000000000,
+        "hp_range": [
+          2000000000
+        ],
+        "damage": 200000,
+        "maps": [
+          14
+        ]
+      },
+      {
+        "phase": 1,
+        "name": "Baby",
+        "hp": 2000000000,
+        "hp_range": [
+          2000000000
+        ],
+        "damage": 250000,
+        "maps": [
+          14
+        ]
+      },
+      {
+        "phase": 2,
+        "name": "Baby",
+        "hp": 2000000000,
+        "hp_range": [
+          2000000000
+        ],
+        "damage": 30000,
+        "maps": [
+          14
+        ]
+      }
+    ],
+    "dynamic_stats": false,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/Baby/Baby.java"
+  },
+  {
+    "key": "id:-203",
+    "boss_id": -203,
+    "class_name": "nro.models.boss.Black_Goku.BlackGoku",
+    "name": "Black Goku",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Black Goku",
+        "hp": 500000000,
+        "hp_range": [
+          500000000
+        ],
+        "damage": 50000,
+        "maps": [
+          102,
+          92,
+          93,
+          94,
+          96,
+          97,
+          98,
+          99,
+          100
+        ]
+      },
+      {
+        "phase": 1,
+        "name": "Super Black Goku",
+        "hp": 2000000000,
+        "hp_range": [
+          2000000000
+        ],
+        "damage": 100000,
+        "maps": [
+          102,
+          92,
+          93,
+          94,
+          96,
+          97,
+          98,
+          99,
+          100
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/Black_Goku/BlackGoku.java"
+  },
+  {
+    "key": "id:-928",
+    "boss_id": -928,
+    "class_name": "nro.models.boss.Black_Goku.Zamasu",
+    "name": "Zamasu",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Zamasu",
+        "hp": 2000000000,
+        "hp_range": [
+          2000000000
+        ],
+        "damage": 100000,
+        "maps": [
+          102,
+          92,
+          93,
+          94,
+          96,
+          97,
+          98,
+          99,
+          100
+        ]
+      }
+    ],
+    "dynamic_stats": false,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/Black_Goku/Zamasu.java"
+  },
+  {
+    "key": "class:nro.models.boss.Boss_mini.AnTrom",
+    "boss_id": null,
+    "class_name": "nro.models.boss.Boss_mini.AnTrom",
+    "name": "Ăn Trộm",
+    "quest": false,
+    "limited": false,
+    "kind": "mini",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Ăn Trộm ",
+        "hp": 100,
+        "hp_range": [
+          100
+        ],
+        "damage": 1,
+        "maps": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          63,
+          64,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71,
+          72,
+          73,
+          74,
+          75,
+          76,
+          77,
+          79,
+          80,
+          81,
+          82,
+          83,
+          84,
+          92,
+          93,
+          94,
+          96,
+          97,
+          98,
+          99,
+          100,
+          102,
+          103,
+          104,
+          105,
+          106,
+          107,
+          108,
+          109,
+          110
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/Boss_mini/AnTrom.java"
+  },
+  {
+    "key": "class:nro.models.boss.Boss_mini.MatTroi",
+    "boss_id": null,
+    "class_name": "nro.models.boss.Boss_mini.MatTroi",
+    "name": "Mặt Trời",
+    "quest": false,
+    "limited": false,
+    "kind": "mini",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Mặt Trời ",
+        "hp": 100,
+        "hp_range": [
+          100
+        ],
+        "damage": 10,
+        "maps": [
+          5,
+          7,
+          0,
+          14
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/Boss_mini/MatTroi.java"
+  },
+  {
+    "key": "class:nro.models.boss.Boss_mini.Odo",
+    "boss_id": null,
+    "class_name": "nro.models.boss.Boss_mini.Odo",
+    "name": "Ở Dơ",
+    "quest": false,
+    "limited": false,
+    "kind": "mini",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Ở Dơ ",
+        "hp": 500000,
+        "hp_range": [
+          500000
+        ],
+        "damage": 1000,
+        "maps": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          63,
+          64,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71,
+          72,
+          73,
+          74,
+          75,
+          76,
+          77,
+          79,
+          80,
+          81,
+          82,
+          83,
+          84,
+          92,
+          93,
+          94,
+          96,
+          97,
+          98,
+          99,
+          100,
+          102,
+          103,
+          104,
+          105,
+          106,
+          107,
+          108,
+          109,
+          110
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/Boss_mini/Odo.java"
+  },
+  {
+    "key": "id:-386998",
+    "boss_id": -386998,
+    "class_name": "nro.models.boss.Boss_mini.RongNhi",
+    "name": "Rồng Nhí",
+    "quest": false,
+    "limited": false,
+    "kind": "mini",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Rồng Nhí",
+        "hp": 50000000,
+        "hp_range": [
+          50000000
+        ],
+        "damage": 1,
+        "maps": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/Boss_mini/RongNhi.java"
+  },
+  {
+    "key": "class:nro.models.boss.Boss_mini.SoiHecQuyn",
+    "boss_id": null,
+    "class_name": "nro.models.boss.Boss_mini.SoiHecQuyn",
+    "name": "Sói hẹc quyn",
+    "quest": false,
+    "limited": false,
+    "kind": "mini",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Sói hẹc quyn",
+        "hp": 10000,
+        "hp_range": [
+          10000
+        ],
+        "damage": 1000,
+        "maps": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          63,
+          64,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71,
+          72,
+          73,
+          74,
+          75,
+          76,
+          77,
+          79,
+          80,
+          81,
+          82,
+          83,
+          84,
+          92,
+          93,
+          94,
+          96,
+          97,
+          98,
+          99,
+          100,
+          102,
+          103,
+          104,
+          105,
+          106,
+          107,
+          108,
+          109,
+          110
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/Boss_mini/SoiHecQuyn.java"
+  },
+  {
+    "key": "id:-79",
+    "boss_id": -79,
+    "class_name": "nro.models.boss.Boss_mini.Virut",
+    "name": "Virut",
+    "quest": false,
+    "limited": false,
+    "kind": "mini",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Virut ",
+        "hp": 100,
+        "hp_range": [
+          100
+        ],
+        "damage": 10,
+        "maps": [
+          5,
+          7,
+          0,
+          14
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/Boss_mini/Virut.java"
+  },
+  {
+    "key": "id:-1822",
+    "boss_id": -1822,
+    "class_name": "nro.models.boss.Broly.Broly",
+    "name": "Broly",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Broly",
+        "hp": 500,
+        "hp_range": [
+          500
+        ],
+        "damage": 100,
+        "maps": [
+          5,
+          13,
+          20,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/Broly/Broly.java"
+  },
+  {
+    "key": "id:-82282",
+    "boss_id": -82282,
+    "class_name": "nro.models.boss.Broly.SuperBroly",
+    "name": "Super Broly",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Super Broly",
+        "hp": 1000,
+        "hp_range": [
+          1000
+        ],
+        "damage": 100,
+        "maps": [
+          5,
+          13,
+          20,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/Broly/SuperBroly.java"
+  },
+  {
+    "key": "id:-101",
+    "boss_id": -101,
+    "class_name": "nro.models.boss.Cell.SieuBoHung",
+    "name": "Xên Hoàn Thiện",
+    "quest": true,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Xên Hoàn Thiện",
+        "hp": 150000000,
+        "hp_range": [
+          150000000
+        ],
+        "damage": 35000,
+        "maps": [
+          103
+        ]
+      },
+      {
+        "phase": 1,
+        "name": "Siêu Bọ Hung",
+        "hp": 200000000,
+        "hp_range": [
+          200000000
+        ],
+        "damage": 40000,
+        "maps": [
+          103
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/Cell/SieuBoHung.java"
+  },
+  {
+    "key": "id:-102",
+    "boss_id": -102,
+    "class_name": "nro.models.boss.Cell.XENCON1",
+    "name": "Xên con 1",
+    "quest": true,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Xên con 1",
+        "hp": 5000000,
+        "hp_range": [
+          5000000
+        ],
+        "damage": 15000,
+        "maps": [
+          103
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/Cell/XENCON1.java"
+  },
+  {
+    "key": "id:-103",
+    "boss_id": -103,
+    "class_name": "nro.models.boss.Cell.XENCON2",
+    "name": "Xên con 2",
+    "quest": true,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Xên con 2",
+        "hp": 5000000,
+        "hp_range": [
+          5000000
+        ],
+        "damage": 15000,
+        "maps": [
+          103
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/Cell/XENCON2.java"
+  },
+  {
+    "key": "id:-104",
+    "boss_id": -104,
+    "class_name": "nro.models.boss.Cell.XENCON3",
+    "name": "Xên con 3",
+    "quest": true,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Xên con 3",
+        "hp": 5000000,
+        "hp_range": [
+          5000000
+        ],
+        "damage": 15000,
+        "maps": [
+          103
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/Cell/XENCON3.java"
+  },
+  {
+    "key": "id:-105",
+    "boss_id": -105,
+    "class_name": "nro.models.boss.Cell.XENCON4",
+    "name": "Xên con 4",
+    "quest": true,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Xên con 4",
+        "hp": 5000000,
+        "hp_range": [
+          5000000
+        ],
+        "damage": 15000,
+        "maps": [
+          103
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/Cell/XENCON4.java"
+  },
+  {
+    "key": "id:-106",
+    "boss_id": -106,
+    "class_name": "nro.models.boss.Cell.XENCON5",
+    "name": "Xên con 5",
+    "quest": true,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Xên con 5",
+        "hp": 5000000,
+        "hp_range": [
+          5000000
+        ],
+        "damage": 15000,
+        "maps": [
+          103
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/Cell/XENCON5.java"
+  },
+  {
+    "key": "id:-107",
+    "boss_id": -107,
+    "class_name": "nro.models.boss.Cell.XENCON6",
+    "name": "Xên con 6",
+    "quest": true,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Xên con 6",
+        "hp": 5000000,
+        "hp_range": [
+          5000000
+        ],
+        "damage": 15000,
+        "maps": [
+          103
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/Cell/XENCON6.java"
+  },
+  {
+    "key": "id:-108",
+    "boss_id": -108,
+    "class_name": "nro.models.boss.Cell.XENCON7",
+    "name": "Xên con 7",
+    "quest": true,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Xên con 7",
+        "hp": 5000000,
+        "hp_range": [
+          5000000
+        ],
+        "damage": 15000,
+        "maps": [
+          103
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/Cell/XENCON7.java"
+  },
+  {
+    "key": "id:-100",
+    "boss_id": -100,
+    "class_name": "nro.models.boss.Cell.XenBoHung",
+    "name": "Xên bọ hung",
+    "quest": true,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Xên bọ hung",
+        "hp": 50000000,
+        "hp_range": [
+          50000000
+        ],
+        "damage": 20000,
+        "maps": [
+          100
+        ]
+      },
+      {
+        "phase": 1,
+        "name": "Xên hoàn thiện",
+        "hp": 100000000,
+        "hp_range": [
+          100000000
+        ],
+        "damage": 25000,
+        "maps": [
+          100
+        ]
+      },
+      {
+        "phase": 2,
+        "name": "Xên hoàn thiện",
+        "hp": 150000000,
+        "hp_range": [
+          150000000
+        ],
+        "damage": 30000,
+        "maps": [
+          100
+        ]
+      }
+    ],
+    "dynamic_stats": false,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/Cell/XenBoHung.java"
+  },
+  {
+    "key": "id:-29",
+    "boss_id": -29,
+    "class_name": "nro.models.boss.Cold.Cooler",
+    "name": "Cooler",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Cooler",
+        "hp": 200000000,
+        "hp_range": [
+          200000000
+        ],
+        "damage": 32000,
+        "maps": [
+          110
+        ]
+      },
+      {
+        "phase": 1,
+        "name": "Cooler 2",
+        "hp": 500000000,
+        "hp_range": [
+          500000000
+        ],
+        "damage": 50000,
+        "maps": [
+          110
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/Cold/Cooler.java"
+  },
+  {
+    "key": "id:-28",
+    "boss_id": -28,
+    "class_name": "nro.models.boss.Frieza.Fide",
+    "name": "Fide đại ca 1",
+    "quest": true,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Fide đại ca 1",
+        "hp": 10000000,
+        "hp_range": [
+          10000000
+        ],
+        "damage": 22000,
+        "maps": [
+          80
+        ]
+      },
+      {
+        "phase": 1,
+        "name": "Fide đại ca 2",
+        "hp": 20000000,
+        "hp_range": [
+          20000000
+        ],
+        "damage": 25000,
+        "maps": [
+          80
+        ]
+      },
+      {
+        "phase": 2,
+        "name": "Fide đại ca 3",
+        "hp": 30000000,
+        "hp_range": [
+          30000000
+        ],
+        "damage": 30000,
+        "maps": [
+          80
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/Frieza/Fide.java"
+  },
+  {
+    "key": "id:-609",
+    "boss_id": -609,
+    "class_name": "nro.models.boss.Golden_fireza.DeathBeam1",
+    "name": "$",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "$",
+        "hp": 500,
+        "hp_range": [
+          500
+        ],
+        "damage": 1000,
+        "maps": [
+          6
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/Golden_fireza/DeathBeam1.java"
+  },
+  {
+    "key": "id:-610",
+    "boss_id": -610,
+    "class_name": "nro.models.boss.Golden_fireza.DeathBeam2",
+    "name": "$",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "$",
+        "hp": 500,
+        "hp_range": [
+          500
+        ],
+        "damage": 1000,
+        "maps": [
+          6
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/Golden_fireza/DeathBeam2.java"
+  },
+  {
+    "key": "id:-611",
+    "boss_id": -611,
+    "class_name": "nro.models.boss.Golden_fireza.DeathBeam3",
+    "name": "$",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "$",
+        "hp": 500,
+        "hp_range": [
+          500
+        ],
+        "damage": 1000,
+        "maps": [
+          6
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/Golden_fireza/DeathBeam3.java"
+  },
+  {
+    "key": "id:-612",
+    "boss_id": -612,
+    "class_name": "nro.models.boss.Golden_fireza.DeathBeam4",
+    "name": "$",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "$",
+        "hp": 500,
+        "hp_range": [
+          500
+        ],
+        "damage": 1000,
+        "maps": [
+          6
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/Golden_fireza/DeathBeam4.java"
+  },
+  {
+    "key": "id:-613",
+    "boss_id": -613,
+    "class_name": "nro.models.boss.Golden_fireza.DeathBeam5",
+    "name": "$",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "$",
+        "hp": 500,
+        "hp_range": [
+          500
+        ],
+        "damage": 1000,
+        "maps": [
+          6
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/Golden_fireza/DeathBeam5.java"
+  },
+  {
+    "key": "id:-502",
+    "boss_id": -502,
+    "class_name": "nro.models.boss.Golden_fireza.GoldenFrieza",
+    "name": "Fide Vàng",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Fide Vàng",
+        "hp": 1000000000,
+        "hp_range": [
+          1000000000
+        ],
+        "damage": 100000,
+        "maps": [
+          6
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/Golden_fireza/GoldenFrieza.java"
+  },
+  {
+    "key": "class:nro.models.boss.HuntingTrio.HuntingTrioBoss#Basil",
+    "boss_id": null,
+    "class_name": "nro.models.boss.HuntingTrio.HuntingTrioBoss",
+    "name": "Basil",
+    "quest": false,
+    "limited": true,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Basil",
+        "hp": 1000,
+        "hp_range": [
+          1000
+        ],
+        "damage": 1,
+        "maps": [
+          39,
+          0,
+          1,
+          2,
+          3,
+          40,
+          7,
+          8,
+          9,
+          10,
+          41,
+          14,
+          15,
+          16,
+          17
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/HuntingTrio/HuntingTrioBoss.java",
+    "variant": "Basil",
+    "outgoing_formula": "5% HP tối đa mục tiêu"
+  },
+  {
+    "key": "class:nro.models.boss.HuntingTrio.HuntingTrioBoss#Lavender",
+    "boss_id": null,
+    "class_name": "nro.models.boss.HuntingTrio.HuntingTrioBoss",
+    "name": "Lavender",
+    "quest": false,
+    "limited": true,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Lavender",
+        "hp": 1000,
+        "hp_range": [
+          1000
+        ],
+        "damage": 1,
+        "maps": [
+          39,
+          0,
+          1,
+          2,
+          3,
+          40,
+          7,
+          8,
+          9,
+          10,
+          41,
+          14,
+          15,
+          16,
+          17
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/HuntingTrio/HuntingTrioBoss.java",
+    "variant": "Lavender",
+    "outgoing_formula": "5% HP tối đa mục tiêu"
+  },
+  {
+    "key": "class:nro.models.boss.HuntingTrio.HuntingTrioBoss#Bergamo",
+    "boss_id": null,
+    "class_name": "nro.models.boss.HuntingTrio.HuntingTrioBoss",
+    "name": "Bergamo",
+    "quest": false,
+    "limited": true,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Bergamo",
+        "hp": 1000,
+        "hp_range": [
+          1000
+        ],
+        "damage": 1,
+        "maps": [
+          39,
+          0,
+          1,
+          2,
+          3,
+          40,
+          7,
+          8,
+          9,
+          10,
+          41,
+          14,
+          15,
+          16,
+          17
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/HuntingTrio/HuntingTrioBoss.java",
+    "variant": "Bergamo",
+    "outgoing_formula": "5% HP tối đa mục tiêu"
+  },
+  {
+    "key": "class:nro.models.boss.HuntingTrio.HuntingTrioBoss#Pi Láp",
+    "boss_id": null,
+    "class_name": "nro.models.boss.HuntingTrio.HuntingTrioBoss",
+    "name": "Pi Láp",
+    "quest": false,
+    "limited": true,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Pi Láp",
+        "hp": 1000,
+        "hp_range": [
+          1000
+        ],
+        "damage": 1,
+        "maps": [
+          39,
+          0,
+          1,
+          2,
+          3,
+          40,
+          7,
+          8,
+          9,
+          10,
+          41,
+          14,
+          15,
+          16,
+          17
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/HuntingTrio/HuntingTrioBoss.java",
+    "variant": "Pi Láp",
+    "outgoing_formula": "5% HP tối đa mục tiêu"
+  },
+  {
+    "key": "class:nro.models.boss.HuntingTrio.HuntingTrioBoss#Mai",
+    "boss_id": null,
+    "class_name": "nro.models.boss.HuntingTrio.HuntingTrioBoss",
+    "name": "Mai",
+    "quest": false,
+    "limited": true,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Mai",
+        "hp": 1000,
+        "hp_range": [
+          1000
+        ],
+        "damage": 1,
+        "maps": [
+          39,
+          0,
+          1,
+          2,
+          3,
+          40,
+          7,
+          8,
+          9,
+          10,
+          41,
+          14,
+          15,
+          16,
+          17
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/HuntingTrio/HuntingTrioBoss.java",
+    "variant": "Mai",
+    "outgoing_formula": "5% HP tối đa mục tiêu"
+  },
+  {
+    "key": "class:nro.models.boss.HuntingTrio.HuntingTrioBoss#Su",
+    "boss_id": null,
+    "class_name": "nro.models.boss.HuntingTrio.HuntingTrioBoss",
+    "name": "Su",
+    "quest": false,
+    "limited": true,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Su",
+        "hp": 1000,
+        "hp_range": [
+          1000
+        ],
+        "damage": 1,
+        "maps": [
+          39,
+          0,
+          1,
+          2,
+          3,
+          40,
+          7,
+          8,
+          9,
+          10,
+          41,
+          14,
+          15,
+          16,
+          17
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/HuntingTrio/HuntingTrioBoss.java",
+    "variant": "Su",
+    "outgoing_formula": "5% HP tối đa mục tiêu"
+  },
+  {
+    "key": "id:-927",
+    "boss_id": -927,
+    "class_name": "nro.models.boss.Mabu.FatMabuTournament",
+    "name": "Mabu mập",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Mabu mập",
+        "hp": 300000000,
+        "hp_range": [
+          300000000
+        ],
+        "damage": 1,
+        "maps": [
+          52
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/Mabu/FatMabuTournament.java"
+  },
+  {
+    "key": "id:-234",
+    "boss_id": -234,
+    "class_name": "nro.models.boss.MajinBuu_12h.BuiBui",
+    "name": "Bui Bui",
+    "quest": true,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Bui Bui",
+        "hp": 40000000,
+        "hp_range": [
+          40000000
+        ],
+        "damage": 200000,
+        "maps": [
+          115
+        ]
+      }
+    ],
+    "dynamic_stats": false,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/MajinBuu_12h/BuiBui.java"
+  },
+  {
+    "key": "id:-238",
+    "boss_id": -238,
+    "class_name": "nro.models.boss.MajinBuu_12h.BuiBui2",
+    "name": "Bui Bui",
+    "quest": true,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Bui Bui",
+        "hp": 40000000,
+        "hp_range": [
+          40000000
+        ],
+        "damage": 200000,
+        "maps": [
+          117
+        ]
+      }
+    ],
+    "dynamic_stats": false,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/MajinBuu_12h/BuiBui2.java"
+  },
+  {
+    "key": "id:-342",
+    "boss_id": -342,
+    "class_name": "nro.models.boss.MajinBuu_12h.Cadic",
+    "name": "Ca Đít",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Ca Đít",
+        "hp": 60000000,
+        "hp_range": [
+          60000000
+        ],
+        "damage": 1000,
+        "maps": [
+          119
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/MajinBuu_12h/Cadic.java"
+  },
+  {
+    "key": "id:-233",
+    "boss_id": -233,
+    "class_name": "nro.models.boss.MajinBuu_12h.Drabura",
+    "name": "Drabura",
+    "quest": true,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Drabura",
+        "hp": 20000000,
+        "hp_range": [
+          20000000
+        ],
+        "damage": 10000,
+        "maps": [
+          114
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/MajinBuu_12h/Drabura.java"
+  },
+  {
+    "key": "id:-237",
+    "boss_id": -237,
+    "class_name": "nro.models.boss.MajinBuu_12h.Drabura2",
+    "name": "Drabura",
+    "quest": true,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Drabura",
+        "hp": 20000000,
+        "hp_range": [
+          20000000
+        ],
+        "damage": 200000,
+        "maps": [
+          119
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/MajinBuu_12h/Drabura2.java"
+  },
+  {
+    "key": "id:-343",
+    "boss_id": -343,
+    "class_name": "nro.models.boss.MajinBuu_12h.Drabura3",
+    "name": "Drabura",
+    "quest": true,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Drabura",
+        "hp": 20000000,
+        "hp_range": [
+          20000000
+        ],
+        "damage": 100000,
+        "maps": [
+          114
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/MajinBuu_12h/Drabura3.java"
+  },
+  {
+    "key": "id:-341",
+    "boss_id": -341,
+    "class_name": "nro.models.boss.MajinBuu_12h.Goku",
+    "name": "Gôku",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Gôku",
+        "hp": 60000000,
+        "hp_range": [
+          60000000
+        ],
+        "damage": 1000,
+        "maps": [
+          119
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/MajinBuu_12h/Goku.java"
+  },
+  {
+    "key": "id:-236",
+    "boss_id": -236,
+    "class_name": "nro.models.boss.MajinBuu_12h.Mabu",
+    "name": "Mabư",
+    "quest": true,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Mabư",
+        "hp": 100000000,
+        "hp_range": [
+          100000000
+        ],
+        "damage": 10000,
+        "maps": [
+          120
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/MajinBuu_12h/Mabu.java"
+  },
+  {
+    "key": "id:-235",
+    "boss_id": -235,
+    "class_name": "nro.models.boss.MajinBuu_12h.Yacon",
+    "name": "Ya côn",
+    "quest": true,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Ya côn",
+        "hp": 50000000,
+        "hp_range": [
+          50000000
+        ],
+        "damage": 200000,
+        "maps": [
+          118
+        ]
+      }
+    ],
+    "dynamic_stats": false,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/MajinBuu_12h/Yacon.java"
+  },
+  {
+    "key": "id:-214",
+    "boss_id": -214,
+    "class_name": "nro.models.boss.MajinBuu_14h.Mabu2H",
+    "name": "Mabư mập",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Mabư mập",
+        "hp": 50000000,
+        "hp_range": [
+          50000000
+        ],
+        "damage": 500000,
+        "maps": [
+          127
+        ]
+      },
+      {
+        "phase": 1,
+        "name": "Super Bư",
+        "hp": 60000000,
+        "hp_range": [
+          60000000
+        ],
+        "damage": 500000,
+        "maps": [
+          127,
+          128
+        ]
+      },
+      {
+        "phase": 2,
+        "name": "Bư Tênk",
+        "hp": 80000000,
+        "hp_range": [
+          80000000
+        ],
+        "damage": 500000,
+        "maps": [
+          127
+        ]
+      },
+      {
+        "phase": 3,
+        "name": "Bư Han",
+        "hp": 100000000,
+        "hp_range": [
+          100000000
+        ],
+        "damage": 500000,
+        "maps": [
+          127
+        ]
+      },
+      {
+        "phase": 4,
+        "name": "Kid Bư",
+        "hp": 150000000,
+        "hp_range": [
+          150000000
+        ],
+        "damage": 500000,
+        "maps": [
+          127
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/MajinBuu_14h/Mabu2H.java"
+  },
+  {
+    "key": "id:-348",
+    "boss_id": -348,
+    "class_name": "nro.models.boss.MajinBuu_14h.SuperBu",
+    "name": "Super Bư",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Super Bư",
+        "hp": 50000000,
+        "hp_range": [
+          50000000
+        ],
+        "damage": 500000,
+        "maps": [
+          127,
+          128
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/MajinBuu_14h/SuperBu.java"
+  },
+  {
+    "key": "id:-20",
+    "boss_id": -20,
+    "class_name": "nro.models.boss.Nappa.Kuku",
+    "name": "Kuku",
+    "quest": true,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Kuku",
+        "hp": 500000,
+        "hp_range": [
+          500000
+        ],
+        "damage": 9000,
+        "maps": [
+          68,
+          69,
+          70,
+          71,
+          72
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/Nappa/Kuku.java"
+  },
+  {
+    "key": "id:-21",
+    "boss_id": -21,
+    "class_name": "nro.models.boss.Nappa.MapDauDinh",
+    "name": "Mập Đầu Đinh",
+    "quest": true,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Mập Đầu Đinh",
+        "hp": 1000000,
+        "hp_range": [
+          1000000
+        ],
+        "damage": 10000,
+        "maps": [
+          63,
+          64,
+          65,
+          66,
+          67
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/Nappa/MapDauDinh.java"
+  },
+  {
+    "key": "id:-22",
+    "boss_id": -22,
+    "class_name": "nro.models.boss.Nappa.Rambo",
+    "name": "Rambo",
+    "quest": true,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Rambo",
+        "hp": 1500000,
+        "hp_range": [
+          1500000
+        ],
+        "damage": 12400,
+        "maps": [
+          74,
+          75,
+          76,
+          77
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/Nappa/Rambo.java"
+  },
+  {
+    "key": "class:nro.models.boss.Tau_PayPay.TaoPaiPai",
+    "boss_id": null,
+    "class_name": "nro.models.boss.Tau_PayPay.TaoPaiPai",
+    "name": "Tàu Pảy Pảy",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Tàu Pảy Pảy",
+        "hp": 10000,
+        "hp_range": [
+          10000
+        ],
+        "damage": 100,
+        "maps": [
+          111
+        ]
+      }
+    ],
+    "dynamic_stats": false,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/Tau_PayPay/TaoPaiPai.java"
+  },
+  {
+    "key": "id:-6",
+    "boss_id": -6,
+    "class_name": "nro.models.boss.ban_do_kho_bau.TrungUyXanhLo",
+    "name": "Trung úy Xanh Lơ",
+    "quest": false,
+    "limited": false,
+    "kind": "dungeon",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Trung úy Xanh Lơ",
+        "hp": null,
+        "hp_range": [],
+        "damage": null,
+        "maps": [
+          103
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/ban_do_kho_bau/TrungUyXanhLo.java"
+  },
+  {
+    "key": "id:-203999",
+    "boss_id": -203999,
+    "class_name": "nro.models.boss.cumber.Cumber",
+    "name": "Cumber",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Cumber",
+        "hp": 500000000,
+        "hp_range": [
+          500000000
+        ],
+        "damage": 50000,
+        "maps": [
+          155
+        ]
+      },
+      {
+        "phase": 1,
+        "name": "Super Cumber",
+        "hp": 2000000000,
+        "hp_range": [
+          2000000000
+        ],
+        "damage": 100000,
+        "maps": [
+          155
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/cumber/Cumber.java"
+  },
+  {
+    "key": "id:-80",
+    "boss_id": -80,
+    "class_name": "nro.models.boss.dai_hoi_vo_thuat.ChaPa",
+    "name": "Cha pa",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Cha pa",
+        "hp": 100000,
+        "hp_range": [
+          100000
+        ],
+        "damage": 9000,
+        "maps": [
+          168
+        ]
+      }
+    ],
+    "dynamic_stats": false,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/dai_hoi_vo_thuat/ChaPa.java"
+  },
+  {
+    "key": "id:-82",
+    "boss_id": -82,
+    "class_name": "nro.models.boss.dai_hoi_vo_thuat.ChanXu",
+    "name": "Chan xư",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Chan xư",
+        "hp": 500000,
+        "hp_range": [
+          500000
+        ],
+        "damage": 10000,
+        "maps": [
+          168
+        ]
+      }
+    ],
+    "dynamic_stats": false,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/dai_hoi_vo_thuat/ChanXu.java"
+  },
+  {
+    "key": "id:-85",
+    "boss_id": -85,
+    "class_name": "nro.models.boss.dai_hoi_vo_thuat.JackyChun",
+    "name": "Jacky Chun",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Jacky Chun",
+        "hp": 25000000,
+        "hp_range": [
+          25000000
+        ],
+        "damage": 20000,
+        "maps": [
+          168
+        ]
+      }
+    ],
+    "dynamic_stats": false,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/dai_hoi_vo_thuat/JackyChun.java"
+  },
+  {
+    "key": "id:-87",
+    "boss_id": -87,
+    "class_name": "nro.models.boss.dai_hoi_vo_thuat.LiuLiu",
+    "name": "Liu Liu",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Liu Liu",
+        "hp": 150000000,
+        "hp_range": [
+          150000000
+        ],
+        "damage": 30000,
+        "maps": [
+          168
+        ]
+      }
+    ],
+    "dynamic_stats": false,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/dai_hoi_vo_thuat/LiuLiu.java"
+  },
+  {
+    "key": "id:-78",
+    "boss_id": -78,
+    "class_name": "nro.models.boss.dai_hoi_vo_thuat.ODo",
+    "name": "Ở dơ",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Ở dơ",
+        "hp": 25000,
+        "hp_range": [
+          25000
+        ],
+        "damage": 3000,
+        "maps": [
+          168
+        ]
+      }
+    ],
+    "dynamic_stats": false,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/dai_hoi_vo_thuat/ODo.java"
+  },
+  {
+    "key": "id:-92",
+    "boss_id": -92,
+    "class_name": "nro.models.boss.dai_hoi_vo_thuat.Pocolo",
+    "name": "PôCôLô",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "PôCôLô",
+        "hp": 100000000,
+        "hp_range": [
+          100000000
+        ],
+        "damage": 50000,
+        "maps": [
+          168
+        ]
+      }
+    ],
+    "dynamic_stats": false,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/dai_hoi_vo_thuat/Pocolo.java"
+  },
+  {
+    "key": "id:-81",
+    "boss_id": -81,
+    "class_name": "nro.models.boss.dai_hoi_vo_thuat.PonPut",
+    "name": "Pon put",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Pon put",
+        "hp": 250000,
+        "hp_range": [
+          250000
+        ],
+        "damage": 10000,
+        "maps": [
+          168
+        ]
+      }
+    ],
+    "dynamic_stats": false,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/dai_hoi_vo_thuat/PonPut.java"
+  },
+  {
+    "key": "id:-77",
+    "boss_id": -77,
+    "class_name": "nro.models.boss.dai_hoi_vo_thuat.SoiHecQuyn",
+    "name": "Sói hẹc quyn",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Sói hẹc quyn",
+        "hp": 10000,
+        "hp_range": [
+          10000
+        ],
+        "damage": 1000,
+        "maps": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          63,
+          64,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71,
+          72,
+          73,
+          74,
+          75,
+          76,
+          77,
+          79,
+          80,
+          81,
+          82,
+          83,
+          84,
+          92,
+          93,
+          94,
+          96,
+          97,
+          98,
+          99,
+          100,
+          102,
+          103,
+          104,
+          105,
+          106,
+          107,
+          108,
+          109,
+          110
+        ]
+      }
+    ],
+    "dynamic_stats": false,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/dai_hoi_vo_thuat/SoiHecQuyn.java"
+  },
+  {
+    "key": "id:-83",
+    "boss_id": -83,
+    "class_name": "nro.models.boss.dai_hoi_vo_thuat.TauPayPay",
+    "name": "Tàu Pảy Pảy",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Tàu Pảy Pảy",
+        "hp": 2000000,
+        "hp_range": [
+          2000000
+        ],
+        "damage": 15000,
+        "maps": [
+          168
+        ]
+      }
+    ],
+    "dynamic_stats": false,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/dai_hoi_vo_thuat/TauPayPay.java"
+  },
+  {
+    "key": "id:-86",
+    "boss_id": -86,
+    "class_name": "nro.models.boss.dai_hoi_vo_thuat.ThienXinHang",
+    "name": "Thiên xin hăng",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Thiên xin hăng",
+        "hp": 75000000,
+        "hp_range": [
+          75000000
+        ],
+        "damage": 22000,
+        "maps": [
+          168
+        ]
+      }
+    ],
+    "dynamic_stats": false,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/dai_hoi_vo_thuat/ThienXinHang.java"
+  },
+  {
+    "key": "class:nro.models.boss.dai_hoi_vo_thuat.ThienXinHangClone",
+    "boss_id": null,
+    "class_name": "nro.models.boss.dai_hoi_vo_thuat.ThienXinHangClone",
+    "name": "Thiên xin hăng",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Thiên xin hăng",
+        "hp": 20000000,
+        "hp_range": [
+          20000000
+        ],
+        "damage": 5000,
+        "maps": [
+          168
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/dai_hoi_vo_thuat/ThienXinHangClone.java"
+  },
+  {
+    "key": "class:nro.models.boss.dai_hoi_vo_thuat.Xinbato",
+    "boss_id": -79,
+    "class_name": "nro.models.boss.dai_hoi_vo_thuat.Xinbato",
+    "name": "Xinbatô",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Xinbatô",
+        "hp": 50000,
+        "hp_range": [
+          50000
+        ],
+        "damage": 6000,
+        "maps": [
+          168
+        ]
+      }
+    ],
+    "dynamic_stats": false,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/dai_hoi_vo_thuat/Xinbato.java"
+  },
+  {
+    "key": "id:-84",
+    "boss_id": -84,
+    "class_name": "nro.models.boss.dai_hoi_vo_thuat.Yamcha",
+    "name": "Yamcha",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Yamcha",
+        "hp": 5000000,
+        "hp_range": [
+          5000000
+        ],
+        "damage": 15000,
+        "maps": [
+          168
+        ]
+      }
+    ],
+    "dynamic_stats": false,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/dai_hoi_vo_thuat/Yamcha.java"
+  },
+  {
+    "key": "id:-7",
+    "boss_id": -7,
+    "class_name": "nro.models.boss.doanh_trai.NinjaAoTim",
+    "name": "Ninja Áo Tím",
+    "quest": false,
+    "limited": false,
+    "kind": "dungeon",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Ninja Áo Tím",
+        "hp": null,
+        "hp_range": [],
+        "damage": null,
+        "maps": [
+          54
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/doanh_trai/NinjaAoTim.java"
+  },
+  {
+    "key": "class:nro.models.boss.doanh_trai.NinjaClone",
+    "boss_id": null,
+    "class_name": "nro.models.boss.doanh_trai.NinjaClone",
+    "name": "Ninja Áo Tím",
+    "quest": false,
+    "limited": false,
+    "kind": "dungeon",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Ninja Áo Tím",
+        "hp": null,
+        "hp_range": [],
+        "damage": null,
+        "maps": [
+          54
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/doanh_trai/NinjaClone.java"
+  },
+  {
+    "key": "class:nro.models.boss.doanh_trai.RobotVeSi",
+    "boss_id": -8,
+    "class_name": "nro.models.boss.doanh_trai.RobotVeSi",
+    "name": "Rôbốt Vệ Sĩ 0",
+    "quest": false,
+    "limited": false,
+    "kind": "dungeon",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Rôbốt Vệ Sĩ 0",
+        "hp": null,
+        "hp_range": [],
+        "damage": null,
+        "maps": [
+          57
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/doanh_trai/RobotVeSi.java"
+  },
+  {
+    "key": "id:-5",
+    "boss_id": -5,
+    "class_name": "nro.models.boss.doanh_trai.TrungUyThep",
+    "name": "Trung uý Thép",
+    "quest": false,
+    "limited": false,
+    "kind": "dungeon",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Trung uý Thép",
+        "hp": null,
+        "hp_range": [],
+        "damage": null,
+        "maps": [
+          55
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/doanh_trai/TrungUyThep.java"
+  },
+  {
+    "key": "id:-4",
+    "boss_id": -4,
+    "class_name": "nro.models.boss.doanh_trai.TrungUyTrang",
+    "name": "Trung uý Trắng",
+    "quest": false,
+    "limited": false,
+    "kind": "dungeon",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Trung uý Trắng",
+        "hp": null,
+        "hp_range": [],
+        "damage": null,
+        "maps": [
+          59
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/doanh_trai/TrungUyTrang.java"
+  },
+  {
+    "key": "class:nro.models.boss.doanh_trai.TrungUyXanhLo",
+    "boss_id": -6,
+    "class_name": "nro.models.boss.doanh_trai.TrungUyXanhLo",
+    "name": "Trung uý Xanh Lơ",
+    "quest": false,
+    "limited": false,
+    "kind": "dungeon",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Trung uý Xanh Lơ",
+        "hp": null,
+        "hp_range": [],
+        "damage": null,
+        "maps": [
+          62
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/doanh_trai/TrungUyXanhLo.java"
+  },
+  {
+    "key": "id:-351",
+    "boss_id": -351,
+    "class_name": "nro.models.boss.event.Halloween.BiMa",
+    "name": "Bí ma",
+    "quest": false,
+    "limited": true,
+    "kind": "event",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Bí ma",
+        "hp": 500000,
+        "hp_range": [
+          500000
+        ],
+        "damage": 100,
+        "maps": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          63,
+          64,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71,
+          72,
+          73,
+          74,
+          75,
+          76,
+          77,
+          79,
+          80,
+          81,
+          82,
+          83,
+          84,
+          92,
+          93,
+          94,
+          96,
+          97,
+          98,
+          99,
+          100,
+          102,
+          103,
+          104,
+          105,
+          106,
+          107,
+          108,
+          109,
+          110
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/event/Halloween/BiMa.java"
+  },
+  {
+    "key": "id:-350",
+    "boss_id": -350,
+    "class_name": "nro.models.boss.event.Halloween.Doi",
+    "name": "Dơi",
+    "quest": false,
+    "limited": true,
+    "kind": "event",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Dơi",
+        "hp": 500000,
+        "hp_range": [
+          500000
+        ],
+        "damage": 100,
+        "maps": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          63,
+          64,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71,
+          72,
+          73,
+          74,
+          75,
+          76,
+          77,
+          79,
+          80,
+          81,
+          82,
+          83,
+          84,
+          92,
+          93,
+          94,
+          96,
+          97,
+          98,
+          99,
+          100,
+          102,
+          103,
+          104,
+          105,
+          106,
+          107,
+          108,
+          109,
+          110
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/event/Halloween/Doi.java"
+  },
+  {
+    "key": "id:-349",
+    "boss_id": -349,
+    "class_name": "nro.models.boss.event.Halloween.MaTroi",
+    "name": "Ma trơi",
+    "quest": false,
+    "limited": true,
+    "kind": "event",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Ma trơi",
+        "hp": 500000,
+        "hp_range": [
+          500000
+        ],
+        "damage": 100,
+        "maps": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          63,
+          64,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71,
+          72,
+          73,
+          74,
+          75,
+          76,
+          77,
+          79,
+          80,
+          81,
+          82,
+          83,
+          84,
+          92,
+          93,
+          94,
+          96,
+          97,
+          98,
+          99,
+          100,
+          102,
+          103,
+          104,
+          105,
+          106,
+          107,
+          108,
+          109,
+          110
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/event/Halloween/MaTroi.java"
+  },
+  {
+    "key": "id:-354",
+    "boss_id": -354,
+    "class_name": "nro.models.boss.event_hung_vuong.SonTinh",
+    "name": "Sơn Tinh",
+    "quest": false,
+    "limited": true,
+    "kind": "event",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Sơn Tinh",
+        "hp": 50000000,
+        "hp_range": [
+          50000000
+        ],
+        "damage": 1000,
+        "maps": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          63,
+          64,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71,
+          72,
+          73,
+          74,
+          75,
+          76,
+          77,
+          79,
+          80,
+          81,
+          82,
+          83,
+          84,
+          92,
+          93,
+          94,
+          96,
+          97,
+          98,
+          99,
+          100,
+          102,
+          103,
+          104,
+          105,
+          106,
+          107,
+          108,
+          109,
+          110
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/event_hung_vuong/SonTinh.java"
+  },
+  {
+    "key": "id:-355",
+    "boss_id": -355,
+    "class_name": "nro.models.boss.event_hung_vuong.ThuyTinh",
+    "name": "Thủy Tinh",
+    "quest": false,
+    "limited": true,
+    "kind": "event",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Thủy Tinh",
+        "hp": 50000000,
+        "hp_range": [
+          50000000
+        ],
+        "damage": 1000,
+        "maps": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          63,
+          64,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71,
+          72,
+          73,
+          74,
+          75,
+          76,
+          77,
+          79,
+          80,
+          81,
+          82,
+          83,
+          84,
+          92,
+          93,
+          94,
+          96,
+          97,
+          98,
+          99,
+          100,
+          102,
+          103,
+          104,
+          105,
+          106,
+          107,
+          108,
+          109,
+          110
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/event_hung_vuong/ThuyTinh.java"
+  },
+  {
+    "key": "id:-353",
+    "boss_id": -353,
+    "class_name": "nro.models.boss.event_noel.OngGiaNoel",
+    "name": "Ông già Noel",
+    "quest": false,
+    "limited": false,
+    "kind": "event",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Ông già Noel",
+        "hp": 500,
+        "hp_range": [
+          500
+        ],
+        "damage": 5000000,
+        "maps": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          63,
+          64,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71,
+          72,
+          73,
+          74,
+          75,
+          76,
+          77,
+          79,
+          80,
+          81,
+          82,
+          83,
+          84,
+          92,
+          93,
+          94,
+          96,
+          97,
+          98,
+          99,
+          100,
+          102,
+          103,
+          104,
+          105,
+          106,
+          107,
+          108,
+          109,
+          110
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/event_noel/OngGiaNoel.java"
+  },
+  {
+    "key": "class:nro.models.boss.event_tet.LanCon",
+    "boss_id": -371,
+    "class_name": "nro.models.boss.event_tet.LanCon",
+    "name": "Lân con",
+    "quest": false,
+    "limited": false,
+    "kind": "event",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Lân con",
+        "hp": 5000000,
+        "hp_range": [
+          5000000
+        ],
+        "damage": 5000,
+        "maps": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          63,
+          64,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71,
+          72,
+          73,
+          74,
+          75,
+          76,
+          77,
+          79,
+          80,
+          81,
+          82,
+          83,
+          84,
+          92,
+          93,
+          94,
+          96,
+          97,
+          98,
+          99,
+          100,
+          102,
+          103,
+          104,
+          105,
+          106,
+          107,
+          108,
+          109,
+          110
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/event_tet/LanCon.java"
+  },
+  {
+    "key": "id:-344",
+    "boss_id": -344,
+    "class_name": "nro.models.boss.event_trung_thu.KhiDot",
+    "name": "Khỉ đột",
+    "quest": false,
+    "limited": false,
+    "kind": "event",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Khỉ đột",
+        "hp": 100000000,
+        "hp_range": [
+          100000000
+        ],
+        "damage": 100000,
+        "maps": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/event_trung_thu/KhiDot.java"
+  },
+  {
+    "key": "id:-345",
+    "boss_id": -345,
+    "class_name": "nro.models.boss.event_trung_thu.NguyetThan",
+    "name": "Nguyệt thần",
+    "quest": false,
+    "limited": true,
+    "kind": "event",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Nguyệt thần",
+        "hp": 50000000,
+        "hp_range": [
+          50000000
+        ],
+        "damage": 1000,
+        "maps": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/event_trung_thu/NguyetThan.java"
+  },
+  {
+    "key": "id:-346",
+    "boss_id": -346,
+    "class_name": "nro.models.boss.event_trung_thu.NhatThan",
+    "name": "Nhật thần",
+    "quest": false,
+    "limited": true,
+    "kind": "event",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Nhật thần",
+        "hp": 50000000,
+        "hp_range": [
+          50000000
+        ],
+        "damage": 1000,
+        "maps": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/event_trung_thu/NhatThan.java"
+  },
+  {
+    "key": "id:-208",
+    "boss_id": -208,
+    "class_name": "nro.models.boss.khi_gas.DrLychee",
+    "name": "Dr Lychee",
+    "quest": false,
+    "limited": false,
+    "kind": "dungeon",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Dr Lychee",
+        "hp": null,
+        "hp_range": [],
+        "damage": null,
+        "maps": [
+          148
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/khi_gas/DrLychee.java"
+  },
+  {
+    "key": "id:-207",
+    "boss_id": -207,
+    "class_name": "nro.models.boss.khi_gas.Hatchiyack",
+    "name": "",
+    "quest": false,
+    "limited": false,
+    "kind": "dungeon",
+    "phases": [
+      {
+        "phase": 0,
+        "name": " ",
+        "hp": null,
+        "hp_range": [],
+        "damage": null,
+        "maps": [
+          148
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/khi_gas/Hatchiyack.java"
+  },
+  {
+    "key": "id:-357",
+    "boss_id": -357,
+    "class_name": "nro.models.boss.luyen_tap_tu_dong.Karin",
+    "name": "Karin",
+    "quest": false,
+    "limited": false,
+    "kind": "training",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Karin",
+        "hp": 500,
+        "hp_range": [
+          500
+        ],
+        "damage": 500,
+        "maps": [
+          46
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/luyen_tap_tu_dong/Karin.java"
+  },
+  {
+    "key": "id:-361",
+    "boss_id": -361,
+    "class_name": "nro.models.boss.luyen_tap_tu_dong.KhiBubbles",
+    "name": "Khỉ Bubbles",
+    "quest": false,
+    "limited": false,
+    "kind": "training",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Khỉ Bubbles",
+        "hp": 30000,
+        "hp_range": [
+          30000
+        ],
+        "damage": 30000,
+        "maps": [
+          48
+        ]
+      }
+    ],
+    "dynamic_stats": false,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/luyen_tap_tu_dong/KhiBubbles.java"
+  },
+  {
+    "key": "id:-359",
+    "boss_id": -359,
+    "class_name": "nro.models.boss.luyen_tap_tu_dong.MrPoPo",
+    "name": "Mr.PôPô",
+    "quest": false,
+    "limited": false,
+    "kind": "training",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Mr.PôPô",
+        "hp": 5100,
+        "hp_range": [
+          5100
+        ],
+        "damage": 1100,
+        "maps": [
+          46
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/luyen_tap_tu_dong/MrPoPo.java"
+  },
+  {
+    "key": "id:-309",
+    "boss_id": -309,
+    "class_name": "nro.models.boss.luyen_tap_tu_dong.TauPayPay",
+    "name": "Tàu Pảy Pảy",
+    "quest": false,
+    "limited": false,
+    "kind": "training",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Tàu Pảy Pảy",
+        "hp": 1000,
+        "hp_range": [
+          1000
+        ],
+        "damage": 500,
+        "maps": [
+          46
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/luyen_tap_tu_dong/TauPayPay.java"
+  },
+  {
+    "key": "id:-362",
+    "boss_id": -362,
+    "class_name": "nro.models.boss.luyen_tap_tu_dong.ThanVuTru",
+    "name": "Thần Vũ Trụ",
+    "quest": false,
+    "limited": false,
+    "kind": "training",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Thần Vũ Trụ",
+        "hp": 45000,
+        "hp_range": [
+          45000
+        ],
+        "damage": 45000,
+        "maps": [
+          48
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/luyen_tap_tu_dong/ThanVuTru.java"
+  },
+  {
+    "key": "id:-360",
+    "boss_id": -360,
+    "class_name": "nro.models.boss.luyen_tap_tu_dong.ThuongDe",
+    "name": "Thượng đế",
+    "quest": false,
+    "limited": false,
+    "kind": "training",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Thượng đế",
+        "hp": 1000,
+        "hp_range": [
+          1000
+        ],
+        "damage": 10000,
+        "maps": [
+          49
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/luyen_tap_tu_dong/ThuongDe.java"
+  },
+  {
+    "key": "id:-363",
+    "boss_id": -363,
+    "class_name": "nro.models.boss.luyen_tap_tu_dong.ToSuKaio",
+    "name": "Tổ sư Kaio",
+    "quest": false,
+    "limited": false,
+    "kind": "training",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Tổ sư Kaio",
+        "hp": 45000,
+        "hp_range": [
+          45000
+        ],
+        "damage": 45000,
+        "maps": [
+          50
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/luyen_tap_tu_dong/ToSuKaio.java"
+  },
+  {
+    "key": "id:-364",
+    "boss_id": -364,
+    "class_name": "nro.models.boss.luyen_tap_tu_dong.Whis",
+    "name": "Whis",
+    "quest": false,
+    "limited": false,
+    "kind": "training",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Whis",
+        "hp": 550000,
+        "hp_range": [
+          550000
+        ],
+        "damage": 10000,
+        "maps": [
+          154
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/luyen_tap_tu_dong/Whis.java"
+  },
+  {
+    "key": "id:-358",
+    "boss_id": -358,
+    "class_name": "nro.models.boss.luyen_tap_tu_dong.Yajiro",
+    "name": "Yajirô",
+    "quest": false,
+    "limited": false,
+    "kind": "training",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Yajirô",
+        "hp": 1100,
+        "hp_range": [
+          1100
+        ],
+        "damage": 1100,
+        "maps": [
+          46
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/luyen_tap_tu_dong/Yajiro.java"
+  },
+  {
+    "key": "id:-340",
+    "boss_id": -340,
+    "class_name": "nro.models.boss.ma_vuong_picolo.Pocolo",
+    "name": "Ma vương Pôcôlô",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Ma vương Pôcôlô",
+        "hp": null,
+        "hp_range": [],
+        "damage": null,
+        "maps": [
+          146
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/ma_vuong_picolo/Pocolo.java"
+  },
+  {
+    "key": "class:nro.models.boss.nhan_ban.NhanBan",
+    "boss_id": null,
+    "class_name": "nro.models.boss.nhan_ban.NhanBan",
+    "name": "NhanBan",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": null,
+        "hp": null,
+        "hp_range": [],
+        "damage": null,
+        "maps": []
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/nhan_ban/NhanBan.java"
+  },
+  {
+    "key": "class:nro.models.boss.sieu_hang.Rival",
+    "boss_id": null,
+    "class_name": "nro.models.boss.sieu_hang.Rival",
+    "name": "Rival",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": null,
+        "hp": null,
+        "hp_range": [],
+        "damage": null,
+        "maps": [
+          113
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/sieu_hang/Rival.java"
+  },
+  {
+    "key": "id:-26",
+    "boss_id": -26,
+    "class_name": "nro.models.boss.tieu_doi_sat_thu.SO1",
+    "name": "Số 1",
+    "quest": true,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Số 1",
+        "hp": 40000000,
+        "hp_range": [
+          40000000
+        ],
+        "damage": 12500,
+        "maps": [
+          79,
+          81,
+          82,
+          83
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/tieu_doi_sat_thu/SO1.java"
+  },
+  {
+    "key": "id:-25",
+    "boss_id": -25,
+    "class_name": "nro.models.boss.tieu_doi_sat_thu.SO2",
+    "name": "Số 2",
+    "quest": true,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Số 2",
+        "hp": 30500000,
+        "hp_range": [
+          30500000
+        ],
+        "damage": 12000,
+        "maps": [
+          79,
+          81,
+          82,
+          83
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/tieu_doi_sat_thu/SO2.java"
+  },
+  {
+    "key": "id:-24",
+    "boss_id": -24,
+    "class_name": "nro.models.boss.tieu_doi_sat_thu.SO3",
+    "name": "Số 3",
+    "quest": true,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Số 3",
+        "hp": 30000000,
+        "hp_range": [
+          30000000
+        ],
+        "damage": 11000,
+        "maps": [
+          79,
+          81,
+          82,
+          83
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/tieu_doi_sat_thu/SO3.java"
+  },
+  {
+    "key": "id:-23",
+    "boss_id": -23,
+    "class_name": "nro.models.boss.tieu_doi_sat_thu.SO4",
+    "name": "Số 4",
+    "quest": true,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Số 4",
+        "hp": 25000000,
+        "hp_range": [
+          25000000
+        ],
+        "damage": 10000,
+        "maps": [
+          79,
+          81,
+          82,
+          83
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/tieu_doi_sat_thu/SO4.java"
+  },
+  {
+    "key": "id:-27",
+    "boss_id": -27,
+    "class_name": "nro.models.boss.tieu_doi_sat_thu.TDT",
+    "name": "Tiểu đội trưởng",
+    "quest": true,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Tiểu đội trưởng",
+        "hp": 50000000,
+        "hp_range": [
+          50000000
+        ],
+        "damage": 13000,
+        "maps": [
+          79,
+          81,
+          82,
+          83
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/tieu_doi_sat_thu/TDT.java"
+  },
+  {
+    "key": "id:-314",
+    "boss_id": -314,
+    "class_name": "nro.models.boss.tieu_doi_sat_thu_namek.SO1_NM",
+    "name": "Số 1 Namek",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Số 1 Namek",
+        "hp": 4000000,
+        "hp_range": [
+          4000000
+        ],
+        "damage": 13200,
+        "maps": [
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          25,
+          34,
+          33,
+          43
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/tieu_doi_sat_thu_namek/SO1_NM.java"
+  },
+  {
+    "key": "id:-313",
+    "boss_id": -313,
+    "class_name": "nro.models.boss.tieu_doi_sat_thu_namek.SO2_NM",
+    "name": "Số 2 Namek",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Số 2 Namek",
+        "hp": 3500000,
+        "hp_range": [
+          3500000
+        ],
+        "damage": 12200,
+        "maps": [
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          25,
+          34,
+          33,
+          43
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/tieu_doi_sat_thu_namek/SO2_NM.java"
+  },
+  {
+    "key": "id:-312",
+    "boss_id": -312,
+    "class_name": "nro.models.boss.tieu_doi_sat_thu_namek.SO3_NM",
+    "name": "Số 3 Namek",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Số 3 Namek",
+        "hp": 3000000,
+        "hp_range": [
+          3000000
+        ],
+        "damage": 10000,
+        "maps": [
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          25,
+          34,
+          33,
+          43
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/tieu_doi_sat_thu_namek/SO3_NM.java"
+  },
+  {
+    "key": "id:-311",
+    "boss_id": -311,
+    "class_name": "nro.models.boss.tieu_doi_sat_thu_namek.SO4_NM",
+    "name": "Số 4 Namek",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Số 4 Namek",
+        "hp": 2500000,
+        "hp_range": [
+          2500000
+        ],
+        "damage": 10000,
+        "maps": [
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          25,
+          34,
+          33,
+          43
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/tieu_doi_sat_thu_namek/SO4_NM.java"
+  },
+  {
+    "key": "id:-315",
+    "boss_id": -315,
+    "class_name": "nro.models.boss.tieu_doi_sat_thu_namek.TDT_NM",
+    "name": "Tiểu đội trưởng Namek",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Tiểu đội trưởng Namek",
+        "hp": 5000000,
+        "hp_range": [
+          5000000
+        ],
+        "damage": 15000,
+        "maps": [
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          25,
+          34,
+          33,
+          43
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/tieu_doi_sat_thu_namek/TDT_NM.java"
+  },
+  {
+    "key": "id:-319",
+    "boss_id": -319,
+    "class_name": "nro.models.boss.trai_dat.BIDO",
+    "name": "Bido",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Bido",
+        "hp": 80000000,
+        "hp_range": [
+          80000000
+        ],
+        "damage": 250200,
+        "maps": [
+          3,
+          4,
+          5,
+          6,
+          27,
+          28,
+          29,
+          30
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/trai_dat/BIDO.java"
+  },
+  {
+    "key": "id:-320",
+    "boss_id": -320,
+    "class_name": "nro.models.boss.trai_dat.BOJACK",
+    "name": "Bojack",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Bojack",
+        "hp": 100000000,
+        "hp_range": [
+          100000000
+        ],
+        "damage": 300000,
+        "maps": [
+          3,
+          4,
+          5,
+          6,
+          27,
+          28,
+          29,
+          30
+        ]
+      },
+      {
+        "phase": 1,
+        "name": "Siêu Bojack",
+        "hp": 150000000,
+        "hp_range": [
+          150000000
+        ],
+        "damage": 300000,
+        "maps": [
+          3,
+          4,
+          5,
+          6,
+          27,
+          28,
+          29,
+          30
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/trai_dat/BOJACK.java"
+  },
+  {
+    "key": "id:-316",
+    "boss_id": -316,
+    "class_name": "nro.models.boss.trai_dat.BUJIN",
+    "name": "Bujin",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Bujin",
+        "hp": 20000000,
+        "hp_range": [
+          20000000
+        ],
+        "damage": 170000,
+        "maps": [
+          3,
+          4,
+          5,
+          6,
+          27,
+          28,
+          29,
+          30
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/trai_dat/BUJIN.java"
+  },
+  {
+    "key": "id:-317",
+    "boss_id": -317,
+    "class_name": "nro.models.boss.trai_dat.KOGU",
+    "name": "Kogu",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Kogu",
+        "hp": 40000000,
+        "hp_range": [
+          40000000
+        ],
+        "damage": 180000,
+        "maps": [
+          3,
+          4,
+          5,
+          6,
+          27,
+          28,
+          29,
+          30
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/trai_dat/KOGU.java"
+  },
+  {
+    "key": "id:-321",
+    "boss_id": -321,
+    "class_name": "nro.models.boss.trai_dat.SUPER_BOJACK",
+    "name": "Siêu Bojack",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Siêu Bojack",
+        "hp": 500000000,
+        "hp_range": [
+          500000000
+        ],
+        "damage": 300000,
+        "maps": [
+          3,
+          4,
+          5,
+          6,
+          27,
+          28,
+          29,
+          30
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/trai_dat/SUPER_BOJACK.java"
+  },
+  {
+    "key": "id:-318",
+    "boss_id": -318,
+    "class_name": "nro.models.boss.trai_dat.ZANGYA",
+    "name": "Zangya",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Zangya",
+        "hp": 60000000,
+        "hp_range": [
+          60000000
+        ],
+        "damage": 207200,
+        "maps": [
+          3,
+          4,
+          5,
+          6,
+          27,
+          28,
+          29,
+          30
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/trai_dat/ZANGYA.java"
+  },
+  {
+    "key": "id:-95",
+    "boss_id": -95,
+    "class_name": "nro.models.boss.vo_dai_hat_mit.BongBang",
+    "name": "Bông băng",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Bông băng",
+        "hp": 15000,
+        "hp_range": [
+          15000
+        ],
+        "damage": 2000,
+        "maps": [
+          112
+        ]
+      }
+    ],
+    "dynamic_stats": false,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/vo_dai_hat_mit/BongBang.java"
+  },
+  {
+    "key": "id:-93",
+    "boss_id": -93,
+    "class_name": "nro.models.boss.vo_dai_hat_mit.Dracula",
+    "name": "Đracula",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Đracula",
+        "hp": 5000,
+        "hp_range": [
+          5000
+        ],
+        "damage": 1000,
+        "maps": [
+          112
+        ]
+      }
+    ],
+    "dynamic_stats": false,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/vo_dai_hat_mit/Dracula.java"
+  },
+  {
+    "key": "id:-94",
+    "boss_id": -94,
+    "class_name": "nro.models.boss.vo_dai_hat_mit.NguoiVoHinh",
+    "name": "Người vô hình",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Người vô hình",
+        "hp": 10000,
+        "hp_range": [
+          10000
+        ],
+        "damage": 1000,
+        "maps": [
+          112
+        ]
+      }
+    ],
+    "dynamic_stats": false,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/vo_dai_hat_mit/NguoiVoHinh.java"
+  },
+  {
+    "key": "id:-97",
+    "boss_id": -97,
+    "class_name": "nro.models.boss.vo_dai_hat_mit.ThoDauBac",
+    "name": "Thỏ Đầu Bạc",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Thỏ Đầu Bạc",
+        "hp": 30000,
+        "hp_range": [
+          30000
+        ],
+        "damage": 3000,
+        "maps": [
+          112
+        ]
+      }
+    ],
+    "dynamic_stats": false,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/vo_dai_hat_mit/ThoDauBac.java"
+  },
+  {
+    "key": "id:-96",
+    "boss_id": -96,
+    "class_name": "nro.models.boss.vo_dai_hat_mit.VuaQuySaTang",
+    "name": "Vua Quỷ Sa tăng",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Vua Quỷ Sa tăng",
+        "hp": 20000,
+        "hp_range": [
+          20000
+        ],
+        "damage": 2000,
+        "maps": [
+          112
+        ]
+      }
+    ],
+    "dynamic_stats": false,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/vo_dai_hat_mit/VuaQuySaTang.java"
+  },
+  {
+    "key": "id:-334",
+    "boss_id": -334,
+    "class_name": "nro.models.boss.yardrat.CHIENBINH0",
+    "name": "Chiến binh-0",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Chiến binh-0",
+        "hp": 500000,
+        "hp_range": [
+          500000
+        ],
+        "damage": 10000,
+        "maps": [
+          133
+        ]
+      }
+    ],
+    "dynamic_stats": false,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/yardrat/CHIENBINH0.java"
+  },
+  {
+    "key": "id:-335",
+    "boss_id": -335,
+    "class_name": "nro.models.boss.yardrat.CHIENBINH1",
+    "name": "Chiến binh-1",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Chiến binh-1",
+        "hp": 500000,
+        "hp_range": [
+          500000
+        ],
+        "damage": 10000,
+        "maps": [
+          133
+        ]
+      }
+    ],
+    "dynamic_stats": false,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/yardrat/CHIENBINH1.java"
+  },
+  {
+    "key": "id:-336",
+    "boss_id": -336,
+    "class_name": "nro.models.boss.yardrat.CHIENBINH2",
+    "name": "Chiến binh-2",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Chiến binh-2",
+        "hp": 500000,
+        "hp_range": [
+          500000
+        ],
+        "damage": 10000,
+        "maps": [
+          133
+        ]
+      }
+    ],
+    "dynamic_stats": false,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/yardrat/CHIENBINH2.java"
+  },
+  {
+    "key": "id:-337",
+    "boss_id": -337,
+    "class_name": "nro.models.boss.yardrat.CHIENBINH3",
+    "name": "Chiến binh-3",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Chiến binh-3",
+        "hp": 500000,
+        "hp_range": [
+          500000
+        ],
+        "damage": 10000,
+        "maps": [
+          133
+        ]
+      }
+    ],
+    "dynamic_stats": false,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/yardrat/CHIENBINH3.java"
+  },
+  {
+    "key": "id:-338",
+    "boss_id": -338,
+    "class_name": "nro.models.boss.yardrat.CHIENBINH4",
+    "name": "Chiến binh-4",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Chiến binh-4",
+        "hp": 500000,
+        "hp_range": [
+          500000
+        ],
+        "damage": 10000,
+        "maps": [
+          133
+        ]
+      }
+    ],
+    "dynamic_stats": false,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/yardrat/CHIENBINH4.java"
+  },
+  {
+    "key": "id:-333",
+    "boss_id": -333,
+    "class_name": "nro.models.boss.yardrat.CHIENBINH5",
+    "name": "Chiến binh-5",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Chiến binh-5",
+        "hp": 500000,
+        "hp_range": [
+          500000
+        ],
+        "damage": 10000,
+        "maps": [
+          132
+        ]
+      }
+    ],
+    "dynamic_stats": false,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/yardrat/CHIENBINH5.java"
+  },
+  {
+    "key": "id:-339",
+    "boss_id": -339,
+    "class_name": "nro.models.boss.yardrat.DOITRUONG5",
+    "name": "Đội trưởng-5",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Đội trưởng-5",
+        "hp": 1000000,
+        "hp_range": [
+          1000000
+        ],
+        "damage": 10000,
+        "maps": [
+          133
+        ]
+      }
+    ],
+    "dynamic_stats": false,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/yardrat/DOITRUONG5.java"
+  },
+  {
+    "key": "id:-328",
+    "boss_id": -328,
+    "class_name": "nro.models.boss.yardrat.TANBINH0",
+    "name": "Tân binh-0",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Tân binh-0",
+        "hp": 450000,
+        "hp_range": [
+          450000
+        ],
+        "damage": 10000,
+        "maps": [
+          132
+        ]
+      }
+    ],
+    "dynamic_stats": false,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/yardrat/TANBINH0.java"
+  },
+  {
+    "key": "id:-329",
+    "boss_id": -329,
+    "class_name": "nro.models.boss.yardrat.TANBINH1",
+    "name": "Tân binh-1",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Tân binh-1",
+        "hp": 450000,
+        "hp_range": [
+          450000
+        ],
+        "damage": 10000,
+        "maps": [
+          132
+        ]
+      }
+    ],
+    "dynamic_stats": false,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/yardrat/TANBINH1.java"
+  },
+  {
+    "key": "id:-330",
+    "boss_id": -330,
+    "class_name": "nro.models.boss.yardrat.TANBINH2",
+    "name": "Tân binh-2",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Tân binh-2",
+        "hp": 450000,
+        "hp_range": [
+          450000
+        ],
+        "damage": 10000,
+        "maps": [
+          132
+        ]
+      }
+    ],
+    "dynamic_stats": false,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/yardrat/TANBINH2.java"
+  },
+  {
+    "key": "id:-331",
+    "boss_id": -331,
+    "class_name": "nro.models.boss.yardrat.TANBINH3",
+    "name": "Tân binh-3",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Tân binh-3",
+        "hp": 450000,
+        "hp_range": [
+          450000
+        ],
+        "damage": 10000,
+        "maps": [
+          132
+        ]
+      }
+    ],
+    "dynamic_stats": false,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/yardrat/TANBINH3.java"
+  },
+  {
+    "key": "id:-332",
+    "boss_id": -332,
+    "class_name": "nro.models.boss.yardrat.TANBINH4",
+    "name": "Tân binh-4",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Tân binh-4",
+        "hp": 450000,
+        "hp_range": [
+          450000
+        ],
+        "damage": 10000,
+        "maps": [
+          132
+        ]
+      }
+    ],
+    "dynamic_stats": false,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/yardrat/TANBINH4.java"
+  },
+  {
+    "key": "id:-327",
+    "boss_id": -327,
+    "class_name": "nro.models.boss.yardrat.TANBINH5",
+    "name": "Tân binh-5",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Tân binh-5",
+        "hp": 450000,
+        "hp_range": [
+          450000
+        ],
+        "damage": 10000,
+        "maps": [
+          131
+        ]
+      }
+    ],
+    "dynamic_stats": false,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/yardrat/TANBINH5.java"
+  },
+  {
+    "key": "id:-322",
+    "boss_id": -322,
+    "class_name": "nro.models.boss.yardrat.TAPSU0",
+    "name": "Tập sự-0",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Tập sự-0",
+        "hp": 350000,
+        "hp_range": [
+          350000
+        ],
+        "damage": 10000,
+        "maps": [
+          131
+        ]
+      }
+    ],
+    "dynamic_stats": false,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/yardrat/TAPSU0.java"
+  },
+  {
+    "key": "id:-323",
+    "boss_id": -323,
+    "class_name": "nro.models.boss.yardrat.TAPSU1",
+    "name": "Tập sự-1",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Tập sự-1",
+        "hp": 350000,
+        "hp_range": [
+          350000
+        ],
+        "damage": 10000,
+        "maps": [
+          131
+        ]
+      }
+    ],
+    "dynamic_stats": false,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/yardrat/TAPSU1.java"
+  },
+  {
+    "key": "id:-324",
+    "boss_id": -324,
+    "class_name": "nro.models.boss.yardrat.TAPSU2",
+    "name": "Tập sự-2",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Tập sự-2",
+        "hp": 350000,
+        "hp_range": [
+          350000
+        ],
+        "damage": 10000,
+        "maps": [
+          131
+        ]
+      }
+    ],
+    "dynamic_stats": false,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/yardrat/TAPSU2.java"
+  },
+  {
+    "key": "id:-325",
+    "boss_id": -325,
+    "class_name": "nro.models.boss.yardrat.TAPSU3",
+    "name": "Tập sự-3",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Tập sự-3",
+        "hp": 350000,
+        "hp_range": [
+          350000
+        ],
+        "damage": 10000,
+        "maps": [
+          131
+        ]
+      }
+    ],
+    "dynamic_stats": false,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/yardrat/TAPSU3.java"
+  },
+  {
+    "key": "id:-326",
+    "boss_id": -326,
+    "class_name": "nro.models.boss.yardrat.TAPSU4",
+    "name": "Tập sự-4",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Tập sự-4",
+        "hp": 350000,
+        "hp_range": [
+          350000
+        ],
+        "damage": 10000,
+        "maps": [
+          131
+        ]
+      }
+    ],
+    "dynamic_stats": false,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss/yardrat/TAPSU4.java"
+  },
+  {
+    "key": "id:-15",
+    "boss_id": -15,
+    "class_name": "nro.models.boss_con_duong_ran_doc.CADICH",
+    "name": "Cađích",
+    "quest": false,
+    "limited": false,
+    "kind": "dungeon",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Cađích",
+        "hp": null,
+        "hp_range": [],
+        "damage": null,
+        "maps": [
+          144
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss_con_duong_ran_doc/CADICH.java"
+  },
+  {
+    "key": "id:-16",
+    "boss_id": -16,
+    "class_name": "nro.models.boss_con_duong_ran_doc.NADIC",
+    "name": "Nađíc",
+    "quest": false,
+    "limited": false,
+    "kind": "dungeon",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Nađíc",
+        "hp": null,
+        "hp_range": [],
+        "damage": null,
+        "maps": [
+          144
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss_con_duong_ran_doc/NADIC.java"
+  },
+  {
+    "key": "class:nro.models.boss_con_duong_ran_doc.SAIBAMEN",
+    "boss_id": -17,
+    "class_name": "nro.models.boss_con_duong_ran_doc.SAIBAMEN",
+    "name": "Số",
+    "quest": false,
+    "limited": false,
+    "kind": "dungeon",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Số ",
+        "hp": null,
+        "hp_range": [],
+        "damage": null,
+        "maps": [
+          144
+        ]
+      }
+    ],
+    "dynamic_stats": true,
+    "drop_summary": "Theo cơ chế gốc; chỉnh quy tắc tùy chọn trong phần Rơi đồ",
+    "source": "SRC/src/nro/models/boss_con_duong_ran_doc/SAIBAMEN.java"
+  },
+  {
+    "key": "id:-929",
+    "boss_id": -929,
+    "class_name": "nro.models.boss.PrisonBill.PrisonBillBoss",
+    "name": "Heart",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Heart",
+        "hp": 2000000000,
+        "hp_range": [
+          2000000000
+        ],
+        "damage": 100000,
+        "maps": [
+          154,
+          155
+        ]
+      }
+    ],
+    "dynamic_stats": false,
+    "drop_summary": "Black Goku; sealed level9-12 5%, divine 1%, sealed divine 0.5%",
+    "source": "SRC/src/nro/models/boss/PrisonBill/PrisonBillBoss.java"
+  },
+  {
+    "key": "id:-930",
+    "boss_id": -930,
+    "class_name": "nro.models.boss.PrisonBill.PrisonBillBoss",
+    "name": "Kamin",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Kamin",
+        "hp": 1000000000,
+        "hp_range": [
+          1000000000
+        ],
+        "damage": 100000,
+        "maps": [
+          154,
+          155
+        ]
+      }
+    ],
+    "dynamic_stats": false,
+    "drop_summary": "Black Goku; sealed level9-12 5%, divine 1%, sealed divine 0.5%",
+    "source": "SRC/src/nro/models/boss/PrisonBill/PrisonBillBoss.java"
+  },
+  {
+    "key": "id:-931",
+    "boss_id": -931,
+    "class_name": "nro.models.boss.PrisonBill.PrisonBillBoss",
+    "name": "Oren",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Oren",
+        "hp": 1000000000,
+        "hp_range": [
+          1000000000
+        ],
+        "damage": 100000,
+        "maps": [
+          154,
+          155
+        ]
+      }
+    ],
+    "dynamic_stats": false,
+    "drop_summary": "Black Goku; sealed level9-12 5%, divine 1%, sealed divine 0.5%",
+    "source": "SRC/src/nro/models/boss/PrisonBill/PrisonBillBoss.java"
+  },
+  {
+    "key": "id:-932",
+    "boss_id": -932,
+    "class_name": "nro.models.boss.PrisonBill.PrisonBillBoss",
+    "name": "Beerus",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Beerus",
+        "hp": 2000000000,
+        "hp_range": [
+          2000000000
+        ],
+        "damage": 100000,
+        "maps": [
+          154,
+          155
+        ]
+      }
+    ],
+    "dynamic_stats": false,
+    "drop_summary": "Black Goku; sealed level9-12 5%, divine 1%, sealed divine 0.5%",
+    "source": "SRC/src/nro/models/boss/PrisonBill/PrisonBillBoss.java"
+  },
+  {
+    "key": "id:-933",
+    "boss_id": -933,
+    "class_name": "nro.models.boss.PrisonBill.PrisonBillBoss",
+    "name": "Whis",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Whis",
+        "hp": 2000000000,
+        "hp_range": [
+          2000000000
+        ],
+        "damage": 100000,
+        "maps": [
+          154,
+          155
+        ]
+      }
+    ],
+    "dynamic_stats": false,
+    "drop_summary": "Black Goku; sealed level9-12 5%, divine 1%, sealed divine 0.5%",
+    "source": "SRC/src/nro/models/boss/PrisonBill/PrisonBillBoss.java"
+  },
+  {
+    "key": "id:-934",
+    "boss_id": -934,
+    "class_name": "nro.models.boss.PrisonBill.PrisonBillBoss",
+    "name": "Champa",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Champa",
+        "hp": 2000000000,
+        "hp_range": [
+          2000000000
+        ],
+        "damage": 100000,
+        "maps": [
+          154,
+          155
+        ]
+      }
+    ],
+    "dynamic_stats": false,
+    "drop_summary": "Black Goku; sealed level9-12 5%, divine 1%, sealed divine 0.5%",
+    "source": "SRC/src/nro/models/boss/PrisonBill/PrisonBillBoss.java"
+  },
+  {
+    "key": "id:-935",
+    "boss_id": -935,
+    "class_name": "nro.models.boss.PrisonBill.PrisonBillBoss",
+    "name": "Vados",
+    "quest": false,
+    "limited": false,
+    "kind": "normal",
+    "phases": [
+      {
+        "phase": 0,
+        "name": "Vados",
+        "hp": 2000000000,
+        "hp_range": [
+          2000000000
+        ],
+        "damage": 100000,
+        "maps": [
+          154,
+          155
+        ]
+      }
+    ],
+    "dynamic_stats": false,
+    "drop_summary": "Black Goku; sealed level9-12 5%, divine 1%, sealed divine 0.5%",
+    "source": "SRC/src/nro/models/boss/PrisonBill/PrisonBillBoss.java"
+  }
+]

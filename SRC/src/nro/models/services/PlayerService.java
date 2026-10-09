@@ -283,6 +283,7 @@ public class PlayerService {
                 if (canHs) {
                     Service.gI().sendMoney(player);
                     Service.gI().hsChar(player, player.nPoint.hpMax, player.nPoint.mpMax);
+                    AchievementService.gI().checkDoneTask(player, nro.models.consts.ConstAchievement.THANH_HOI_SINH);
                     player.powerReduced = false;
                 }
             }
@@ -314,6 +315,7 @@ public class PlayerService {
             if (canHs) {
                 Service.gI().sendMoney(player);
                 Service.gI().hsChar(player, player.nPoint.hpMax, player.nPoint.mpMax);
+                AchievementService.gI().checkDoneTask(player, nro.models.consts.ConstAchievement.THANH_HOI_SINH);
             }
         }
     }

@@ -9,6 +9,7 @@ import nro.models.boss.Android.KingKong;
 import nro.models.boss.Android.Pic;
 import nro.models.boss.Android.Poc;
 import nro.models.boss.Black_Goku.BlackGoku;
+import nro.models.boss.Black_Goku.Zamasu;
 import nro.models.boss.Boss;
 import nro.models.boss.BossID;
 import nro.models.boss.Boss_mini.AnTrom;
@@ -155,6 +156,9 @@ public class BossManager implements Runnable {
         this.createBoss(BossID.CUMBER);
         this.createBoss(BossID.COOLER, 1);
         this.createBoss(BossID.BLACK_GOKU, 2);
+        this.createBoss(BossID.ZAMASU, 2);
+        for (int id : nro.models.boss.PrisonBill.PrisonBillBossCatalog.IDS)
+            if (id != BossID.OREN) this.createBoss(id);
         this.createBoss(BossID.GOLDEN_FRIEZA, 1);
         this.createBoss(BossID.SOI_HEC_QUYN1, 2);
         this.createBoss(BossID.AN_TROM, 5);
@@ -353,6 +357,11 @@ public class BossManager implements Runnable {
                     new MatTroi();
                 case BossID.BLACK_GOKU ->
                     new BlackGoku();
+                case BossID.ZAMASU ->
+                    new Zamasu();
+                case BossID.HEART, BossID.KAMIN, BossID.OREN, BossID.BEERUS_BATTLE,
+                        BossID.WHIS_BATTLE, BossID.CHAMPA_BATTLE, BossID.VADOS_BATTLE ->
+                    new nro.models.boss.PrisonBill.PrisonBillBoss(bossID);
                 case BossID.CUMBER ->
                     new Cumber();
                 case BossID.AN_TROM ->

@@ -929,6 +929,15 @@ public class BossesData {
             AppearType.ANOTHER_LEVEL //type appear
     );
 
+    public static final BossData ZAMASU = new BossData(
+            "Zamasu", SUPER_BLACK_GOKU.getGender(),
+            new short[]{903, 904, 905, -1, -1, -1},
+            SUPER_BLACK_GOKU.getDame(), SUPER_BLACK_GOKU.getHp().clone(),
+            SUPER_BLACK_GOKU.getMapJoin().clone(),
+            java.util.Arrays.stream(SUPER_BLACK_GOKU.getSkillTemp()).map(int[]::clone).toArray(int[][]::new),
+            new String[]{}, new String[]{"|-1|Ta là Zamasu!"}, new String[]{}, REST_5_M
+    );
+
     //========================CUMBER========================
     public static final BossData CUMBER = new BossData(
             "Cumber", //name

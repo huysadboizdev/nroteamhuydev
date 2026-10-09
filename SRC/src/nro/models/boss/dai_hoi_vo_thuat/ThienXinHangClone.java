@@ -62,6 +62,7 @@ public class ThienXinHangClone extends The23rdMartialArtCongress {
 //        super.update();
         try {
             if(updateDeathLifecycle())return;
+            nro.models.services.BossAdminConfig.applyAtTick(this);
             EffectSkillService.gI().removeStun(this);
             switch (this.bossStatus) {
                 case RESPAWN:

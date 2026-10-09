@@ -116,7 +116,7 @@ public class Virut extends Boss {
     }
 
     @Override
-    public void reward(Player plKill) {
+    public void rewardDefault(Player plKill) {
         int[] itemIds = {1591, 1594};
         for (int i = 0; i < itemIds.length; i++) {
             int itemId = itemIds[i];
@@ -143,6 +143,8 @@ public class Virut extends Boss {
         this.nPoint.hpMax = 100;
         this.nPoint.hp = this.nPoint.hpMax;
         this.nPoint.dameg = 1;
+        this.nPoint.dame = 1;
+        nro.models.services.BossAdminConfig.applyAfterNativeSpawn(this);
         this.joinMap2();
         st = System.currentTimeMillis();
     }

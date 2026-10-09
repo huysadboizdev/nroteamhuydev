@@ -83,7 +83,7 @@ public class DrLychee extends Boss {
     }
 
     @Override
-    public void reward(Player plKill) {
+    public void rewardDefault(Player plKill) {
         dropCt(0);
         for (int i = 0; i < this.zone.getNumOfPlayers(); i++) {
             int x = (i + 1) * 50;

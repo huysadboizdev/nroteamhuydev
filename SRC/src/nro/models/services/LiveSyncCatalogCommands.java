@@ -51,12 +51,14 @@ public final class LiveSyncCatalogCommands {
             List<Shop> shops=all||"RELOAD_SHOP".equals(type)?shops(con):null;
             List<String> notices=all||"RELOAD_NOTIFY".equals(type)?notices(con):null;
             Runnable bosses=all||"RELOAD_BOSS".equals(type)?BossLiveReload.stage(con):null;
+            Runnable adminBosses=all||"RELOAD_BOSS".equals(type)?BossAdminConfig.stage(con):null;
             return new Operation("Applied "+type+(mobs==null?"":"; mob HP applies at next respawn; reconnect to refresh mob data"),()-> {
                 if(gifts!=null)GiftCodeManager.gI().listGiftCode=new ArrayList<>(gifts);
                 if(mobs!=null)publishMobs(mobs);
                 if(shops!=null){long next=shopVersion+1;for(Shop s:shops)s.catalogVersion=next;Manager.SHOPS=List.copyOf(shops);shopVersion=next;}
                 if(notices!=null)Manager.NOTIFY=List.copyOf(notices);
                 if(bosses!=null)bosses.run();
+                if(adminBosses!=null)adminBosses.run();
             });
     }
     /** Receipt recovery reads latest SQL, never replays a historical setting write. */

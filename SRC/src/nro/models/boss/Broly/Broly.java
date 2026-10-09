@@ -61,6 +61,7 @@ public class Broly extends Boss {
         this.nPoint.hp = this.nPoint.hpMax;
         this.nPoint.dame = this.nPoint.hpMax / 100;
         this.nPoint.crit = Util.nextInt(50);
+        nro.models.services.BossAdminConfig.applyAfterNativeSpawn(this);
         this.joinMap2();
         st = System.currentTimeMillis();
     }
@@ -212,6 +213,7 @@ public class Broly extends Boss {
 
     @Override
     public void die(Player plKill) {
+        nro.models.services.BossAdminDropService.rewardWithoutDefault(this, plKill);
         this.changeStatus(BossStatus.DIE);
     }
 
@@ -219,8 +221,8 @@ public class Broly extends Boss {
         int hpMax = this.nPoint.hpMax;
         int rand = Util.nextInt(10, 100);
         hpMax = hpMax + hpMax / rand < 16_070_777 ? hpMax + hpMax / rand : 16_070_777;
-        this.nPoint.hpMax = hpMax;
-        this.nPoint.dame = hpMax / 10;
+        this.nPoint.hpMax = nro.models.services.BossAdminConfig.nativeHp(this, hpMax);
+        this.nPoint.dame = nro.models.services.BossAdminConfig.nativeDamage(this, this.nPoint.hpMax / 10);
     }
 
     @Override

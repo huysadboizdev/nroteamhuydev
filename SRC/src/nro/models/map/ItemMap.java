@@ -13,6 +13,7 @@ import nro.models.services.Service;
 
 public class ItemMap {
 
+    public final boolean bossAdminSuppressed;
     public volatile Zone zone;
     public int itemMapId;
     public volatile ItemTemplate itemTemplate;
@@ -45,6 +46,7 @@ public class ItemMap {
     /** Installs independent options before addItem exposes this drop to pickup or zone snapshots. */
     public ItemMap(Zone zone, int tempId, int quantity, int x, int y, long playerId,
             boolean keepOwnerUntilDespawn, List<ItemOption> initialOptions) {
+        this.bossAdminSuppressed = nro.models.services.BossAdminDropService.suppressConstruction(tempId);
         this.zone = zone;
         this.itemMapId = allocateItemMapId(zone);
         this.itemTemplate = ItemService.gI().getTemplate((short) tempId);
@@ -59,10 +61,11 @@ public class ItemMap {
         this.isBlackBall = ItemMapService.gI().isBlackBall(this.itemTemplate.id);
         this.isNamecBall = ItemMapService.gI().isNamecBall(this.itemTemplate.id);
         this.lastTimeMoveToPlayer = System.currentTimeMillis();
-        this.zone.addItem(this);
+        if (!bossAdminSuppressed) this.zone.addItem(this);
     }
 
     public ItemMap(Zone zone, ItemTemplate temp, int quantity, int x, int y, long playerId) {
+        this.bossAdminSuppressed = nro.models.services.BossAdminDropService.suppressConstruction(temp.id);
         this.zone = zone;
         this.itemMapId = allocateItemMapId(zone);
         this.itemTemplate = temp;
@@ -75,7 +78,7 @@ public class ItemMap {
         this.isBlackBall = ItemMapService.gI().isBlackBall(this.itemTemplate.id);
         this.isNamecBall = ItemMapService.gI().isNamecBall(this.itemTemplate.id);
         this.lastTimeMoveToPlayer = System.currentTimeMillis();
-        this.zone.addItem(this);
+        if (!bossAdminSuppressed) this.zone.addItem(this);
     }
 
     private static int allocateItemMapId(Zone zone) {
@@ -87,6 +90,7 @@ public class ItemMap {
     }
 
     public ItemMap(ItemMap itemMap) {
+        this.bossAdminSuppressed = itemMap.bossAdminSuppressed || nro.models.services.BossAdminDropService.suppressConstruction(itemMap.itemTemplate.id);
         this.zone = itemMap.zone;
         this.itemMapId = itemMap.itemMapId;
         this.itemTemplate = itemMap.itemTemplate;
@@ -101,7 +105,7 @@ public class ItemMap {
         this.isNamecBall = itemMap.isNamecBall;
         this.lastTimeMoveToPlayer = itemMap.lastTimeMoveToPlayer;
         this.createTime = System.currentTimeMillis();
-        this.zone.addItem(this);
+        if (!bossAdminSuppressed) this.zone.addItem(this);
     }
 
     public void update() {

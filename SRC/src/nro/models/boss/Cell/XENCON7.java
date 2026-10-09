@@ -23,7 +23,7 @@ public class XENCON7 extends Boss {
         super(BossID.XEN_CON_7, BossesData.XEN_CON_7);
     }
    @Override
-    public void reward(Player plKill) {
+    public void rewardDefault(Player plKill) {
         BadgesTaskService.updateCountBagesTask(plKill, ConstTaskBadges.TRUM_SAN_BOSS, 1);
         int diem = 5;
         plKill.event.addEventPoint(diem);

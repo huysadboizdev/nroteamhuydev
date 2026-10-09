@@ -1,0 +1,15 @@
+# Achievement ruby rewards and progress repair
+
+Goal: All 20 achievement missions display and grant 1,000 ruby exactly once; existing progress and claimed states survive loading, saving and reconnects.
+
+Architecture: AchievementService uses a fixed 1,000-ruby policy and validates eligibility under the player monitor. AchievementRewardDAO commits wallet JSON and achievement JSON in one locked InnoDB transaction, preserving unknown inventory tail fields. Commit uncertainty retains the existing identity mutation gate and retries idempotently; logout and maintenance wait for reconciliation. Client Game1/Game2 reward labels use hồng ngọc without changing the existing short wire field (1,000 fits).
+
+- [ ] Reproduce incomplete/duplicate/full-bag claims, signed-short overflow and missing/overflowing counters using `SRC/test/nro/models/services/AchievementAuditTest.java` on current classes.
+- [ ] Repair Achievement slot initialization, tolerant per-row load and serialization; bounded nonnegative counters, monotonic power/tree progress, elapsed online time, distinct opponents persisted as optional third field of PvP row. Update MrBlue/PlayerDAO to use central serialization. Add model round-trip tests.
+- [ ] Implement fixed ruby UI/reward policy and durable AchievementRewardDAO; validate index, completion, prior claim, wallet bounds/reservations, pending operations and logout before any change. Test concurrency, repeated requests, save errors, ambiguous commits and logout recovery with an isolated database.
+- [ ] Audit all 20 hook sources: ThachDau winner/different opponents; picked gem quantities; sold item quantities; successful pea transfers only; skill counting on completed casts; self-revive only at-place; elapsed play time outside home-map gate. Preserve mob/boss kill hooks and top-up/specific Namek revival hooks.
+- [ ] Set achievement_template money=1000 in both sanitized seeds and migration; repair stale 15-million-power description. Change only achievement reward labels in both client Panel files. Verify Unity compilation/log where available.
+- [ ] Compile all Java with --release 17; run model/service/packet/DAO/hook regression tests and existing TaskProgressTest, pet and combat regressions impacted by hook changes. Produce a candidate from current SRC/20.jar plus affected classes; rerun tests directly on candidate.
+- [ ] Install through saved maintenance with timestamped JAR backup, old/new SHA-256 and metadata; apply template migration with a scoped snapshot; verify server listener/log and live template rewards. Authorization for saved maintenance/restart was granted in this session; if automatic review blocks this deployment, retain tested artifacts and explain the exact rejection.
+
+Scope: The requested audit is the 20 achievement missions shown in the screenshot. Previously claimed missions remain claimed; no automatic retroactive refund or reset. Legacy PvP totals are retained because historical opponent IDs cannot be reconstructed; future wins track distinct opponents.

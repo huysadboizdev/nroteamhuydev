@@ -1127,7 +1127,6 @@ public class Service {
 
             Send_Info_NV(pl);
             PlayerService.gI().sendInfoHpMp(pl);
-            AchievementService.gI().checkDoneTask(pl, ConstAchievement.THANH_HOI_SINH);
         } catch (Exception e) {
             Logger.logException(Service.class, e);
         }
@@ -1178,7 +1177,8 @@ public class Service {
                 if (plAtt != null && SkillService.gI().canAttackPlayer(pl, plAtt)) {
                     Mob mob = plAtt.mobMe;
                     if (mob != null) {
-                        mob.injured(pl, pl.nPoint.getDameAttack(false), true);
+                        int executingSkillId=HighDamageNoticeService.selectedSkill(pl);
+                        HighDamageNoticeService.injureMob(mob,pl,pl.nPoint.getDameAttack(false),true,executingSkillId);
                     }
                 }
             }
@@ -1538,6 +1538,7 @@ public class Service {
     }
 
     public void dropItemMap(Zone zone, ItemMap item) {
+        if (!BossAdminDropService.mayPublish(item)) return;
         Message msg;
         try {
             msg = new Message(68);
@@ -1554,6 +1555,7 @@ public class Service {
     }
 
     public void dropItemMapForMe(Player player, ItemMap item) {
+        if (!BossAdminDropService.mayPublish(item)) return;
         Message msg;
         try {
             msg = new Message(68);

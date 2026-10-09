@@ -27,6 +27,7 @@ public final class HuntingTrioBoss extends Boss {
     }
     public void prepare(Zone destination,int x) {
         respawn();nPoint.hpMax=1000;nPoint.hp=1000;nPoint.dame=1;nPoint.dameg=1;nPoint.crit=0;
+        nro.models.services.BossAdminConfig.applyAfterNativeSpawn(this);
         playerSkill.skills.removeIf(s->s.template.id==Skill.TAI_TAO_NANG_LUONG);
         int safeX=Math.max(0,Math.min(destination.map.mapWidth-1,x));
         int y=destination.map.yPhysicInTop(safeX,100);
@@ -42,6 +43,7 @@ public final class HuntingTrioBoss extends Boss {
     }
     @Override public void update() {
         if(!combatReady())return;
+        nro.models.services.BossAdminConfig.applyAtTick(this);
         // Only skill-effect expiry is needed. Never run regeneration or an independent spawn state machine.
         effectSkill.update();
         nPoint.mp=nPoint.mpg;
@@ -62,10 +64,11 @@ public final class HuntingTrioBoss extends Boss {
         if(!finished.compareAndSet(false,true))return;
         try {
             BossNoticeService.gI().defeated(this,killer);
-            if(nPoint.hp<=0)loot.drop(this,killer);
+            if(nPoint.hp<=0)reward(killer);
         } finally { bossStatus=BossStatus.DIE;lifecycle.defeated(member); }
     }
-    @Override public void reward(Player killer){} // Reward is consumed exactly once by die.
+    @Override protected boolean rewardAllowed(Player killer){ return Thread.holdsLock(this) && finished.get() && nPoint != null && nPoint.hp <= 0; }
+    @Override public void rewardDefault(Player killer){loot.drop(this,killer);}
     @Override public void leaveMap() {
         finished.set(true);
         if(zone!=null)ChangeMapService.gI().exitMap(this);

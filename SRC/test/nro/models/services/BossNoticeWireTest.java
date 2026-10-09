@@ -21,7 +21,9 @@ public final class BossNoticeWireTest {
         long[] now={System.currentTimeMillis()};var tracker=new nro.models.boss.notice.BossNoticeTracker("run",()->now[0],row->{});set(service,"tracker",tracker);
         Object quest=new Object(),general=new Object(),dead=new Object();
         tracker.appear(quest,-900000,0,"Quest","Map",nro.models.boss.BossID.KUKU,true,7);
-        tracker.appear(general,-799,0,"General","Map",nro.models.boss.BossID.MAT_TROI,false,5);
+        tracker.appear(general,-928,0,"General","Map",nro.models.boss.BossID.ZAMASU,false,5);
+        tracker.appear(new Object(),-799,0,"Sun","Map",nro.models.boss.BossID.MAT_TROI,false,5);
+        check(service.rows(0).size()==2&&service.rows(1).size()==2,"excluded mini boss filtered from board and history");
         tracker.appear(dead,-20,0,"Dead","Map",nro.models.boss.BossID.KUKU,false,8);tracker.defeat(dead,"admin");
         Capture player=PinkFixture.blank(Capture.class);player.session=PinkFixture.blank(nro.models.shop_ky_gui.ConsignRegressionTest.Connected.class);player.session.player=player;player.session.bossNoticeBoard=true;player.session.bossNoticeCategories=true;
         service.requestV2(player.session,5,1,0,0);

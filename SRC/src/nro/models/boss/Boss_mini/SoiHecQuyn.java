@@ -230,7 +230,7 @@ public class SoiHecQuyn extends Boss {
     }
 
     @Override
-    public void reward(Player plKill) {
+    public void rewardDefault(Player plKill) {
         plKill = nro.models.services.MiniBossPinkCapsuleDrop.creditedPlayer(plKill);
         if (plKill == null) return;
         synchronized (plKill) {

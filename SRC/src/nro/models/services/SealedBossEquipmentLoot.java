@@ -33,6 +33,18 @@ public final class SealedBossEquipmentLoot {
     public static Item build(Player owner, IntUnaryOperator randomBounded) {
         return build(owner,randomBounded,60,30);
     }
+    /** Select a fixed pool after its independent per-kill chance has passed. */
+    static Item buildCategory(Player owner, int category, IntUnaryOperator randomBounded) {
+        if (category < 0 || category > 2) throw new IllegalArgumentException("Invalid equipment category");
+        IntUnaryOperator pool = new IntUnaryOperator() {
+            boolean first = true;
+            public int applyAsInt(int bound) {
+                if (first) { first = false; return category == 0 ? 0 : category == 1 ? 60 : 90; }
+                return randomBounded.applyAsInt(bound);
+            }
+        };
+        return build(owner, pool, 60, 30);
+    }
     private static Item build(Player owner, IntUnaryOperator randomBounded,int shopRate,int ordinaryDivineRate) {
         if (owner == null || owner.gender < 0 || owner.gender > 2) return null;
         int category = roll(randomBounded,100);

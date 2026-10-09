@@ -51,6 +51,7 @@ import nro.models.player.Player;
 import nro.models.skill.Skill;
 import nro.models.server.ServerNotify;
 import nro.models.map.service.MapService;
+import nro.models.services.BossNoticeService;
 import nro.models.services.PlayerService;
 import nro.models.services.Service;
 import nro.models.services.SkillService;
@@ -61,8 +62,15 @@ import nro.models.utils.SkillUtil;
 import nro.models.utils.Util;
 import nro.models.interfaces.IBoss;
 import java.io.IOException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class Boss extends Player implements IBoss {
+    public long adminLife, adminAppliedRevision = -1;
+    public int adminDefaultHp, adminDefaultDamage, adminDefaultDef, adminDefaultCrit;
+    public boolean adminAliveMode;
+    public volatile nro.models.services.BossAdminConfig.Config adminStats;
     private boolean questSupport, questSupportCredit;
     private volatile boolean questSupportRetired;
     private int questSupportSemanticId;
@@ -209,13 +217,16 @@ public class Boss extends Player implements IBoss {
 
     public boolean noticePublic() {
         if (questSupport && questSupportRetired) return false;
-        if(isNotifyDisabled||zone==null||zone.map==null)return false;
+        if(nro.models.services.BossAnnouncementPolicy.excluded(this)||zone==null||zone.map==null)return false;
         if(noticeBossType==BossType.PLAYERAO||noticeBossType==BossType.CADIC||noticeBossType==BossType.MANAGER_DEBUG
                 ||this instanceof nro.models.boss.luyen_tap_tu_dong.TrainingBoss||this instanceof nro.models.boss.sieu_hang.SuperRank
                 ||this instanceof nro.models.boss.dai_hoi_vo_thuat.The23rdMartialArtCongress
-                ||noticeBossType==YARDART||noticeBossType==SKILLSUMMONED||noticeBossType==PHOBAN||noticeBossType==PHOBANDT
-                ||noticeBossType==PHOBANBDKB||noticeBossType==PHOBANCDRD||noticeBossType==PHOBANKGHD)return false;
+                ||noticeBossType==YARDART||noticeBossType==SKILLSUMMONED)return false;
         int map=zone.map.mapId;
+        if(map==140||map==111)return false;
+        if(nro.models.services.BossAnnouncementPolicy.equipment(this))return true;
+        if(isNotifyDisabled||noticeBossType==PHOBAN||noticeBossType==PHOBANDT||noticeBossType==PHOBANBDKB
+                ||noticeBossType==PHOBANCDRD||noticeBossType==PHOBANKGHD)return false;
         return map!=140&&map!=111&&!MapService.gI().isMapPhoBan(map)&&!MapService.gI().isMapMaBu(map)&&!MapService.gI().isMapBlackBallWar(map);
     }
     public long noticeNextSpawnAt() {
@@ -338,10 +349,10 @@ public class Boss extends Player implements IBoss {
         this.nPoint.dameg = data.getDame();
         this.nPoint.hpg = data.getHp()[Util.nextInt(0, data.getHp().length - 1)];
         this.nPoint.hp = nPoint.hpg;
-        nro.models.services.BossLiveReload.applyAtSpawn(this);
         this.nPoint.calPoint();
         this.initSkill();
         this.resetBase();
+        nro.models.services.BossAdminConfig.applyAtSpawn(this);
     }
 
     protected void initSkill() {
@@ -363,6 +374,7 @@ public class Boss extends Player implements IBoss {
     private boolean kolDeathCounted;
     private synchronized boolean claimKolDeath() { if(kolDeathCounted)return false;kolDeathCounted=true;return true; }
     protected void resetBase() {
+        nro.models.services.BossAdminDropService.reset(this);
         synchronized (this) { questSupportCredit = false; questSupportCombat = false; }
         synchronized(this) { kolDeathCounted=false;defeatedWait=false;deathPhaseStarted=0;defeatedSinceSpawn=false;defeatConsumed=false; }
         this.lastTimeChatS = 0;
@@ -478,11 +490,13 @@ public class Boss extends Player implements IBoss {
 
     @Override
     public void updateInfo() {
+        nro.models.services.BossAdminConfig.applyAtTick(this);
         super.update();
     }
 
     @Override
     public void update() {
+        nro.models.services.BossAdminConfig.applyAtTick(this);
         if (!seasonalAllowed()) return;
         if (questSupportRetired) return;
         super.update();
@@ -498,8 +512,10 @@ public class Boss extends Player implements IBoss {
                 this.autoLeaveMap();
         }
         switch (this.bossStatus) {
-            case REST ->
+            case REST -> {
                 this.rest();
+                if (bossStatus == REST) nro.models.services.BossNoticeService.gI().resting(this);
+            }
             case RESPAWN -> {
                 this.respawn();
                 this.changeStatus(BossStatus.JOIN_MAP);
@@ -682,18 +698,9 @@ public class Boss extends Player implements IBoss {
     }
 
     protected void notifyJoinMap() {
-        if (canSendNotify()) {
-            ServerNotify.gI().notify("BOSS " + this.name + " vừa xuất hiện tại " + this.zone.map.mapName);
-        }
+        nro.models.services.BossNoticeService.gI().appeared(this);
     }
-
-    private boolean canSendNotify() {
-        return !questSupport && !(this.isNotifyDisabled || this.zone.map.mapId == 140
-                || this.zone.map.mapId == 111
-                || MapService.gI().isMapPhoBan(this.zone.map.mapId)
-                || MapService.gI().isMapMaBu(this.zone.map.mapId)
-                || MapService.gI().isMapBlackBallWar(this.zone.map.mapId));
-    }
+    private boolean canSendNotify() { return !questSupport && noticePublic(); }
 
     @Override
     public boolean chatS() {
@@ -805,7 +812,7 @@ public class Boss extends Player implements IBoss {
     public void die(Player plKill) {
         if (!seasonalAllowed()) return;
         if (questSupport) {
-            if (!questSupportRetired && plKill != null && !plKill.isBot) questSupportReward(plKill);
+            if (!questSupportRetired && plKill != null && !plKill.isBot) reward(plKill);
             this.changeStatus(BossStatus.DIE);
             return;
         }
@@ -819,7 +826,6 @@ public class Boss extends Player implements IBoss {
             if (!plKill.isBot) {
                 reward(plKill);
             }
-            ServerNotify.gI().notify(plKill.name + ": Đã tiêu diệt được " + this.name + " mọi người đều ngưỡng mộ.");
             this.changeStatus(BossStatus.DIE);
         } else {
             if (plKill != null && !plKill.isBot) {
@@ -830,7 +836,15 @@ public class Boss extends Player implements IBoss {
     }
 
     @Override
-    public void reward(Player plKill) {
+    public final void reward(Player plKill) {
+        if (!rewardAllowed(plKill)) return;
+        nro.models.services.BossAdminDropService.reward(this, plKill,
+                () -> { if (isQuestSupport()) questSupportReward(plKill); else rewardDefault(plKill); });
+    }
+
+    protected boolean rewardAllowed(Player killer) { return seasonalAllowed(); }
+
+    public void rewardDefault(Player plKill) {
         TaskService.gI().checkDoneTaskKillBoss(plKill, this);
     }
 
@@ -986,13 +1000,17 @@ public class Boss extends Player implements IBoss {
         this.changeStatus(BossStatus.LEAVE_MAP);
     }
 
-    @Override
+    private static final ScheduledExecutorService BOM_SCHEDULER = Executors.newSingleThreadScheduledExecutor(r -> {
+        Thread t = new Thread(r, "Boss self-destruct timer");
+        t.setDaemon(true);
+        return t;
+    });
+
     public void setBom(Player plAtt) {
         try {
             if (!prepareBom) {
                 prepareBom = true;
                 this.nPoint.hp = 1;
-                long lastTime = System.currentTimeMillis();
                 //gồng tự sát
                 Service.gI().chat(Boss.this, "Rồi, rồi, mày xong rồi!");
                 Message msg;
@@ -1007,17 +1025,20 @@ public class Boss extends Player implements IBoss {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                while (prepareBom) {
-                    if (Util.canDoWithTime(lastTime, 2500)) {
+                // Async explosion after 2.5s — no busy-wait, no thread blocking
+                final Player bomber = plAtt;
+                BOM_SCHEDULER.schedule(() -> {
+                    if (!prepareBom) return;
+                    prepareBom = false;
+                    try {
                         setDie(this);
-                        die(plAtt);
+                        die(bomber == null ? BossNoticeService.deathAttacker(this) : bomber);
                         long dame = Boss.this.nPoint.hpMax;
                         for (Mob mob : Boss.this.zone.mobs) {
                             mob.injured(Boss.this, dame, true);
                         }
                         List<Player> playersMap = Boss.this.zone.getNotBosses();
                         if (!MapService.gI().isMapOffline(Boss.this.zone.map.mapId)) {
-                            //Sử dụng vòng for lặp ngược để hạn chế lỗi đồng bộ
                             for (int i = playersMap.size() - 1; i >= 0; i--) {
                                 Player pl = playersMap.get(i);
                                 if (!Boss.this.equals(pl)) {
@@ -1027,9 +1048,12 @@ public class Boss extends Player implements IBoss {
                                 }
                             }
                         }
+                    } catch (Exception ex) {
                         prepareBom = false;
+                        setDie(this);
+                        die(bomber);
                     }
-                }
+                }, 2500, TimeUnit.MILLISECONDS);
             }
         } catch (Exception e) {
             if (prepareBom) {

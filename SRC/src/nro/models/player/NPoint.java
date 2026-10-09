@@ -158,6 +158,7 @@ public class NPoint {
 
     public short tlGiap;
     public int tlLuck;
+    public int tlDameBoss;
 
     public short tlxgcc;
 
@@ -330,6 +331,10 @@ public class NPoint {
                             this.hpAdd += io.param;
                             this.mpAdd += io.param;
                             break;
+                        case 204:
+                            this.tlDameBoss += io.param;
+                            break;
+
                         case 49: //Tấn công+#%
                         case 50: //Sức đánh+#%
                             this.tlDame.add(io.param);
@@ -484,6 +489,9 @@ public class NPoint {
         }
         this.hasCollectionChestBonus = !player.isPet && !player.isBoss && !player.isBot && !player.isNewPet
                 && nro.models.item.CollectionChestRules.hasBonus(player.inventory);
+        if(nro.models.item.AnimeEquipment.paired(player)){
+            this.tlHp.add(2);this.tlMp.add(2);this.tlDame.add(2);
+        }
         setBasePoint();
         setOutfitFusion();
         setSpeed();
@@ -568,6 +576,10 @@ public class NPoint {
                 this.hpAdd += io.param;
                 this.mpAdd += io.param;
                 break;
+            case 204:
+                this.tlDameBoss += io.param;
+                break;
+
             case 49: //Tấn công+#%
             case 50: //Sức đánh+#%
                 this.tlDame.add(io.param);
@@ -1297,6 +1309,7 @@ public class NPoint {
         this.tlBom = 0;
         this.tlGiap = 0;
         this.tlLuck = 0;
+        this.tlDameBoss = 0;
         this.tlxgcc = 0;
         this.tlxgc = 0;
         this.tlchinhxac = 0;
@@ -1378,6 +1391,10 @@ public class NPoint {
 
     /** Target and successful legal PvP are explicit; mob/unqualified callers cannot use costume charges. */
     public int getDameAttack(boolean isAttackMob, Player target, boolean legalPvpHit) {
+        return nro.models.item.AnimeEquipment.bossDamage(getBaseDameAttack(isAttackMob,target,legalPvpHit),target,tlDameBoss);
+    }
+
+    private int getBaseDameAttack(boolean isAttackMob, Player target, boolean legalPvpHit) {
         setIsCrit();
         long dameAttack = this.dame;
         intrinsic = this.player.playerIntrinsic.intrinsic;
@@ -1600,11 +1617,17 @@ public class NPoint {
         if (sub <= 0) {
             return;
         }
-        if (sub >= this.hp) {
-            this.setHp(0);
-        } else {
-            this.hp -= (int) sub;
+        long removed;
+        synchronized(this) {
+            int before=this.hp;
+            removed=Math.min(sub,Math.max(0,before));
+            if (sub >= before) {
+                this.setHp(0);
+            } else {
+                this.hp = before - (int) sub;
+            }
         }
+        nro.models.services.HighDamageNoticeService.hpRemoved(this,removed);
     }
 
     public void subMP(long sub) {

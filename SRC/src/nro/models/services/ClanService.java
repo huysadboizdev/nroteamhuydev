@@ -187,10 +187,13 @@ public class ClanService {
                                 }
                             }
                             if (pea != null) {
-                                InventoryService.gI().subQuantityItem(plGive.inventory.itemsBox, pea, 1);
                                 Item peaCopy = ItemService.gI().createNewItem(pea.template.id);
                                 peaCopy.itemOptions = pea.itemOptions;
-                                InventoryService.gI().addItemBag(plReceive, peaCopy);
+                                if (!InventoryService.gI().addItemBag(plReceive, peaCopy)) {
+                                    Service.gI().sendThongBao(plGive, "Hành trang người nhận đã đầy, chưa gửi đậu.");
+                                    return;
+                                }
+                                InventoryService.gI().subQuantityItem(plGive.inventory.itemsBox, pea, 1);
                                 InventoryService.gI().sendItemBags(plReceive);
                                 Service.gI().sendThongBao(plReceive, plGive.name + " đã cho bạn " + peaCopy.template.name);
                                 cmg.receiveDonate++;

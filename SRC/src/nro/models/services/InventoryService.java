@@ -421,16 +421,17 @@ public class InventoryService {
                 index = player.isPet ? 8 : 10;
                 break;
         }
-        if (player.isPet && (item.template.type == 11 || item.template.type == 25)) {
+        if (player.isPet && (item.template.type == 11 || item.template.type == 25 || item.template.type == 27)) {
             Pet pet = (Pet) player;
-            if (pet.type != 2 && pet.type != 3 && pet.type != 4) {
+            if (pet.typePet != 2 && pet.typePet != 3 && pet.typePet != 4) {
                 Player recipient = pet.master != null ? pet.master : player;
                 Service.gI().sendThongBaoOK(recipient, "Chỉ đệ tử vip mới sử dụng được vật phẩm này!");
                 return sItem;
             }
         }
 
-        if (player.isPet && (item.template.type == 23 || item.template.type == 24 || item.template.type == 27)) {
+        if (player.isPet && (item.template.type == 23 || item.template.type == 24
+                || (item.template.type == 27 && nro.models.item.CompanionCatalog.parts(item.template.id) == null))) {
             Player recipient = ((Pet) player).master;
             if (recipient == null) {
                 recipient = player;
@@ -534,6 +535,17 @@ public class InventoryService {
                     sendItemBags(player);
                     sendItemBody(player);
                     if (!itemSwap.equals(item)) {
+                        if (item.template.type == 27) {
+                            if (player.pet.newPet != null) {
+                                player.pet.newPet.dispose();
+                                player.pet.newPet = null;
+                            }
+                            player.pet.sendNewPet();
+                            if (player.pet.newPet != null) {
+                                player.pet.newPet.joinMapMaster();
+                            }
+                        }
+                        Service.gI().point(player.pet);
                         Service.gI().point(player);
                         Service.gI().showInfoPet(player);
                     }
@@ -562,6 +574,13 @@ public class InventoryService {
         Item item = player.pet.inventory.itemsBody.get(index);
         if (item.isNotNullItem()) {
             player.pet.inventory.itemsBody.set(index, putItemBag(player, item));
+            if (player.pet.inventory.itemsBody.get(index) != item) {
+                if (index == 7 && player.pet.newPet != null) {
+                    player.pet.newPet.dispose();
+                    player.pet.newPet = null;
+                }
+                Service.gI().point(player.pet);
+            }
             sendItemBags(player);
             sendItemBody(player);
             Service.gI().point(player);

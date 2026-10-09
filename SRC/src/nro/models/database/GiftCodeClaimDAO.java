@@ -26,11 +26,11 @@ public class GiftCodeClaimDAO {
         }
     }
     private Receipt receipt(Connection c,long player,int account,String code,String token)throws SQLException {
-        try(PreparedStatement q=c.prepareStatement("SELECT request_id,player_id,catalog_id,remaining_after FROM giftcode_claim WHERE account_id=? AND canonical_code=?")) {
-            q.setInt(1,account);q.setString(2,code);try(ResultSet r=q.executeQuery()) {
+        try(PreparedStatement q=c.prepareStatement("SELECT account_id,canonical_code,player_id,catalog_id,remaining_after FROM giftcode_claim_request WHERE request_id=?")) {
+            q.setString(1,token);try(ResultSet r=q.executeQuery()) {
                 if(!r.next())return null;
-                if(!token.equals(r.getString(1))||r.getLong(2)!=player)throw new SQLException("Account already claimed this giftcode");
-                return new Receipt(r.getInt(3),r.getInt(4));
+                if(r.getInt(1)!=account||!code.equals(r.getString(2))||r.getLong(3)!=player)throw new SQLException("Giftcode request ownership mismatch");
+                return new Receipt(r.getInt(4),r.getInt(5));
             }
         }
     }
@@ -57,17 +57,37 @@ public class GiftCodeClaimDAO {
                     q.setString(1,code);try(ResultSet r=q.executeQuery()) {
                         if(!r.next())throw new SQLException("Giftcode no longer exists");
                         gift=new Catalog(r.getInt(1),r.getString(2),r.getInt(3),r.getString(4));
-                        if(!code.equals(gift.code())||!r.getBoolean(5)||gift.remaining()==0||gift.remaining() < -1||r.next())throw new SQLException("Giftcode expired, exhausted or ambiguous");
+                        if(!code.equals(gift.code())||!r.getBoolean(5)||gift.remaining() < -1||r.next())throw new SQLException("Giftcode expired or ambiguous");
                     }
                 }
-                Snapshot snapshot=stage.prepare(gift);
+                boolean supplement=false;String delivered="[]";
+                // Catalog first, then entitlement: matches the web edit lock order.
+                try(PreparedStatement q=c.prepareStatement("SELECT delivered_detail FROM giftcode_claim WHERE account_id=? AND canonical_code=? FOR UPDATE")) {
+                    q.setInt(1,account);q.setString(2,code);try(ResultSet r=q.executeQuery()){
+                        if(r.next()){supplement=true;delivered=r.getString(1);}
+                    }
+                }
+                if(!supplement&&gift.remaining()==0)throw new SQLException("Giftcode exhausted");
+                nro.models.services.GiftCodeRewardDelta.Plan plan;
+                try{plan=nro.models.services.GiftCodeRewardDelta.calculate(gift.detail(),delivered);}
+                catch(IllegalArgumentException invalid){throw new SQLException(invalid.getMessage(),invalid);}
+                if(new JsonParser().parse(plan.deltaDetail()).getAsJsonArray().size()==0)throw new SQLException("Giftcode has no additional rewards");
+                Snapshot snapshot=stage.prepare(new Catalog(gift.id(),gift.code(),gift.remaining(),plan.deltaDetail()));
                 if(snapshot.player()!=player||snapshot.account()!=account)throw new SQLException("Snapshot ownership mismatch");
-                int remaining=gift.remaining()==-1?-1:gift.remaining()-1;
-                try(PreparedStatement q=c.prepareStatement("INSERT INTO giftcode_claim(account_id,canonical_code,request_id,player_id,catalog_id,remaining_after) VALUES(?,?,?,?,?,?)")) {
+                int remaining=supplement||gift.remaining()==-1?gift.remaining():gift.remaining()-1;
+                if(supplement)try(PreparedStatement q=c.prepareStatement("UPDATE giftcode_claim SET delivered_detail=?,remaining_after=? WHERE account_id=? AND canonical_code=?")){
+                    q.setString(1,plan.deliveredDetail());q.setInt(2,remaining);q.setInt(3,account);q.setString(4,code);
+                    if(q.executeUpdate()!=1)throw new SQLException("Gift entitlement update failed");
+                } else try(PreparedStatement q=c.prepareStatement("INSERT INTO giftcode_claim(account_id,canonical_code,request_id,player_id,catalog_id,remaining_after,delivered_detail) VALUES(?,?,?,?,?,?,?)")) {
                     q.setInt(1,account);q.setString(2,code);q.setString(3,token);q.setLong(4,player);q.setInt(5,gift.id());q.setInt(6,remaining);
+                    q.setString(7,plan.deliveredDetail());
                     if(q.executeUpdate()!=1)throw new SQLException("Claim insert failed");
                 }
-                try(PreparedStatement q=c.prepareStatement("UPDATE giftcode SET count_left=?,datecreate=datecreate WHERE id=? AND code=? AND count_left=? AND datecreate<=CURRENT_TIMESTAMP AND expired>CURRENT_TIMESTAMP")) {
+                try(PreparedStatement q=c.prepareStatement("INSERT INTO giftcode_claim_request(request_id,account_id,canonical_code,player_id,catalog_id,remaining_after) VALUES(?,?,?,?,?,?)")){
+                    q.setString(1,token);q.setInt(2,account);q.setString(3,code);q.setLong(4,player);q.setInt(5,gift.id());q.setInt(6,remaining);
+                    if(q.executeUpdate()!=1)throw new SQLException("Giftcode receipt insert failed");
+                }
+                if(!supplement)try(PreparedStatement q=c.prepareStatement("UPDATE giftcode SET count_left=?,datecreate=datecreate WHERE id=? AND code=? AND count_left=? AND datecreate<=CURRENT_TIMESTAMP AND expired>CURRENT_TIMESTAMP")) {
                     q.setInt(1,remaining);q.setInt(2,gift.id());q.setString(3,code);q.setInt(4,gift.remaining());
                     // Unlimited produces a matched row even though no quota changes (Connector/J defaults matched rows).
                     if(q.executeUpdate()!=1)throw new SQLException("Quota changed or giftcode expired");
@@ -78,6 +98,10 @@ public class GiftCodeClaimDAO {
                 try(PreparedStatement q=c.prepareStatement("UPDATE player SET data_inventory=?,items_bag=?,giftcode=? WHERE id=? AND account_id=?")) {
                     q.setString(1,old.toString());q.setString(2,snapshot.bag());q.setString(3,snapshot.history());q.setLong(4,player);q.setInt(5,account);
                     if(q.executeUpdate()!=1)throw new SQLException("Reward persistence failed");
+                }
+                // Long staging must not grant a code that expired while the catalog was locked.
+                try(PreparedStatement q=c.prepareStatement("SELECT expired>CURRENT_TIMESTAMP FROM giftcode WHERE id=?")){
+                    q.setInt(1,gift.id());try(ResultSet r=q.executeQuery()){if(!r.next()||!r.getBoolean(1))throw new SQLException("Giftcode expired while preparing rewards");}
                 }
                 committing=true;c.commit();return new Receipt(gift.id(),remaining);
             }catch(Exception e){try{c.rollback();}catch(SQLException ignored){}throw e;}

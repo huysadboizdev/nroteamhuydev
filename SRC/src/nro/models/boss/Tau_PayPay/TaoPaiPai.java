@@ -33,7 +33,7 @@ public class TaoPaiPai extends Boss {
             if (damage >= 100) {
                 damage = 100;
             }
-            this.nPoint.dame = (int) damage / Util.nextInt(500, 1000);
+            this.nPoint.dame = nro.models.services.BossAdminConfig.nativeDamage(this, (int) ((int) damage / Util.nextInt(500, 1000)));
             this.nPoint.subHP(damage);
             long tnSm = damage * Util.nextInt(20, 50);
             if (tnSm > 10000000) {

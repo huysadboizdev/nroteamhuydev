@@ -134,7 +134,13 @@ public final class MobMe extends Mob {
             if (damage > point.maxHp / 20) {
                 damage = point.maxHp / 20;
             }
-            point.hp -= damage;
+            long removed;
+            synchronized(point) {
+                int before=point.hp;
+                removed=Math.min(Math.max(0,damage),Math.max(0,before));
+                point.hp=(int)(before-damage);
+            }
+            nro.models.services.HighDamageNoticeService.hpRemoved(plAtt,this,removed);
             msg = new Message(-95);
             msg.writer().writeByte(5);//type
             msg.writer().writeInt((int) plAtt.id);

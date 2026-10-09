@@ -89,26 +89,26 @@ CREATE TABLE `achievement_template` (
 --
 
 INSERT INTO `achievement_template` (`id`, `info1`, `info2`, `money`, `max_count`) VALUES
-(1, 'Gia nhập Vệ Binh', 'Đạt cấp Vệ Binh', 10000, 340000),
-(2, 'Sức mạnh siêu cấp', 'Đạt cấp %1', 50, 1500000),
-(3, 'Nông dân chăm chỉ', 'Cây đậu thần đạt cấp 5', 20, 5),
-(4, 'Trăm trận trăm thắng', 'Thắng 100 người khác nhau', 20, 100),
-(5, 'Nội công cao cường', 'Chưởng 2.000 phát', 10, 2000),
-(6, 'Khinh công thành thạo', 'Bay 20.000 mét', 10, 20000),
-(7, 'Thợ săn thiện xạ', 'Hạ 1.000 quái trên không', 10, 1000),
-(8, 'Tập luyện bài bản', 'Hạ 1.000 người rơm', 10, 1000),
-(9, 'Hoạt động chăm chỉ', 'Chơi hơn 120 giờ', 20, 120),
-(10, 'Hỗ trợ đồng đội', 'Cho 10.000 đậu thần', 50, 10000),
-(11, 'Trùm nhặt ve chai', 'Bán cho %2 200 món đồ', 10, 200),
-(12, 'Lần đầu nạp ngọc', 'Nạp ít nhất 150 ngọc', 50, 150),
-(13, 'Đánh bại siêu quái', 'Hạ 100 siêu quái', 10, 100),
-(14, 'Thánh hồi sinh', 'Hồi sinh tại chỗ 200 lần', 50, 200),
-(15, 'Kỹ năng thành thạo', 'Dùng chiêu đặc biệt 1000 lần', 20, 1000),
-(16, 'Trùm nhặt ngọc', 'Nhặt 1000 ngọc', 20, 1000),
-(17, 'Đạt 15 triệu sức mạnh', 'Dành cho tân thủ từ 19/7/2023', 100, 15000000),
-(18, 'Tuyệt kỹ thành thạo', 'Dùng tuyệt kỹ (skill thứ 9) 7749 lần', 50000, 7749),
-(19, 'Chăm sóc đặc biệt', 'Được Namếc hồi sinh 2K lần', 15, 2000),
-(20, 'Trùm kết liễu Boss', 'Đánh đòn cuối hạ Boss 2K lần', 20, 2000);
+(1, 'Gia nhập Vệ Binh', 'Đạt cấp Vệ Binh', 1000, 340000),
+(2, 'Sức mạnh siêu cấp', 'Đạt cấp %1', 1000, 1500000),
+(3, 'Nông dân chăm chỉ', 'Cây đậu thần đạt cấp 5', 1000, 5),
+(4, 'Trăm trận trăm thắng', 'Thắng 100 người khác nhau', 1000, 100),
+(5, 'Nội công cao cường', 'Chưởng 2.000 phát', 1000, 2000),
+(6, 'Khinh công thành thạo', 'Bay 20.000 mét', 1000, 20000),
+(7, 'Thợ săn thiện xạ', 'Hạ 1.000 quái trên không', 1000, 1000),
+(8, 'Tập luyện bài bản', 'Hạ 1.000 người rơm', 1000, 1000),
+(9, 'Hoạt động chăm chỉ', 'Chơi hơn 120 giờ', 1000, 120),
+(10, 'Hỗ trợ đồng đội', 'Cho 10.000 đậu thần', 1000, 10000),
+(11, 'Trùm nhặt ve chai', 'Bán cho %2 200 món đồ', 1000, 200),
+(12, 'Lần đầu nạp ngọc', 'Nạp ít nhất 150 ngọc', 1000, 150),
+(13, 'Đánh bại siêu quái', 'Hạ 100 siêu quái', 1000, 100),
+(14, 'Thánh hồi sinh', 'Hồi sinh tại chỗ 200 lần', 1000, 200),
+(15, 'Kỹ năng thành thạo', 'Dùng chiêu đặc biệt 1000 lần', 1000, 1000),
+(16, 'Trùm nhặt ngọc', 'Nhặt 1000 ngọc', 1000, 1000),
+(17, 'Đạt 15 triệu sức mạnh', 'Đạt 15 triệu sức mạnh', 1000, 15000000),
+(18, 'Tuyệt kỹ thành thạo', 'Dùng tuyệt kỹ (skill thứ 9) 7749 lần', 1000, 7749),
+(19, 'Chăm sóc đặc biệt', 'Được Namếc hồi sinh 2K lần', 1000, 2000),
+(20, 'Trùm kết liễu Boss', 'Đánh đòn cuối hạ Boss 2K lần', 1000, 2000);
 
 -- --------------------------------------------------------
 
@@ -11253,3 +11253,322 @@ UPDATE map_template SET npcs=JSON_ARRAY_APPEND(npcs,'$',JSON_ARRAY(66,215,624))
  WHERE id=184 AND JSON_VALID(npcs) AND REPLACE(npcs,' ','') NOT LIKE '%[66,%';
 UPDATE map_template SET npcs=JSON_ARRAY_APPEND(npcs,'$',JSON_ARRAY(66,801,672))
  WHERE id=185 AND JSON_VALID(npcs) AND REPLACE(npcs,' ','') NOT LIKE '%[66,%';
+
+
+-- GIFTCODE_SUPPLEMENTS_20261008
+-- Apply during saved maintenance after 20261007_giftcode_claims.sql and a backup.
+-- Baselines are captured exactly once. NULL means unknown historical delivery and
+-- must remain NULL even if an administrator later recreates the catalog code.
+DELIMITER $$
+DROP FUNCTION IF EXISTS giftcode_baseline_20261008$$
+CREATE FUNCTION giftcode_baseline_20261008(raw LONGTEXT) RETURNS LONGTEXT DETERMINISTIC
+BEGIN
+ DECLARE i INT DEFAULT 0;
+ DECLARE j INT DEFAULT 0;
+ DECLARE k INT DEFAULT 0;
+ DECLARE entry_value LONGTEXT;
+ DECLARE options_value LONGTEXT;
+ DECLARE option_value LONGTEXT;
+ DECLARE normalized LONGTEXT DEFAULT '[]';
+ DECLARE id_value BIGINT;
+ DECLARE quantity_value BIGINT;
+ DECLARE option_id BIGINT;
+ DECLARE param_value BIGINT;
+ IF raw IS NULL OR JSON_VALID(raw)=0 THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Invalid giftcode baseline JSON'; END IF;
+ IF JSON_TYPE(raw)<>'ARRAY' OR JSON_LENGTH(raw)>200 THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Giftcode baseline must be array of at most 200 rewards'; END IF;
+ WHILE i<JSON_LENGTH(raw) DO
+  SET entry_value=JSON_EXTRACT(raw,CONCAT('$[',i,']'));
+  IF JSON_TYPE(entry_value)<>'OBJECT' OR COALESCE(JSON_TYPE(JSON_EXTRACT(entry_value,'$.id')),'NULL')<>'INTEGER' OR COALESCE(JSON_TYPE(JSON_EXTRACT(entry_value,'$.quantity')),'NULL')<>'INTEGER' THEN
+   SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Giftcode baseline reward needs integer id and quantity';
+  END IF;
+  -- Check lexical magnitude before BIGINT assignment to avoid overflow/coercion.
+  IF JSON_EXTRACT(entry_value,'$.id') < -3 OR JSON_EXTRACT(entry_value,'$.id') > 32767 OR JSON_EXTRACT(entry_value,'$.quantity') < 1 OR JSON_EXTRACT(entry_value,'$.quantity') > 2147483647 THEN
+   SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Giftcode baseline reward outside supported range';
+  END IF;
+  SET id_value=JSON_EXTRACT(entry_value,'$.id');
+  SET quantity_value=JSON_EXTRACT(entry_value,'$.quantity');
+  SET k=0;
+  WHILE k<i DO
+   IF JSON_EXTRACT(raw,CONCAT('$[',k,'].id'))=id_value THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Duplicate giftcode baseline reward id'; END IF;
+   SET k=k+1;
+  END WHILE;
+  IF JSON_CONTAINS_PATH(entry_value,'one','$.options')=0 THEN SET options_value='[]';
+  ELSE SET options_value=JSON_EXTRACT(entry_value,'$.options'); END IF;
+  IF JSON_TYPE(options_value)<>'ARRAY' OR JSON_LENGTH(options_value)>100 THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Giftcode baseline options must be array of at most 100 options'; END IF;
+  SET j=0;
+  WHILE j<JSON_LENGTH(options_value) DO
+   SET option_value=JSON_EXTRACT(options_value,CONCAT('$[',j,']'));
+   IF JSON_TYPE(option_value)<>'OBJECT' OR COALESCE(JSON_TYPE(JSON_EXTRACT(option_value,'$.id')),'NULL')<>'INTEGER' OR COALESCE(JSON_TYPE(JSON_EXTRACT(option_value,'$.param')),'NULL')<>'INTEGER' THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Giftcode baseline option needs integer id and param';
+   END IF;
+   IF JSON_EXTRACT(option_value,'$.id')<0 OR JSON_EXTRACT(option_value,'$.id')>32767 OR JSON_EXTRACT(option_value,'$.param')<0 OR JSON_EXTRACT(option_value,'$.param')>2147483647 THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Giftcode baseline option outside supported range';
+   END IF;
+   SET option_id=JSON_EXTRACT(option_value,'$.id');
+   SET param_value=JSON_EXTRACT(option_value,'$.param');
+   SET k=0;
+   WHILE k<j DO
+    IF JSON_EXTRACT(options_value,CONCAT('$[',k,'].id'))=option_id THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Duplicate giftcode baseline option id'; END IF;
+    SET k=k+1;
+   END WHILE;
+   SET j=j+1;
+  END WHILE;
+  SET normalized=JSON_ARRAY_APPEND(normalized,'$',JSON_OBJECT('id',CAST(id_value AS SIGNED),'quantity',CAST(quantity_value AS SIGNED),'options',JSON_EXTRACT(options_value,'$')));
+  SET i=i+1;
+ END WHILE;
+ RETURN normalized;
+END$$
+DROP PROCEDURE IF EXISTS migrate_giftcode_20261008$$
+CREATE PROCEDURE migrate_giftcode_20261008()
+BEGIN
+ DECLARE already_applied INT DEFAULT 0;
+ DECLARE EXIT HANDLER FOR SQLEXCEPTION BEGIN ROLLBACK; RESIGNAL; END;
+ IF EXISTS(SELECT 1 FROM information_schema.tables WHERE table_schema=DATABASE() AND table_name='giftcode_schema_migration') THEN
+  SELECT COUNT(*) INTO already_applied FROM giftcode_schema_migration WHERE migration_id='20261008_giftcode_supplements';
+ END IF;
+ DROP TEMPORARY TABLE IF EXISTS giftcode_baseline_stage_20261008;
+ CREATE TEMPORARY TABLE giftcode_baseline_stage_20261008(
+  account_id INT NOT NULL,
+  canonical_code VARCHAR(100) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  delivered_detail LONGTEXT NOT NULL,
+  PRIMARY KEY(account_id,canonical_code)
+ ) ENGINE=InnoDB;
+ -- JSON validation/staging happens before any persistent table/column mutation.
+ -- Marker reruns deliberately do not inspect today's catalog or infer new baselines.
+ IF already_applied=0 THEN
+  INSERT INTO giftcode_baseline_stage_20261008(account_id,canonical_code,delivered_detail)
+   SELECT c.account_id,c.canonical_code,giftcode_baseline_20261008(g.detail)
+   FROM giftcode_claim c INNER JOIN giftcode g ON g.code=c.canonical_code;
+ END IF;
+ IF NOT EXISTS(SELECT 1 FROM information_schema.columns WHERE table_schema=DATABASE() AND table_name='giftcode_claim' AND column_name='delivered_detail') THEN
+  ALTER TABLE giftcode_claim ADD COLUMN delivered_detail LONGTEXT NULL;
+ END IF;
+ -- Web catalog edits lock only the account watermarks for the edited code.
+ IF NOT EXISTS(SELECT 1 FROM information_schema.statistics WHERE table_schema=DATABASE() AND table_name='giftcode_claim' AND index_name='giftcode_claim_code') THEN
+  ALTER TABLE giftcode_claim ADD KEY giftcode_claim_code(canonical_code,account_id);
+ END IF;
+ CREATE TABLE IF NOT EXISTS giftcode_claim_request(
+  request_id CHAR(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  account_id INT NOT NULL,
+  canonical_code VARCHAR(100) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  player_id BIGINT NOT NULL,
+  catalog_id INT NOT NULL,
+  remaining_after INT NOT NULL,
+  claimed_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY(request_id),
+  KEY giftcode_request_account_code(account_id,canonical_code)
+ ) ENGINE=InnoDB;
+ CREATE TABLE IF NOT EXISTS giftcode_schema_migration(
+  migration_id VARCHAR(100) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  applied_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY(migration_id)
+ ) ENGINE=InnoDB;
+ START TRANSACTION;
+ IF already_applied=0 THEN
+  UPDATE giftcode_claim c INNER JOIN giftcode_baseline_stage_20261008 b
+   ON b.account_id=c.account_id AND b.canonical_code=c.canonical_code
+   SET c.delivered_detail=b.delivered_detail;
+  INSERT INTO giftcode_claim_request(request_id,account_id,canonical_code,player_id,catalog_id,remaining_after,claimed_at)
+   SELECT request_id,account_id,canonical_code,player_id,catalog_id,remaining_after,claimed_at FROM giftcode_claim;
+  INSERT INTO giftcode_schema_migration(migration_id) VALUES('20261008_giftcode_supplements');
+ END IF;
+ COMMIT;
+ DROP TEMPORARY TABLE giftcode_baseline_stage_20261008;
+END$$
+CALL migrate_giftcode_20261008()$$
+DROP PROCEDURE migrate_giftcode_20261008$$
+DROP FUNCTION giftcode_baseline_20261008$$
+DELIMITER ;
+
+
+-- Genuine Grand Priest assets: head703/body704/leg705, portrait6578.
+-- Preserve every other map NPC, including Bo Mong outside houses21..23.
+-- Repeated application normalizes exactly one Daishinkan per starter village.
+DELIMITER $$
+DROP PROCEDURE IF EXISTS migrate_daishinkan_village_rankings$$
+CREATE PROCEDURE migrate_daishinkan_village_rankings()
+BEGIN
+    DECLARE map_number INT;
+    DECLARE row_index INT;
+    DECLARE map_npcs LONGTEXT;
+    DECLARE npc_x INT;
+    DECLARE npc_y INT;
+    DECLARE target_map INT;
+    IF EXISTS (SELECT 1 FROM npc_template WHERE id=111 AND NAME<>'Daishinkan') THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='NPC111 already belongs to another NPC';
+    END IF;
+    IF (SELECT COUNT(*) FROM part WHERE id IN (703,704,705))<>3 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Missing original Daishinkan parts';
+    END IF;
+    IF (SELECT COUNT(*) FROM map_template WHERE id IN (0,7,14,21,22,23) AND JSON_VALID(npcs))<>6 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Missing or invalid starter map NPC data';
+    END IF;
+    INSERT INTO npc_template (id,NAME,head,body,leg,avatar)
+        VALUES (111,'Daishinkan',703,704,705,6578)
+        ON DUPLICATE KEY UPDATE head=703,body=704,leg=705,avatar=6578;
+    SET map_number=0;
+    WHILE map_number<6 DO
+        SET map_number=map_number+1;
+        SET target_map=CASE map_number WHEN 1 THEN 0 WHEN 2 THEN 7 WHEN 3 THEN 14 WHEN 4 THEN 21 WHEN 5 THEN 22 ELSE 23 END;
+        SELECT npcs INTO map_npcs FROM map_template WHERE id=target_map;
+        SET row_index=JSON_LENGTH(map_npcs)-1;
+        WHILE row_index>=0 DO
+            IF (target_map IN (21,22,23) AND JSON_EXTRACT(map_npcs,CONCAT('$[',row_index,'][0]'))=17)
+                OR (target_map IN (0,7,14) AND JSON_EXTRACT(map_npcs,CONCAT('$[',row_index,'][0]'))=111) THEN
+                SET map_npcs=JSON_REMOVE(map_npcs,CONCAT('$[',row_index,']'));
+            END IF;
+            SET row_index=row_index-1;
+        END WHILE;
+        IF target_map IN (0,7,14) THEN
+            SET npc_x=1100;
+            SET npc_y=CASE target_map WHEN 14 THEN 408 ELSE 432 END;
+            SET map_npcs=JSON_ARRAY_APPEND(map_npcs,'$',JSON_ARRAY(111,CAST(npc_x AS SIGNED),CAST(npc_y AS SIGNED)));
+        END IF;
+        UPDATE map_template SET npcs=map_npcs WHERE id=target_map;
+    END WHILE;
+END$$
+DELIMITER ;
+START TRANSACTION;
+CALL migrate_daishinkan_village_rankings();
+COMMIT;
+DROP PROCEDURE migrate_daishinkan_village_rankings;
+
+
+-- Disable Xe nuoc mia NPC84 placements; preserve every other NPC/template.
+DELIMITER $$
+DROP PROCEDURE IF EXISTS disable_sugarcane_npc_20261008$$
+CREATE PROCEDURE disable_sugarcane_npc_20261008()
+BEGIN
+    DECLARE done INT DEFAULT 0;
+    DECLARE target_map INT;
+    DECLARE map_npcs LONGTEXT;
+    DECLARE row_index INT;
+    DECLARE map_cursor CURSOR FOR SELECT id,npcs FROM map_template WHERE JSON_VALID(npcs);
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done=1;
+    OPEN map_cursor;
+    map_loop: LOOP
+        FETCH map_cursor INTO target_map,map_npcs;
+        IF done=1 THEN LEAVE map_loop; END IF;
+        SET row_index=JSON_LENGTH(map_npcs)-1;
+        WHILE row_index>=0 DO
+            IF JSON_EXTRACT(map_npcs,CONCAT('$[',row_index,'][0]'))=84 THEN
+                SET map_npcs=JSON_REMOVE(map_npcs,CONCAT('$[',row_index,']'));
+            END IF;
+            SET row_index=row_index-1;
+        END WHILE;
+        UPDATE map_template SET npcs=map_npcs WHERE id=target_map;
+    END LOOP;
+    CLOSE map_cursor;
+END$$
+DELIMITER ;
+START TRANSACTION;
+CALL disable_sugarcane_npc_20261008();
+COMMIT;
+DROP PROCEDURE disable_sugarcane_npc_20261008;
+
+-- PRISON_BILL_BOSS_APPEARANCES_20261009
+-- Dedicated combat boss appearances; no existing part, NPC or item is overwritten.
+START TRANSACTION;
+INSERT INTO part(id,type,data) VALUES (2099,0,'[[17200,4,-3],[17201,6,-2],[24000,0,0]]');
+INSERT INTO part(id,type,data) VALUES (2100,1,'[[17202,-8,-5],[17203,-1,-9],[17204,-5,-10],[17205,0,-10],[17206,-3,-10],[17207,-5,-10],[17208,-8,-10],[17209,-5,-6],[17210,-1,-6],[17211,-4,-9],[17212,-6,-9],[17213,-3,-7],[17214,-4,-5],[17215,-1,-10],[17216,-5,-9],[17217,-10,-7],[24000,0,0]]');
+INSERT INTO part(id,type,data) VALUES (2101,2,'[[17218,4,4],[17219,-1,-4],[17220,-1,-4],[17221,1,-4],[17222,-1,-4],[17223,-2,-4],[17224,0,-3],[17225,-1,-1],[17226,0,0],[17227,-1,-5],[17228,-1,-2],[17229,-1,0],[17230,-1,0],[24000,0,0]]');
+INSERT INTO head_avatar(head_id,avatar_id) VALUES (2099,17231);
+INSERT INTO part(id,type,data) VALUES (2102,0,'[[17265,2,-3],[17266,2,-1],[24000,0,0]]');
+INSERT INTO part(id,type,data) VALUES (2103,1,'[[17267,0,-1],[17268,-1,-5],[17269,0,-5],[17270,-1,-5],[17271,0,-6],[17272,1,-5],[17273,1,-4],[17274,1,-1],[17275,0,-3],[17276,-1,-4],[17277,1,-2],[17278,0,-1],[17279,0,0],[17280,2,-4],[17281,-1,-4],[17282,-1,-4],[24000,0,0]]');
+INSERT INTO part(id,type,data) VALUES (2104,2,'[[17283,1,5],[17284,-1,-3],[17285,0,0],[17286,0,0],[17287,0,0],[17288,0,0],[17289,0,0],[17290,1,2],[17291,1,2],[17292,0,0],[17293,3,-1],[17294,0,2],[17295,0,0],[24000,0,0]]');
+INSERT INTO head_avatar(head_id,avatar_id) VALUES (2102,17296);
+INSERT INTO part(id,type,data) VALUES (2105,0,'[[17297,4,-5],[17298,5,-1],[24000,0,0]]');
+INSERT INTO part(id,type,data) VALUES (2106,1,'[[17299,0,0],[17300,-2,-5],[17301,0,-4],[17302,0,-4],[17303,0,-5],[17304,1,-4],[17305,1,-4],[17306,0,-1],[17307,-1,-3],[17308,0,-3],[17309,1,-1],[17310,1,-1],[17311,0,0],[17312,3,-4],[17313,-2,-4],[17314,-1,-2],[24000,0,0]]');
+INSERT INTO part(id,type,data) VALUES (2107,2,'[[17315,4,5],[17316,-1,-3],[17317,0,0],[17318,2,0],[17319,0,0],[17320,0,1],[17321,1,0],[17322,0,1],[17323,0,2],[17324,-1,-1],[17325,1,0],[17326,0,2],[17327,0,0],[24000,0,0]]');
+INSERT INTO head_avatar(head_id,avatar_id) VALUES (2105,17328);
+INSERT INTO part(id,type,data) VALUES (2108,0,'[[24001,3,-12],[24002,4,-11],[24003,0,0]]');
+INSERT INTO part(id,type,data) VALUES (2109,1,'[[24004,1,-5],[24005,-3,-7],[24006,-3,-9],[24007,-1,-9],[24008,-1,-9],[24009,2,-7],[24010,1,-8],[24011,-1,-7],[24012,1,-7],[24013,-1,-7],[24014,1,-6],[24015,-4,-5],[24016,1,-6],[24017,1,-7],[24018,2,-6],[24019,1,-7],[24020,0,0]]');
+INSERT INTO part(id,type,data) VALUES (2110,2,'[[24021,-6,-7],[24022,-1,-4],[24023,-14,-2],[24024,-10,-3],[24025,-17,-5],[24026,-11,-2],[24027,-13,-5],[24028,-1,-2],[24029,-2,-2],[24030,-4,-5],[24031,0,-6],[24032,0,-1],[24033,-4,-4],[24034,0,0]]');
+INSERT INTO head_avatar(head_id,avatar_id) VALUES (2108,24035);
+INSERT INTO part(id,type,data) VALUES (2111,0,'[[24036,4,-12],[24036,-1,-19],[24000,0,0]]');
+INSERT INTO part(id,type,data) VALUES (2112,1,'[[24037,-2,-18],[24037,-2,-24],[24037,-5,-30],[24037,-2,-30],[24037,-6,-30],[24037,-4,-30],[24037,-5,-30],[24037,4,-17],[24037,5,-12],[24037,-5,-11],[24037,-2,-18],[24037,-2,-18],[24037,-2,-18],[24037,-2,-18],[24037,-2,-18],[24037,-2,-18],[24020,0,0]]');
+INSERT INTO part(id,type,data) VALUES (2113,2,'[[24038,14,3],[24039,0,-4],[24038,0,-8],[24038,2,-8],[24038,-2,-9],[24038,2,-9],[24038,0,-9],[24038,-1,-4],[24038,0,0],[24039,2,-5],[24038,0,3],[24038,0,4],[24038,2,4],[24034,0,0]]');
+INSERT INTO head_avatar(head_id,avatar_id) VALUES (2111,24040);
+INSERT INTO part(id,type,data) VALUES (2114,0,'[[24041,2,-12],[24042,2,-9],[24003,0,0]]');
+INSERT INTO part(id,type,data) VALUES (2115,1,'[[24043,-1,-5],[24044,-4,-10],[24045,-5,-8],[24046,-2,-7],[24047,-2,-8],[24048,-1,-7],[24049,-4,-7],[24050,-2,-6],[24051,0,-7],[24052,-2,-6],[24053,-1,-5],[24054,-4,-4],[24055,0,-5],[24056,-1,-6],[24057,0,-7],[24058,-2,-7],[24020,0,0]]');
+INSERT INTO part(id,type,data) VALUES (2116,2,'[[24021,2,1],[24059,-2,-4],[24060,-15,-2],[24061,-8,-2],[24062,-17,-4],[24063,-9,-2],[24064,-12,-5],[24065,-3,-2],[24066,-5,-2],[24067,-2,-5],[24068,-3,-4],[24069,-3,0],[24070,-4,-3],[24034,0,0]]');
+INSERT INTO head_avatar(head_id,avatar_id) VALUES (2114,24041);
+INSERT INTO part(id,type,data) VALUES (2117,0,'[[24071,-3,-13],[24071,-9,-19],[24003,0,0]]');
+INSERT INTO part(id,type,data) VALUES (2118,1,'[[24072,-1,-17],[24072,-2,-24],[24072,-6,-29],[24072,-3,-29],[24072,-6,-29],[24072,-5,-29],[24072,-5,-28],[24072,4,-18],[24072,5,-12],[24072,-4,-9],[24072,-6,-26],[24072,-1,-17],[24072,-1,-17],[24072,-1,-17],[24072,-1,-17],[24072,-1,-17],[24020,0,0]]');
+INSERT INTO part(id,type,data) VALUES (2119,2,'[[24073,14,3],[24074,0,-4],[24073,0,-8],[24073,2,-8],[24073,-2,-9],[24073,2,-9],[24073,0,-9],[24073,1,0],[24073,-5,-4],[24073,2,-5],[24073,0,3],[24073,0,4],[24073,2,4],[24034,0,0]]');
+INSERT INTO head_avatar(head_id,avatar_id) VALUES (2117,24075);
+COMMIT;
+
+-- ANIME_APPEARANCES_20261009
+START TRANSACTION;
+INSERT INTO part(id,type,data) VALUES (2120,0,'[[24100,-6,-21],[24101,-6,-20],[24102,0,0]]');
+INSERT INTO part(id,type,data) VALUES (2121,1,'[[24103,-4,-7],[24104,-7,-11],[24105,-10,-13],[24103,-4,-7],[24103,-4,-7],[24103,-4,-7],[24103,-4,-7],[24106,-5,-15],[24107,-12,-17],[24108,-6,-14],[24109,-11,-17],[24110,-12,-19],[24111,-7,-18],[24112,-9,-16],[24113,-11,-15],[24114,-8,-15],[24102,0,0]]');
+INSERT INTO part(id,type,data) VALUES (2122,2,'[[24115,0,5],[24116,-4,-5],[24117,-4,-6],[24118,-9,-19],[24119,-11,-17],[24120,-7,-17],[24121,-7,-17],[24122,-5,-1],[24123,-6,-13],[24124,-6,-7],[24125,-5,-5],[24126,-6,-5],[24127,-4,-8],[24102,0,0]]');
+INSERT INTO head_avatar(head_id,avatar_id) VALUES (2120,24128);
+INSERT INTO item_template(id,TYPE,gender,NAME,description,level,icon_id,part,is_up_to_up,power_require,gold,gem,head,body,leg) VALUES (2020,5,3,'Cải trang Goku vô cực','Trang phục và hình ảnh',1,24129,-1,0,0,0,0,2120,2121,2122);
+INSERT INTO part(id,type,data) VALUES (2123,0,'[[16996,-3,-9],[16997,-6,-11],[24102,0,0]]');
+INSERT INTO part(id,type,data) VALUES (2124,1,'[[16998,-14,-7],[16999,-8,-9],[17000,-11,-13],[16998,-14,-7],[16998,-14,-7],[16998,-14,-7],[16998,-14,-7],[17001,-8,-14],[17002,-4,-4],[17003,-10,-29],[17004,-13,-29],[17005,-10,-18],[17006,-12,-12],[17007,-4,-11],[17008,-17,-9],[17009,-18,-8],[24102,0,0]]');
+INSERT INTO part(id,type,data) VALUES (2125,2,'[[17010,6,5],[17011,-1,-2],[17012,-5,-3],[17013,-8,-19],[17014,-13,-19],[17015,-7,-18],[17016,-9,-18],[17017,-5,-2],[17018,-1,-2],[17019,-5,-6],[17020,-48,-42],[17021,-3,2],[17022,-1,-1],[24102,0,0]]');
+INSERT INTO head_avatar(head_id,avatar_id) VALUES (2123,17024);
+INSERT INTO item_template(id,TYPE,gender,NAME,description,level,icon_id,part,is_up_to_up,power_require,gold,gem,head,body,leg) VALUES (2026,5,3,'Cải trang Naruto','Trang phục và hình ảnh',1,17023,-1,0,0,0,0,2123,2124,2125);
+INSERT INTO part(id,type,data) VALUES (2126,0,'[[17025,3,-8],[17026,2,-7],[24102,0,0]]');
+INSERT INTO part(id,type,data) VALUES (2127,1,'[[17027,-4,-7],[17028,-8,-9],[17029,-11,-11],[17027,-4,-7],[17027,-4,-7],[17027,-4,-7],[17027,-4,-7],[17030,0,-3],[17031,-4,-8],[17032,-4,-24],[17033,-9,-38],[17034,-27,-7],[17035,-1,-13],[17036,-1,-9],[17037,-6,-8],[17038,-6,-9],[24102,0,0]]');
+INSERT INTO part(id,type,data) VALUES (2128,2,'[[17039,4,5],[17040,-1,-5],[17041,-6,-3],[17053,-7,-16],[17042,-12,-17],[17043,-7,-16],[17044,-9,-17],[17045,-2,-3],[17046,-2,-2],[17047,-3,-5],[17048,-38,-27],[17049,-4,0],[17050,-1,-2],[24102,0,0]]');
+INSERT INTO head_avatar(head_id,avatar_id) VALUES (2126,17052);
+INSERT INTO item_template(id,TYPE,gender,NAME,description,level,icon_id,part,is_up_to_up,power_require,gold,gem,head,body,leg) VALUES (2027,5,3,'Cải trang Sasuke','Trang phục và hình ảnh',1,17051,-1,0,0,0,0,2126,2127,2128);
+INSERT INTO part(id,type,data) VALUES (2129,0,'[[24102,0,0],[24102,0,0],[24102,0,0]]');
+INSERT INTO part(id,type,data) VALUES (2130,1,'[[24102,0,0],[16937,0,-13],[24102,0,0],[24102,0,0],[24102,0,0],[24102,0,0],[24102,0,0],[24102,0,0],[24102,0,0],[24102,0,0],[24102,0,0],[24102,0,0],[24102,0,0],[24102,0,0],[24102,0,0],[24102,0,0],[24102,0,0]]');
+INSERT INTO part(id,type,data) VALUES (2131,2,'[[16940,-25,-13],[16938,-30,-23],[16939,-31,-31],[16940,-34,-27],[16941,-33,-32],[16942,-32,-25],[16943,-28,-29],[16943,-34,-25],[16939,-38,-27],[24102,0,0],[24102,0,0],[24102,0,0],[24102,0,0],[24102,0,0]]');
+INSERT INTO item_template(id,TYPE,gender,NAME,description,level,icon_id,part,is_up_to_up,power_require,gold,gem,head,body,leg) VALUES (2019,27,3,'Pet Cửu Vĩ Hồ','Trang phục và hình ảnh',1,16944,-1,0,0,0,0,2129,2130,2131);
+INSERT INTO part(id,type,data) VALUES (2132,0,'[[24130,-6,-19],[24131,-7,-20],[24102,0,0]]');
+INSERT INTO part(id,type,data) VALUES (2133,0,'[[24132,-6,-22],[24133,-4,-21],[24102,0,0]]');
+INSERT INTO flag_bag(id,icon_data,NAME,gold,gem,icon_id) VALUES (157,'17082,17083','Sharingan Vạn Hoa Đồng',-1,-1,17088);
+INSERT INTO item_template(id,TYPE,gender,NAME,description,level,icon_id,part,is_up_to_up,power_require,gold,gem,head,body,leg) VALUES (2030,11,3,'Cờ Sharingan Vạn Hoa Đồng','Phụ kiện',1,17088,157,0,0,0,0,-1,-1,-1);
+COMMIT;
+
+-- ANIME_RUBY_SHOP_20261009
+START TRANSACTION;
+INSERT INTO part(id,type,data) VALUES (2134,0,'[[17135,-2,-8],[17136,-4,-10],[24200,0,0]]');
+INSERT INTO part(id,type,data) VALUES (2135,1,'[[17137,-4,-5],[17138,-5,-10],[17139,-12,-11],[17137,-4,-5],[17137,-4,-5],[17137,-4,-5],[17137,-4,-5],[17140,-6,-5],[17141,-15,-7],[17142,-7,-11],[17143,-6,-10],[17144,-6,-11],[17145,-10,-12],[17146,-13,-10],[17163,-9,-8],[17147,-17,-9],[24200,0,0]]');
+INSERT INTO part(id,type,data) VALUES (2136,2,'[[17148,4,4],[17149,-3,-3],[17150,-5,-4],[17151,-8,-16],[17152,-12,-17],[17153,-8,-17],[17154,-10,-17],[17155,-4,-2],[17156,-3,-1],[17157,-2,-5],[17158,3,-1],[17159,-4,4],[17160,-4,-4],[24200,0,0]]');
+INSERT INTO head_avatar(head_id,avatar_id) VALUES (2134,17162);
+INSERT INTO item_template(id,TYPE,gender,NAME,description,level,icon_id,part,is_up_to_up,power_require,gold,gem,head,body,leg) VALUES (2039,5,3,'Cải trang Akatsuki','Trang phục và hình ảnh',1,17161,-1,0,0,0,0,2134,2135,2136);
+UPDATE item_template SET description='Mặc cùng cải trang Naruto tăng 2% HP, KI, sức đánh' WHERE id=2019;
+INSERT INTO item_shop(id,tab_id,temp_id,is_new,is_sell,type_sell,cost,icon_spec) VALUES (1014,64,2019,1,1,3,200,7743);
+INSERT INTO item_shop_option(item_shop_id,option_id,param) VALUES (1014,50,13);
+INSERT INTO item_shop_option(item_shop_id,option_id,param) VALUES (1014,77,13);
+INSERT INTO item_shop_option(item_shop_id,option_id,param) VALUES (1014,103,13);
+INSERT INTO item_shop_option(item_shop_id,option_id,param) VALUES (1014,204,13);
+INSERT INTO item_shop_option(item_shop_id,option_id,param) VALUES (1014,14,25);
+INSERT INTO item_shop_option(item_shop_id,option_id,param) VALUES (1014,30,0);
+UPDATE item_template SET description='Đi cùng Pet Cửu Vĩ Hồ tăng 2% HP, KI, sức đánh' WHERE id=2026;
+INSERT INTO item_shop(id,tab_id,temp_id,is_new,is_sell,type_sell,cost,icon_spec) VALUES (1015,64,2026,1,1,3,200,7743);
+INSERT INTO item_shop_option(item_shop_id,option_id,param) VALUES (1015,77,25);
+INSERT INTO item_shop_option(item_shop_id,option_id,param) VALUES (1015,6,50000);
+INSERT INTO item_shop_option(item_shop_id,option_id,param) VALUES (1015,94,30);
+INSERT INTO item_shop_option(item_shop_id,option_id,param) VALUES (1015,30,0);
+UPDATE item_template SET description='Đi cùng Cờ Sharingan Vạn Hoa Đồng tăng 2% sức đánh, HP, KI' WHERE id=2027;
+INSERT INTO item_shop(id,tab_id,temp_id,is_new,is_sell,type_sell,cost,icon_spec) VALUES (1016,64,2027,1,1,3,200,7743);
+INSERT INTO item_shop_option(item_shop_id,option_id,param) VALUES (1016,50,25);
+INSERT INTO item_shop_option(item_shop_id,option_id,param) VALUES (1016,0,30000);
+INSERT INTO item_shop_option(item_shop_id,option_id,param) VALUES (1016,14,15);
+INSERT INTO item_shop_option(item_shop_id,option_id,param) VALUES (1016,30,0);
+UPDATE item_template SET description='Đi cùng cải trang Sasuke tăng 2% sức đánh, HP, KI' WHERE id=2030;
+INSERT INTO item_shop(id,tab_id,temp_id,is_new,is_sell,type_sell,cost,icon_spec) VALUES (1017,64,2030,1,1,3,200,7743);
+INSERT INTO item_shop_option(item_shop_id,option_id,param) VALUES (1017,50,20);
+INSERT INTO item_shop_option(item_shop_id,option_id,param) VALUES (1017,77,20);
+INSERT INTO item_shop_option(item_shop_id,option_id,param) VALUES (1017,103,20);
+INSERT INTO item_shop_option(item_shop_id,option_id,param) VALUES (1017,95,20);
+INSERT INTO item_shop_option(item_shop_id,option_id,param) VALUES (1017,96,20);
+INSERT INTO item_shop_option(item_shop_id,option_id,param) VALUES (1017,14,40);
+INSERT INTO item_shop_option(item_shop_id,option_id,param) VALUES (1017,30,0);
+UPDATE item_template SET description='Cải trang thành Akatsuki' WHERE id=2039;
+INSERT INTO item_shop(id,tab_id,temp_id,is_new,is_sell,type_sell,cost,icon_spec) VALUES (1018,64,2039,1,1,3,200,7743);
+INSERT INTO item_shop_option(item_shop_id,option_id,param) VALUES (1018,50,22);
+INSERT INTO item_shop_option(item_shop_id,option_id,param) VALUES (1018,77,22);
+INSERT INTO item_shop_option(item_shop_id,option_id,param) VALUES (1018,103,22);
+INSERT INTO item_shop_option(item_shop_id,option_id,param) VALUES (1018,101,100);
+INSERT INTO item_shop_option(item_shop_id,option_id,param) VALUES (1018,160,70);
+INSERT INTO item_shop_option(item_shop_id,option_id,param) VALUES (1018,14,10);
+INSERT INTO item_shop_option(item_shop_id,option_id,param) VALUES (1018,30,0);
+COMMIT;

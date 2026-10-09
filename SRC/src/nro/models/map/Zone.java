@@ -437,6 +437,7 @@ public class Zone {
     }
 
     public synchronized void addItem(ItemMap itemMap) {
+        if (!nro.models.services.BossAdminDropService.mayPublish(itemMap)) return;
         try(var eventPermit=nro.models.event.EventItemPolicy.admit()) {
         if(itemMap!=null && itemMap.itemTemplate!=null && nro.models.event.EventItemPolicy.isBlocked(itemMap.itemTemplate.id))return;
         if (itemMap != null && !items.contains(itemMap)) {

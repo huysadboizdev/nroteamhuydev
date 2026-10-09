@@ -98,6 +98,7 @@ public abstract class DeathOrAliveArena extends Boss {
             this.nPoint.hpMax = (int) Math.min(Integer.MAX_VALUE,
                     playerAtt.nPoint.hpMax / 100L * hpPercent);
             this.nPoint.hp = this.nPoint.hpMax;
+            nro.models.services.BossAdminConfig.applyAfterNativeSpawn(this);
             ChangeMapService.gI().changeMap(this, this.zone, 523, 336);
         }
     }
@@ -176,6 +177,7 @@ public abstract class DeathOrAliveArena extends Boss {
 
     @Override
     public void die(Player plKill) {
+        nro.models.services.BossAdminDropService.rewardWithoutDefault(this, plKill);
         this.changeStatus(BossStatus.DIE);
     }
 

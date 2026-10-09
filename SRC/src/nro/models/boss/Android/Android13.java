@@ -19,7 +19,7 @@ public class Android13 extends Boss {
         super(BossID.ANDROID_13, BossesData.ANDROID_13);
     }
     @Override
-    public void reward(Player plKill) {
+    public void rewardDefault(Player plKill) {
         if (questSupportReward(plKill)) return;
         int diem = 5;
         plKill.event.addEventPoint(diem);

@@ -16,7 +16,7 @@ public final class MiniWolfRegressionTest {
         public Wolf() throws Exception { super(); }
         @Override protected void setDie(Player p) { }
         @Override public void die(Player p) { deaths++; reward(p); bossStatus=BossStatus.DIE; }
-        @Override public void reward(Player p) { rewards++; }
+        @Override public void rewardDefault(Player p) { rewards++; }
         @Override public void joinMapByZone(nro.models.map.Zone z) { zone=z; }
         @Override public void wakeupAnotherBossWhenAppear() { }
         @Override public boolean noticePublic() { return false; }

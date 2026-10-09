@@ -36,7 +36,7 @@ public class TDT_NM extends Boss {
     }
 
     @Override
-    public void reward(Player plKill) {
+    public void rewardDefault(Player plKill) {
         synchronized (this) {
             if (plKill == null || zone == null || zone.map == null || location == null || rewardGranted) return;
             rewardGranted = true;

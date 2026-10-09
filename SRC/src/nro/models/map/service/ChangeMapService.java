@@ -900,6 +900,21 @@ public class ChangeMapService {
     }
 
     public void exitMap(Player player) {
+        synchronized (player) {
+            exitMapLocked(player);
+        }
+    }
+
+    private void exitMapLocked(Player player) {
+        if (player.playerSkill != null) {
+            player.playerSkill.prepareTuSat = false;
+            player.playerSkill.prepareQCKK = false;
+            player.playerSkill.prepareLaze = false;
+        }
+        if (player.isPet && player.newPet != null && player.newPet.zone != null) {
+            exitMap(player.newPet);
+            player.newPet.zone = null;
+        }
         if(player.isPl() && player.zone!=null) nro.models.services.CommesonChallengeService.gI().onMapExit(player,player.zone);
         if(player instanceof nro.models.boss.Boss boss)nro.models.services.BossNoticeService.gI().departed(boss);
         if (player.zone != null) {

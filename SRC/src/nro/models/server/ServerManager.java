@@ -303,6 +303,7 @@ public class ServerManager {
     public void close() {
         try {
             nro.models.services.LiveSyncService.gI().stop();
+            if (!nro.models.services.AchievementService.gI().drainPending()) throw new IllegalStateException("Achievement claims still awaiting reconciliation");
             if(!nro.models.services.GiftCodeService.gI().drainPending())throw new IllegalStateException("Gift claims still awaiting reconciliation");
             if(!nro.models.services.shenron.SummonDragonNamek.reconcilePendingForMaintenance())throw new IllegalStateException("Namek wish still awaiting reconciliation");
             nro.models.event.EventCleanupService.drainOnline();

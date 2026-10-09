@@ -38,7 +38,7 @@ public class ItemService {
 
     public short getItemIdByIcon(short IconID) {
         for (int i = 0; i < Manager.ITEM_TEMPLATES.size(); i++) {
-            if (Manager.ITEM_TEMPLATES.get(i).iconID == IconID) {
+            if (Manager.ITEM_TEMPLATES.get(i).type >= 0 && Manager.ITEM_TEMPLATES.get(i).iconID == IconID) {
                 return Manager.ITEM_TEMPLATES.get(i).id;
             }
         }
@@ -398,6 +398,8 @@ public class ItemService {
     }
 
     public Template.ItemTemplate getTemplate(int id) {
+        if(id<0||id>=Manager.ITEM_TEMPLATES.size()||Manager.ITEM_TEMPLATES.get(id).type<0)
+            throw new IllegalArgumentException("Unknown item template ID " + id);
         return Manager.ITEM_TEMPLATES.get(id);
     }
 

@@ -1106,22 +1106,8 @@ public class MrBlue {
                 player.superRank.lastPKTime = System.currentTimeMillis();
             }
 
-            //data achievement
-            try {
-                dataArray = (JSONArray) JSONValue.parse(rs.getString("data_achievement"));
-                for (int i = 0; i < Manager.ACHIEVEMENT_TEMPLATE.size(); i++) {
-                    AchievementQuest aq;
-                    if (i < dataArray.size()) {
-                        JSONArray data = (JSONArray) JSONValue.parse(dataArray.get(i).toString());
-                        aq = new AchievementQuest(Long.parseLong(data.get(0).toString()), Boolean.parseBoolean(data.get(1).toString()));
-                    } else {
-                        aq = new AchievementQuest(0, false);
-                    }
-                    player.achievement.add(aq);
-                }
-                dataArray.clear();
-            } catch (Exception e) {
-            }
+            // Initialize every mission; one malformed legacy row cannot disable the rest.
+            player.achievement.load(rs.getString("data_achievement"));
 
             //Giftcode
             try {

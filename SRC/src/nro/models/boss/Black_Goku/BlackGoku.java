@@ -23,11 +23,15 @@ public class BlackGoku extends Boss {
     private int timeLeaveMap;
 
     public BlackGoku() throws Exception {
-        super(BossID.BLACK_GOKU, false, true, BossesData.BLACK_GOKU, BossesData.SUPER_BLACK_GOKU);
+        this(BossID.BLACK_GOKU, BossesData.BLACK_GOKU, BossesData.SUPER_BLACK_GOKU);
+    }
+
+    protected BlackGoku(int bossId, nro.models.boss.BossData... stages) throws Exception {
+        super(bossId, false, true, stages);
     }
 
     @Override
-    public void reward(Player plKill) {
+    public void rewardDefault(Player plKill) {
         BadgesTaskService.updateCountBagesTask(plKill, ConstTaskBadges.TRUM_SAN_BOSS, 1);
         int x = this.location.x; // đâyyyy
         int y = this.zone.map.yPhysicInTop(x, this.location.y - 24);
@@ -134,10 +138,14 @@ public class BlackGoku extends Boss {
 
     @Override
     public void joinMap() {
-        this.name = this.data[this.currentLevel].getName() + " " + Util.nextInt(1, 100);
+        this.name = getSpawnName();
         super.joinMap();
         st = System.currentTimeMillis();
         timeLeaveMap = Util.nextInt(600000, 900000);
+    }
+
+    protected String getSpawnName() {
+        return this.data[this.currentLevel].getName() + " " + Util.nextInt(1, 100);
     }
 
     @Override

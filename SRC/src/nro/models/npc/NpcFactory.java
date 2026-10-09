@@ -1,6 +1,7 @@
 package nro.models.npc;
 
 import nro.models.npc_list.Whis;
+import nro.models.npc_list.Daishinkan;
 import nro.models.npc_list.LinhCanh;
 import nro.models.npc_list.Bulma;
 import nro.models.npc_list.Cargo;
@@ -107,6 +108,8 @@ public class NpcFactory {
                 .findFirst().orElseThrow(() -> new IllegalArgumentException("Unknown NPC template " + tempId)).avatar;
         try {
             return switch (tempId) {
+                case ConstNpc.DAISHINKAN ->
+                    new Daishinkan(mapId, status, cx, cy, tempId, avatar);
                 case ConstNpc.GHI_DANH ->
                     new GhiDanh(mapId, status, cx, cy, tempId, avatar);
                 case ConstNpc.TRONG_TAI ->

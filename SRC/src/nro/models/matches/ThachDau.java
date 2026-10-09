@@ -66,9 +66,7 @@ public class ThachDau extends PVP {
             (p1.equals(plLose) ? p1 : p2).inventory.gold -= this.goldThachDau;
         }
         Service.gI().sendMoney(p1.equals(plLose) ? p1 : p2);
-        if (!p1.equals(plLose)) {
-            AchievementService.gI().checkDoneTask(p1, ConstAchievement.TRAM_TRAN_TRAM_THANG);
-        }
+        AchievementService.gI().checkDoneTaskPvpWin(p1.equals(plLose) ? p2 : p1, plLose);
     }
 
 }

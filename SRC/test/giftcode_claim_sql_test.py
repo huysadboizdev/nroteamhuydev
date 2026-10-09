@@ -1,5 +1,5 @@
 from pathlib import Path
-import subprocess,datetime,json
+import subprocess,datetime,json,atexit,re
 root=Path(__file__).resolve().parents[2]
 mysql=r'C:/xampp/mysql/bin/mysql.exe'
 name='codex_gift_test_'+datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
@@ -12,6 +12,11 @@ def require(result,ok=True):
  if (result.returncode==0)!=ok:raise AssertionError(result.stdout+result.stderr)
  return result
 require(sql('CREATE DATABASE '+name+' CHARACTER SET utf8mb4'))
+def cleanup():
+ assert re.fullmatch(r'codex_gift_test_[0-9_]+',name)
+ require(sql('DROP DATABASE '+name))
+ print('Disposed isolated schema: '+name)
+atexit.register(cleanup)
 for filename in ('20261007_live_settings.sql','20261007_boss_live_override.sql'):
  body=(root/'SRC/sql/migrations'/filename).read_text(encoding='utf-8')
  require(sql(body,name))
@@ -33,11 +38,14 @@ require(sql("UPDATE player SET giftcode='' WHERE id=1",name))
 require(sql(migration,name))
 # Rerunning migration must preserve claims and keep canonical unique index.
 require(sql(migration,name))
+supplement_migration=(root/'SRC/sql/migrations/20261008_giftcode_supplements.sql').read_text(encoding='utf-8')
+require(sql(supplement_migration,name))
+require(sql(supplement_migration,name))
 require(sql("""INSERT INTO giftcode(code,count_left,detail,datecreate,expired) VALUES
-('EXPIRED',5,'[]','2000-01-01','2001-01-01'),('FAIL',5,'[]','2000-01-01','2037-12-31'),('UNLIMITED',-1,'[]','2000-01-01','2037-12-31'),('OLD',5,'[]','2000-01-01','2037-12-31'),('LAST',1,'[]','2000-01-01','2037-12-31'),('SQLFAIL',5,'[]','2000-01-01','2037-12-31'),('LOST',5,'[]','2000-01-01','2037-12-31'),('UNCERTAIN',5,'[]','2000-01-01','2037-12-31');""",name))
+('EXPIRED',5,'[{"id":-1,"quantity":1}]','2000-01-01','2001-01-01'),('FAIL',5,'[{"id":-1,"quantity":1}]','2000-01-01','2037-12-31'),('UNLIMITED',-1,'[{"id":-1,"quantity":1}]','2000-01-01','2037-12-31'),('OLD',5,'[{"id":-1,"quantity":1}]','2000-01-01','2037-12-31'),('LAST',1,'[{"id":-1,"quantity":1}]','2000-01-01','2037-12-31'),('SQLFAIL',5,'[{"id":-1,"quantity":1}]','2000-01-01','2037-12-31'),('LOST',5,'[{"id":-1,"quantity":1}]','2000-01-01','2037-12-31'),('UNCERTAIN',5,'[{"id":-1,"quantity":1}]','2000-01-01','2037-12-31');""",name))
 work=root/'.analysis/gift-live-build'
 (work/'isolated-db.json').write_text(json.dumps({'database':name,'production_touched':False},indent=2))
-build=json.loads((root/'.analysis/web-manager-build-latest.json').read_text(encoding='utf-8'))
+build=json.loads((root/'.analysis/giftcode-supplements-build-latest.json').read_text(encoding='utf-8'))
 result=subprocess.run(['java','-cp',build['tests']+';'+build['candidate']+';'+str(root/'SRC/lib/*'),'nro.models.services.LiveSyncGiftClaimTest',name],cwd=root,capture_output=True,text=True,encoding='utf-8')
 print(result.stdout+result.stderr)
 if result.returncode:raise SystemExit(result.returncode)

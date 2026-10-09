@@ -76,7 +76,8 @@ public class GiftCodeService {
         }
         if((long)ruby+VipRewardCatalog.reservedRuby(p)>Integer.MAX_VALUE)throw new IllegalArgumentException("Reserved ruby capacity exceeded");
         List<String> history=new ArrayList<>();for(String raw:p.giftCode.rewards){String code=nro.models.player.GiftCode.canonical(raw);if(!history.contains(code))history.add(code);}
-        String code=nro.models.player.GiftCode.canonical(gift.code());if(history.contains(code))throw new IllegalArgumentException("Giftcode already claimed");history.add(code);
+        // DAO stages only missing rewards. Legacy string history stays unique for existing readers.
+        String code=nro.models.player.GiftCode.canonical(gift.code());if(!history.contains(code))history.add(code);
         JsonArray inventory=new JsonArray();inventory.add(gold);inventory.add(gem);inventory.add(ruby);inventory.add(p.inventory.coupon);inventory.add(p.inventory.event);
         JsonArray claims=new JsonArray();for(String claim:history)claims.add(claim);
         return new Rewards(gold,gem,ruby,bag,history,new GiftCodeClaimDAO.Snapshot(p.id,account,inventory.toString(),serializeBag(bag),claims.toString()));
@@ -110,7 +111,7 @@ public class GiftCodeService {
             catch(Exception publicationFailure){schedule(op);return false;}
         }}}
     }
-    public void giftCode(Player p,String code){if(!claim(p,code))packet(()->Service.gI().sendThongBao(p,"Không thể nhận code: mã đã dùng, hết hạn, thiếu chỗ hoặc giao dịch đang chờ đối chiếu."));}
+    public void giftCode(Player p,String code){if(!claim(p,code))packet(()->Service.gI().sendThongBao(p,"Không thể nhận code: không có quà bổ sung, hết hạn/lượt, thiếu chỗ hoặc giao dịch đang chờ đối chiếu."));}
     public boolean reconcilePending(Player p){Operation op=ACTIVE.get(p);if(op==null)return !hasPendingId(p.id);
         synchronized(p){synchronized(GiftCodeManager.gI()){
             if(ACTIVE.get(p)!=op)return !hasPendingId(p.id);

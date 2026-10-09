@@ -18,7 +18,7 @@ public class DrKore extends Boss {
     }
 
     @Override
-    public void reward(Player plKill) {
+    public void rewardDefault(Player plKill) {
         if (questSupportReward(plKill)) return;
         int diem = 5;
         plKill.event.addEventPoint(diem);

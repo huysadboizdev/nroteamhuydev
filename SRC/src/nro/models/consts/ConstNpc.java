@@ -140,6 +140,7 @@ public class ConstNpc {
     public static final byte POTAGE = 62;
     public static final byte JACO = 63;
     public static final byte DAI_THIEN_SU = 64;
+    public static final byte DAISHINKAN = 111;
     public static final byte YARIROBE = 65;
     public static final byte NOI_BANH = 66;
     public static final byte MR_POPO = 67;

@@ -172,7 +172,13 @@ public class Mob {
                 damage = 2_147_483_647;
             }
 
-            this.point.hp -= damage;
+            long removed;
+            synchronized(this.point) {
+                int before=this.point.hp;
+                removed=Math.min(Math.max(0,damage),Math.max(0,before));
+                this.point.hp = (int)(before - damage);
+            }
+            nro.models.services.HighDamageNoticeService.hpRemoved(plAtt,this,removed);
             addTemporaryEnemies(plAtt);
             if (this.isDie()) {
                 var farmDeath=claimEquipmentFarmDeath(farmGeneration);

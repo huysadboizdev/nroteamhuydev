@@ -1041,18 +1041,8 @@ public class PlayerDAO {
 
                 String LearnSkill = dataArray.toJSONString();
                 dataArray.clear();
-                //data achievement
-                if (player.achievement != null) {
-                    for (Template.AchievementQuest aq : player.achievement.getAchievementList()) {
-                        JSONArray a = new JSONArray();
-                        a.add(aq.completed);
-                        a.add(aq.isRecieve);
-                        dataArray.add(a.toJSONString());
-                        a.clear();
-                    }
-                }
-                String achievement = dataArray.toJSONString();
-                dataArray.clear();
+                // Include persistent distinct-opponent metadata without changing legacy row fields.
+                String achievement = player.achievement == null ? "[]" : player.achievement.toJson();
 
                 //gift code
                 for (String code : player.giftCode.rewards) {

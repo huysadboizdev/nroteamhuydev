@@ -176,7 +176,7 @@ public class Odo extends Boss {
     }
 
     @Override
-    public synchronized void reward(Player plKill) {
+    public synchronized void rewardDefault(Player plKill) {
         plKill = nro.models.services.MiniBossPinkCapsuleDrop.creditedPlayer(plKill);
         if (capsuleReward == null) capsuleReward = new nro.models.services.MiniBossPinkCapsuleDrop();
         if (!capsuleReward.drop(this, plKill)) return;

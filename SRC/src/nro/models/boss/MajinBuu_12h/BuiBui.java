@@ -30,7 +30,7 @@ public class BuiBui extends Boss {
         super(FINAL, BossID.BUI_BUI, BossesData.BUI_BUI);
     }
     @Override
-    public void reward(Player plKill) {
+    public void rewardDefault(Player plKill) {
         int diem = 5;
         plKill.event.addEventPoint(diem);
         Service.gI().sendThongBao(plKill, "+5 Point");

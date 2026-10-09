@@ -46,7 +46,7 @@ public class NewPet extends Player {
     }
 
     public void joinMapMaster() {
-        if (master == null || master.zone == null) {
+        if (!ownerVisible()) {
             return;
         }
         this.location.x = master.location.x + Util.nextInt(-10, 10);
@@ -75,6 +75,13 @@ public class NewPet extends Player {
 
     @Override
     public void update() {
+        if (master instanceof Pet && !ownerVisible()) {
+            if (zone != null) {
+                ChangeMapService.gI().exitMap(this);
+                zone = null;
+            }
+            return;
+        }
         super.update();
         if (this.isDie()) {
             Service.gI().hsChar(this, nPoint.hpMax, nPoint.mpMax);
@@ -88,7 +95,23 @@ public class NewPet extends Player {
         moveIdle();
     }
 
+    private boolean ownerVisible() {
+        if (master == null || master.zone == null) {
+            return false;
+        }
+        if (master instanceof Pet disciple) {
+            return disciple.master != null && !disciple.isDie()
+                    && disciple.getStatus() != Pet.GOHOME && disciple.getStatus() != Pet.FUSION
+                    && disciple.getStatus() != Pet.HTVV && disciple.master.fusion.typeFusion == 0
+                    && !MapService.gI().isMapOffline(disciple.zone.map.mapId);
+        }
+        return true;
+    }
+
     public void followMaster() {
+        if (!ownerVisible() || zone != master.zone) {
+            return;
+        }
         followMaster(50);
     }
 

@@ -56,6 +56,7 @@ public class PlayerSkill {
 
     public boolean prepareQCKK;
     public boolean prepareTuSat;
+    public volatile boolean delayedBombPending;
     public boolean prepareLaze;
 
     public long lastTimePrepareQCKK;

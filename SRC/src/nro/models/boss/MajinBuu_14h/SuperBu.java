@@ -74,7 +74,7 @@ public class SuperBu extends Boss {
     }
 
     @Override
-    public void reward(Player plKill) {
+    public void rewardDefault(Player plKill) {
         int diem = 5;
         plKill.event.addEventPoint(diem);
         Service.gI().sendThongBao(plKill, "+5 Point");
@@ -85,7 +85,8 @@ public class SuperBu extends Boss {
     public synchronized int injured(Player plAtt, long damage, boolean piercing, boolean isMobAttack) {
         Boss boss = FinalBossManager.gI().getBossById(BossID.MABU, 127, this.zone.zoneId);
         if (boss != null) {
-            boss.injured(plAtt, damage, piercing, isMobAttack);
+            nro.models.services.BossNoticeService.injure(boss,plAtt,damage,piercing,isMobAttack,
+                    nro.models.services.BossNoticeService.damageSkillFor(this));
         }
         if (!this.isDie()) {
             if (!piercing && Util.isTrue(10, 100)) {

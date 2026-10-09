@@ -9,6 +9,7 @@ public final class RubyItemRules {
     public static void normalize(Item item) {
         if (item == null || item.template == null || item.itemOptions == null) return;
         SealedEquipment.normalize(item);
+        AnimeEquipment.complete(item);
         if (item.template.id == 1775) {
             item.itemOptions.removeIf(o -> o != null && o.optionTemplate != null
                     && (o.optionTemplate.id == 30 || o.optionTemplate.id == 86 || o.optionTemplate.id == 87));

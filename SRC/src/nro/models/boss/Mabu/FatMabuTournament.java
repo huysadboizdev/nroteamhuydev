@@ -25,6 +25,7 @@ public final class FatMabuTournament extends Boss {
     }
     public synchronized void prepare(Zone destination){
         respawn();nPoint.hpMax=300_000_000;nPoint.hp=300_000_000;nPoint.dame=1;nPoint.dameg=1;nPoint.crit=0;
+        nro.models.services.BossAdminConfig.applyAfterNativeSpawn(this);
         int x=Math.max(0,Math.min(destination.map.mapWidth-1,destination.map.mapWidth*3/4));
         int y=destination.map.yPhysicInTop(x,100);
         if(y<0)throw new IllegalStateException("Mabu terrain unavailable");
@@ -41,10 +42,11 @@ public final class FatMabuTournament extends Boss {
     public long damageFor(Player target,long original){
         if(original<=0||!combatReady()||target==null||target==this||target.isBoss||target.beforeDispose
                 ||target.nPoint==null||target.isDie()||target.zone!=zone)return 0;
-        return target.nPoint.hpMax<=0?0:Math.max(1,(long)target.nPoint.hpMax*10/100);
+        return target.nPoint.hpMax<=0?0:nro.models.services.BossAdminConfig.nativeDamage(this, (int) Math.max(1,(long)target.nPoint.hpMax*10/100));
     }
     @Override public synchronized void update(){
         if(!combatReady())return;
+        nro.models.services.BossAdminConfig.applyAtTick(this);
         effectSkill.update();nPoint.mp=nPoint.mpg;
         if(effectSkill.isHaveEffectSkill())return;
         // Cast the self skill explicitly, so a distant target cannot prevent the shield.
@@ -80,7 +82,8 @@ public final class FatMabuTournament extends Boss {
         try{BossNoticeService.gI().defeated(this,killer);reward(killer);}
         finally{bossStatus=BossStatus.DIE;}
     }
-    @Override public void reward(Player killer){
+    @Override protected boolean rewardAllowed(Player killer){return Thread.holdsLock(this)&&finished&&nPoint!=null&&nPoint.hp<=0;}
+    @Override public void rewardDefault(Player killer){
         // Only die holds this lock and grants rewards; external reward calls cannot mint loot.
         if(!Thread.holdsLock(this)||!finished||nPoint==null||nPoint.hp>0)return;
         rare.drop(this,killer,EGG_RATE,BOTTLE_RATE);equipment.drop(this,killer);

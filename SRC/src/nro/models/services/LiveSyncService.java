@@ -29,7 +29,7 @@ public final class LiveSyncService {
     public LiveSyncService(Connections connections){this.connections=Objects.requireNonNull(connections);}
     public static LiveSyncService gI(){return INSTANCE;}
     public static boolean supports(String type){return type!=null&&(PLAYER.contains(type)||Set.of("EVENT_SET","KICK_PLAYER","UPDATE_ACCOUNT","ACCOUNT_ACTION").contains(type)||LiveSyncCatalogCommands.supports(type)||LiveSyncConsignCommands.supports(type));}
-    public synchronized void start(){if(isRunning)return;isRunning=true;scheduler=Executors.newSingleThreadScheduledExecutor(r->{Thread t=new Thread(r,"Web command queue");t.setDaemon(true);return t;});scheduler.scheduleWithFixedDelay(this::processQueue,1000,1500,TimeUnit.MILLISECONDS);}
+    public synchronized void start(){if(isRunning)return;isRunning=true;scheduler=Executors.newSingleThreadScheduledExecutor(r->{Thread t=new Thread(r,"Web command queue");t.setDaemon(true);return t;});scheduler.scheduleWithFixedDelay(()->{processQueue();BossAdminHeartbeat.tick();},1000,1500,TimeUnit.MILLISECONDS);}
     public void stop(){ScheduledExecutorService executor;synchronized(this){isRunning=false;executor=scheduler;if(executor!=null)executor.shutdown();}if(executor!=null)try{if(!executor.awaitTermination(30,TimeUnit.SECONDS))throw new IllegalStateException("Web worker did not drain; do not replace JAR");}catch(InterruptedException e){Thread.currentThread().interrupt();throw new IllegalStateException(e);}synchronized(this){for(Pending p:new ArrayList<>(unresolved.values()))try{recover(p);}catch(Exception ignored){}if(!unresolved.isEmpty())throw new IllegalStateException("Unresolved web commands; maintenance must retain the running JVM");}}
     public synchronized void processQueue(){
         try{

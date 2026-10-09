@@ -35,11 +35,16 @@ public final class BossLiveReload {
         return ()->overrides=snapshot;
     }
     private static Integer nullable(ResultSet r,String column)throws SQLException {int v=r.getInt(column);return r.wasNull()?null:v;}
-    public static void loadStartup(Connection con)throws SQLException {stage(con).run();}
+    public static void loadStartup(Connection con)throws SQLException {
+        Runnable legacy=stage(con), admin=BossAdminConfig.stage(con);legacy.run();admin.run();
+    }
     public static void applyAtSpawn(Boss boss) {
+        if(BossAdminConfig.config(boss)!=null)BossAdminConfig.applyAtSpawn(boss);else applyLegacyAtSpawn(boss);
+    }
+    static void applyLegacyAtSpawn(Boss boss) {
         Stats s=overrides.get(new Key(boss.questBossId(),boss.currentLevel));
         if(s==null)return;
-        if(s.hp()!=null){boss.nPoint.hpg=s.hp();boss.nPoint.hp=s.hp();}
-        if(s.damage()!=null)boss.nPoint.dameg=s.damage();
+        if(s.hp()!=null){boss.nPoint.hpg=s.hp();boss.nPoint.hpMax=s.hp();boss.nPoint.hp=s.hp();}
+        if(s.damage()!=null){boss.nPoint.dameg=s.damage();boss.nPoint.dame=s.damage();}
     }
 }

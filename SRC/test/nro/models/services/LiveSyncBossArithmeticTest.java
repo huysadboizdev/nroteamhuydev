@@ -70,7 +70,10 @@ public final class LiveSyncBossArithmeticTest {
     static void returnedDamage() throws Exception {
         WhisProbe b = blank(WhisProbe.class); b.nPoint = new NPoint(b); b.nPoint.hp = 100;
         var level = Whis.class.getDeclaredField("level"); level.setAccessible(true); level.setLong(b, 1);
-        check(b.injured(null, 4_294_967_296L, true, false) == Integer.MAX_VALUE,
+        // Whis only accepts damage from its assigned training partner; use a matching
+        // attacker so the test exercises long-to-int clamping instead of the null guard.
+        var attacker = player(901); b.playerAtt = attacker;
+        check(b.injured(attacker, 4_294_967_296L, true, false) == Integer.MAX_VALUE,
                 "Whis reports bounded nonnegative damage rather than narrow long to zero");
     }
     static void pea() throws Exception {
@@ -82,7 +85,7 @@ public final class LiveSyncBossArithmeticTest {
         b.lastTimeBuff = 0; b.nPoint.hp = 60; b.buffPea(); check(b.nPoint.hp == 80, "ordinary pea heals one fifth");
     }
     static void whis() throws Exception {
-        Player owner = player(902); owner.zone = zone(); owner.traning = new Traning(); owner.traning.setTop(3904);
+        Player owner = player(902); owner.zone = zone(); owner.zone.map.mapId = 154; owner.traning = new Traning(); owner.traning.setTop(3904);
         WhisProbe b = blank(WhisProbe.class); b.playerAtt = owner; b.nPoint = new NPoint(b);
         b.location = new Location(); b.lastTimePickNRNM = System.currentTimeMillis();
         b.nPoint.hpMax = 550_000; b.nPoint.dame = 100; b.joinMap();
@@ -90,7 +93,7 @@ public final class LiveSyncBossArithmeticTest {
         check(b.nPoint.dame == 390_500, "normal Whis damage scale retained");
         owner.traning.setTop(Integer.MAX_VALUE); b.nPoint.hpMax = 550_000; b.nPoint.dame = 2_000; b.joinMap();
         check(b.nPoint.hp == Integer.MAX_VALUE && b.nPoint.dame == Integer.MAX_VALUE, "top+1 and Whis damage scale use long intermediates");
-        b.nPoint.hp = 100; b.injured(null, Long.MAX_VALUE, true, false);
+        b.nPoint.hp = 100; b.injured(owner, Long.MAX_VALUE, true, false);
         check(b.nPoint.hp == 0, "large Whis injury reaches zero without overflow");
     }
     static void arena() throws Exception {

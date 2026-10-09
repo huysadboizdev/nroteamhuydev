@@ -269,7 +269,7 @@ public class Pocolo extends Boss {
     }
 
     @Override
-    public void reward(Player plKill) {
+    public void rewardDefault(Player plKill) {
     }
 
     @Override

@@ -235,6 +235,7 @@ public class PetService {
         pet.nPoint.power = isUub ? 40000000000L : isMabu ? 1500000L : isKidBeer ? 40000000000L : isJiren ? 40000000000L : 2000L;
 
         pet.typePet = (byte) (isMabu ? 1 : isUub ? 2 : isKidBeer ? 3 : isJiren ? 4 : 0);
+        pet.type = pet.typePet;
 
         pet.nPoint.limitPower = 0;
         pet.restoreMinimumPowerLimit();

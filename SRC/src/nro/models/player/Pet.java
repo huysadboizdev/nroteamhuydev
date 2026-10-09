@@ -323,6 +323,7 @@ public class Pet extends Player {
         if(master!=null&&(nro.models.services.LiveSyncCommandGate.hasPendingId(master.id)||nro.models.services.GiftCodeService.hasPendingId(master.id)))return;
         try {
             if (this.master != null && this.master.zone != null) {
+                sendNewPet();
                 super.update();
                 increasePoint();
                 updatePower();
