@@ -1,5 +1,6 @@
 # Local analysis, generated builds and runtime files
 .analysis/
+/ClientWeb/
 SRC/.analysis/
 SRC/build/
 SRC/dist/
