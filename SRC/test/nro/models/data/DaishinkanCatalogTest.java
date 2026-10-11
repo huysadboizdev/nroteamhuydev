@@ -16,7 +16,7 @@ public final class DaishinkanCatalogTest {
         @Override public void sendMessage(Message message) { payload = message.getData(); }
     }
     public static void main(String[] args) throws Exception {
-        if (DataGame.vsMap != 6) throw new AssertionError("NPC catalog version must invalidate version 5 cache");
+        if (DataGame.vsMap <= 5) throw new AssertionError("NPC catalog version must invalidate version 5 cache");
         var field = Unsafe.class.getDeclaredField("theUnsafe"); field.setAccessible(true);
         Unsafe unsafe = (Unsafe) field.get(null);
         Session session = (Session) unsafe.allocateInstance(Session.class);
@@ -27,7 +27,7 @@ public final class DaishinkanCatalogTest {
         Manager.NPC_TEMPLATES.add(npc);
         DataGame.updateMap(session);
         DataInputStream in = new DataInputStream(new ByteArrayInputStream(session.payload));
-        if (in.readByte() != 6 || in.readByte() != 6) throw new AssertionError("Wire catalog version");
+        if (in.readByte() != 6 || in.readByte() != DataGame.vsMap) throw new AssertionError("Wire catalog version");
         int maps = in.readUnsignedByte(); for (int i = 0; i < maps; i++) in.readUTF();
         if (in.readUnsignedByte() != 112) throw new AssertionError("Sparse catalog must include slot111");
         for (int i = 0; i < 112; i++) {

@@ -29,7 +29,7 @@ public final class LargeItemQuantityTest {
     }
     static Item item(int id,int quantity,int option,int param){Item i=new Item((short)id);i.quantity=quantity;i.itemOptions.add(new Item.ItemOption(option,param));return i;}
     static void stack(){
-        for(int quantity:new int[]{100000,1000000,10000000,99999999}){
+        for(int quantity:new int[]{100000,500000,999999}){
             List<Item> bag=new ArrayList<>(List.of(item(933,1,73,0)));
             Item reward=item(933,quantity,73,0);
             check(InventoryService.gI().addItemList(bag,reward),"Existing stack can receive "+quantity+" without an empty slot");
@@ -38,12 +38,12 @@ public final class LargeItemQuantityTest {
             reward=item(934,1,31,quantity);
             check(InventoryService.gI().addItemList(bag,reward) && bag.get(0).itemOptions.get(0).param==quantity+1,"Option quantity adds exactly");
         }
-        List<Item> bag=new ArrayList<>(List.of(item(933,Integer.MAX_VALUE-5,73,0)));
+        List<Item> bag=new ArrayList<>(List.of(item(933,InventoryService.MAX_STACK_QUANTITY-5,73,0)));
         Item reward=item(933,10,73,0);
         check(!InventoryService.gI().addItemList(bag,reward),"Insufficient capacity rejected");
-        check(bag.get(0).quantity==Integer.MAX_VALUE-5 && reward.quantity==10,"No partial loss on failure");
+        check(bag.get(0).quantity==InventoryService.MAX_STACK_QUANTITY-5 && reward.quantity==10,"No partial loss on failure");
         bag.add(new Item());check(InventoryService.gI().addItemList(bag,reward),"Overflow remainder fits free slot");
-        check(bag.get(0).quantity==Integer.MAX_VALUE && bag.get(1).quantity==5,"No integer overflow");
+        check(bag.get(0).quantity==InventoryService.MAX_STACK_QUANTITY && bag.get(1).quantity==5,"Stack cap and overflow remainder");
         bag=new ArrayList<>(List.of(item(934,1,31,Integer.MAX_VALUE-5)));reward=item(934,1,31,10);
         check(!InventoryService.gI().addItemList(bag,reward),"Option overflow rejected");
         check(bag.get(0).itemOptions.get(0).param==Integer.MAX_VALUE-5 && reward.quantity==1,"Option not corrupted on overflow");

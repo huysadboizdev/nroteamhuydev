@@ -20,6 +20,8 @@ SRC/Config.properties
 SRC/nbproject/private/
 /team2026.sql
 SRC/sql/nro1.sql
+SRC/sql/team2026-full-*.sql
+SRC/sql/team2026-full-*.metadata.json
 .env
 .env.*
 !.env.example

@@ -970,7 +970,7 @@ public class Mob {
             list.add(new ItemMap(zone, 1229, 1, x, yEnd, player.id));
         }
 
-        if ((isLuckyDrop(player, 10, 100) && MapService.gI().isMapNguHanhSon(mapid))) {
+        if (MapService.gI().isMapNguHanhSon(mapid) && isLuckyDrop(player, 20, 100)) {
             list.add(new ItemMap(zone, Util.nextInt(541, 542), 1, x, yEnd, player.id));
         }
 

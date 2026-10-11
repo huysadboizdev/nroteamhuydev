@@ -2310,10 +2310,8 @@ public class UseItem {
             newItem.itemOptions.add(new ItemOption(103, 20)); // Sức đánh
             newItem.itemOptions.add(new ItemOption(210, 2));  // May mắn
 
-            int randomOption = (int) (Math.random() * 100);
-            if (randomOption < 0.5) {
-                newItem.itemOptions.add(new ItemOption(93, 0));
-            } else {
+            // Five of 1000 outcomes are permanent: no expiry option at all.
+            if (rand.nextInt(1000) >= 5) {
                 newItem.itemOptions.add(new ItemOption(93, 3));
             }
 
@@ -2322,7 +2320,7 @@ public class UseItem {
             InventoryService.gI().sendItemBags(player);
             Service.gI().sendThongBao(player, "Bạn đã nhận được item ngẫu nhiên");
         } else {
-            Service.gI().sendThongBao(player, "Yêu cầu có 5 ô trống trong hành trang.");
+            Service.gI().sendThongBao(player, "Yêu cầu có 2 ô trống trong hành trang.");
         }
     }
 

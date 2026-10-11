@@ -11572,3 +11572,164 @@ INSERT INTO item_shop_option(item_shop_id,option_id,param) VALUES (1018,160,70);
 INSERT INTO item_shop_option(item_shop_id,option_id,param) VALUES (1018,14,10);
 INSERT INTO item_shop_option(item_shop_id,option_id,param) VALUES (1018,30,0);
 COMMIT;
+
+
+-- Center only Daishinkan between existing village anchors; preserve every other NPC.
+DELIMITER $$
+DROP PROCEDURE IF EXISTS center_daishinkan_villages_20261010$$
+CREATE PROCEDURE center_daishinkan_villages_20261010()
+BEGIN
+    DECLARE village INT;
+    DECLARE map_id INT;
+    DECLARE anchor_id INT;
+    DECLARE entries LONGTEXT;
+    DECLARE idx INT;
+    DECLARE npc_id INT;
+    DECLARE daishinkan_idx INT;
+    DECLARE daishinkan_count INT;
+    DECLARE tori_count INT;
+    DECLARE anchor_count INT;
+    DECLARE tori_x INT;
+    DECLARE anchor_x INT;
+    -- Preflight every map before changing any map.
+    SET village=0;
+    WHILE village<6 DO
+        SET map_id=CASE MOD(village,3) WHEN 0 THEN 0 WHEN 1 THEN 7 ELSE 14 END;
+        SET anchor_id=CASE map_id WHEN 0 THEN 67 WHEN 7 THEN 8 ELSE 9 END;
+        SET entries=NULL;
+        SELECT npcs INTO entries FROM map_template WHERE id=map_id;
+        IF entries IS NULL OR NOT JSON_VALID(entries) THEN
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Missing or invalid village NPC data';
+        END IF;
+        SET idx=0;
+        SET daishinkan_count=0;
+        SET tori_count=0;
+        SET anchor_count=0;
+        WHILE idx<JSON_LENGTH(entries) DO
+            SET npc_id=JSON_EXTRACT(entries,CONCAT('$[',idx,'][0]'));
+            IF npc_id=111 THEN
+                SET daishinkan_idx=idx;
+                SET daishinkan_count=daishinkan_count+1;
+            ELSEIF npc_id=74 THEN
+                SET tori_count=tori_count+1;
+                SET tori_x=JSON_EXTRACT(entries,CONCAT('$[',idx,'][1]'));
+            ELSEIF npc_id=anchor_id THEN
+                SET anchor_count=anchor_count+1;
+                SET anchor_x=JSON_EXTRACT(entries,CONCAT('$[',idx,'][1]'));
+            END IF;
+            SET idx=idx+1;
+        END WHILE;
+        IF daishinkan_count<>1 OR tori_count<>1 OR anchor_count<>1 THEN
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Expected unique Daishinkan and village anchors';
+        END IF;
+        IF village>=3 THEN
+            SET entries=JSON_SET(entries,
+                CONCAT('$[',daishinkan_idx,'][1]'),CAST(ROUND((tori_x+anchor_x)/2) AS SIGNED),
+                CONCAT('$[',daishinkan_idx,'][2]'),CAST(IF(map_id=14,408,432) AS SIGNED));
+            UPDATE map_template SET npcs=entries WHERE id=map_id;
+        END IF;
+        SET village=village+1;
+    END WHILE;
+END$$
+DELIMITER ;
+START TRANSACTION;
+CALL center_daishinkan_villages_20261010();
+COMMIT;
+DROP PROCEDURE center_daishinkan_villages_20261010;
+
+
+-- Keep the genuine red Goku head; use the complete existing Goku uniform animation.
+-- Do not replace reindeer artwork shared by other templates.
+DELIMITER $$
+DROP PROCEDURE IF EXISTS repair_goku_day_god_20261010$$
+CREATE PROCEDURE repair_goku_day_god_20261010()
+BEGIN
+    IF (SELECT COUNT(*) FROM item_template WHERE id=1593 AND TYPE=5 AND head=1467)<>1 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Unexpected Goku SSJ God template';
+    END IF;
+    IF (SELECT COUNT(*) FROM part WHERE
+        (id=1467 AND TYPE=0 AND JSON_VALID(DATA) AND JSON_LENGTH(DATA)=3) OR
+        (id=1450 AND TYPE=1 AND JSON_VALID(DATA) AND JSON_LENGTH(DATA)=17) OR
+        (id=1451 AND TYPE=2 AND JSON_VALID(DATA) AND JSON_LENGTH(DATA)=14))<>3 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Missing or invalid genuine Goku parts';
+    END IF;
+    UPDATE item_template SET body=1450,leg=1451 WHERE id=1593;
+END$$
+DELIMITER ;
+START TRANSACTION;
+CALL repair_goku_day_god_20261010();
+COMMIT;
+DROP PROCEDURE repair_goku_day_god_20261010;
+
+
+-- Ngũ Hành Sơn: village guides, three connected populated maps and final exchange NPCs.
+SET NAMES utf8mb4;
+DROP PROCEDURE IF EXISTS codex_setup_ngu_hanh_son;
+DELIMITER $$
+CREATE PROCEDURE codex_setup_ngu_hanh_son()
+BEGIN
+    DECLARE mid INT;
+    DECLARE idx INT;
+    DECLARE old_npcs LONGTEXT;
+    DECLARE new_npcs LONGTEXT;
+    DECLARE entry LONGTEXT;
+    DECLARE npc_id INT;
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION BEGIN ROLLBACK; RESIGNAL; END;
+    START TRANSACTION;
+    IF (SELECT COUNT(*) FROM map_template WHERE id IN(0,7,14,122,123,124))<>6
+       OR (SELECT COUNT(*) FROM npc_template WHERE id IN(48,49))<>2
+       OR (SELECT COUNT(*) FROM item_template WHERE id IN(544,545,546,547,548,1698) AND type=5)<>6
+       OR (SELECT COUNT(*) FROM item_template WHERE id IN(541,542))<>2 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Missing Tay Du maps/NPCs/items; setup cancelled';
+    END IF;
+    IF EXISTS(SELECT 1 FROM map_template WHERE id IN(0,7,14,122,123,124) AND JSON_VALID(npcs)=0)
+       OR EXISTS(SELECT 1 FROM map_template WHERE id IN(122,123,124) AND (JSON_VALID(mobs)=0 OR JSON_LENGTH(mobs)=0)) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Invalid NPCs or empty monster map; setup cancelled';
+    END IF;
+    IF (SELECT COUNT(*) FROM part WHERE
+        (id IN(457,460,461,462,465,467,1583) AND type=0 AND JSON_VALID(data) AND JSON_LENGTH(data)=3)
+        OR (id IN(458,463,466,468,470,1584) AND type=1 AND JSON_VALID(data) AND JSON_LENGTH(data)=17)
+        OR (id IN(459,464,469,471,1585) AND type=2 AND JSON_VALID(data) AND JSON_LENGTH(data)=14))<>18 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Missing or invalid costume/NPC parts; setup cancelled';
+    END IF;
+    SET mid=0;
+    WHILE mid<6 DO
+        SET @ngu_map=ELT(mid+1,0,7,14,122,123,124);
+        SELECT npcs INTO old_npcs FROM map_template WHERE id=@ngu_map;
+        SET new_npcs=JSON_ARRAY(); SET idx=0;
+        WHILE idx<JSON_LENGTH(old_npcs) DO
+            SET entry=JSON_EXTRACT(old_npcs,CONCAT('$[',idx,']'));
+            IF JSON_TYPE(entry)='STRING' THEN
+                SET entry=JSON_UNQUOTE(entry);
+            END IF;
+            IF JSON_VALID(entry)=0 OR JSON_TYPE(entry)<>'ARRAY' OR JSON_LENGTH(entry)<3 THEN
+                SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Invalid NPC entry; setup cancelled';
+            END IF;
+            SET npc_id=CAST(JSON_UNQUOTE(JSON_EXTRACT(entry,'$[0]')) AS SIGNED);
+            IF npc_id<>49 AND (@ngu_map NOT IN(122,123,124) OR npc_id<>48) THEN
+                SET new_npcs=JSON_ARRAY_APPEND(new_npcs,'$',JSON_EXTRACT(entry,'$'));
+            END IF;
+            SET idx=idx+1;
+        END WHILE;
+        IF @ngu_map=0 THEN SET new_npcs=JSON_ARRAY_APPEND(new_npcs,'$',JSON_ARRAY(49,672,432));
+        ELSEIF @ngu_map=7 THEN SET new_npcs=JSON_ARRAY_APPEND(new_npcs,'$',JSON_ARRAY(49,689,432));
+        ELSEIF @ngu_map=14 THEN SET new_npcs=JSON_ARRAY_APPEND(new_npcs,'$',JSON_ARRAY(49,478,408));
+        ELSEIF @ngu_map=124 THEN
+            SET new_npcs=JSON_ARRAY_APPEND(new_npcs,'$',JSON_ARRAY(49,960,288),'$',JSON_ARRAY(48,1080,288));
+        END IF;
+        UPDATE map_template SET npcs=new_npcs WHERE id=@ngu_map;
+        SET mid=mid+1;
+    END WHILE;
+    UPDATE map_template SET name='Ngũ Hành Sơn 1',waypoints=JSON_ARRAY(
+        JSON_ARRAY('Ngũ Hành Sơn 2',1368,384,1440,456,0,0,123,60,384)) WHERE id=122;
+    UPDATE map_template SET name='Ngũ Hành Sơn 2',waypoints=JSON_ARRAY(
+        JSON_ARRAY('Ngũ Hành Sơn 1',0,336,48,408,0,0,122,1380,432),
+        JSON_ARRAY('Ngũ Hành Sơn 3',1464,336,1536,384,0,0,124,60,360)) WHERE id=123;
+    UPDATE map_template SET name='Ngũ Hành Sơn 3',waypoints=JSON_ARRAY(
+        JSON_ARRAY('Ngũ Hành Sơn 2',0,336,48,384,0,0,123,1476,360)) WHERE id=124;
+    UPDATE npc_template SET name='Tôn Ngộ Không',avatar=4468 WHERE id=48;
+    COMMIT;
+END$$
+DELIMITER ;
+CALL codex_setup_ngu_hanh_son();
+DROP PROCEDURE codex_setup_ngu_hanh_son;

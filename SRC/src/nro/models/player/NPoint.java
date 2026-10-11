@@ -686,7 +686,7 @@ public class NPoint {
 
     private void setSpeed() {
         if (player.isPl()) {
-            speed = (byte) (8 + 8 * (tlSpeed / 100));
+            speed = (byte) (8 + 8L * tlSpeed / 100);
         }
     }
 
@@ -1705,7 +1705,7 @@ public class NPoint {
                 }
             }
             if (MapService.gI().isMapNguHanhSon(this.player.zone.map.mapId)) {
-                tiemNang *= 1;
+                tiemNang = ExpArithmetic.multiply(tiemNang, 5);
             }
             if (MapService.gI().AllMap(this.player.zone.map.mapId)) {
                 //  tiemNang *= 10; //x x3 tiềm năng toàn server

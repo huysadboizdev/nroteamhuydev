@@ -270,7 +270,7 @@ public class ItemService {
             }
         }
         if (type < 0) throw new IllegalArgumentException("Template does not belong to VIP catalog");
-        if (templateId >= Manager.ITEM_TEMPLATES.size()) {
+        if (templateId >= Manager.ITEM_TEMPLATES.size() || Manager.ITEM_TEMPLATES.get(templateId) == null) {
             throw new IllegalStateException("Missing VIP item template");
         }
         Template.ItemTemplate template = getTemplate(templateId);

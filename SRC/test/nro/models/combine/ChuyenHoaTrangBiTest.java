@@ -81,6 +81,7 @@ public final class ChuyenHoaTrangBiTest {
     }
     private static Item item(int id) {
         Item item = ItemService.gI().createNewItem((short) id);
+        item.itemOptions.clear(); // This fixture explicitly supplies the exact conversion input.
         item.itemOptions.add(new Item.ItemOption(21, 80)); // deliberately first, not base stat
         int base = switch (item.template.type) { case 0 -> 47; case 1 -> 22;
             case 2 -> 0; case 3 -> 23; default -> 14; };
@@ -258,6 +259,7 @@ public final class ChuyenHoaTrangBiTest {
         JSONArray row=new JSONArray();row.add(item.template.id);row.add(item.quantity);row.add(options.toJSONString());row.add(item.createTime);
         JSONArray loaded=(JSONArray)JSONValue.parse(row.toJSONString());
         Item restored=ItemService.gI().createNewItem(Short.parseShort(loaded.get(0).toString()),Integer.parseInt(loaded.get(1).toString()));
+        restored.itemOptions.clear(); // Saved options replace fresh-item defaults, as in the DAO.
         JSONArray opts=(JSONArray)JSONValue.parse(loaded.get(2).toString().replaceAll("\"", ""));
         for(Object v:opts){JSONArray pair=(JSONArray)JSONValue.parse(v.toString()); restored.itemOptions.add(new Item.ItemOption(Integer.parseInt(pair.get(0).toString()),Integer.parseInt(pair.get(1).toString())));}
         restored.createTime=Long.parseLong(loaded.get(3).toString());

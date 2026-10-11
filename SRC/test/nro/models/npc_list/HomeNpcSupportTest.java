@@ -27,7 +27,10 @@ public final class HomeNpcSupportTest {
     private static Unsafe unsafe;
     private static final AtomicInteger created = new AtomicInteger();
     private static void replace(Class<?> c,String name,Object value)throws Exception {
-        Field f=c.getDeclaredField(name);f.setAccessible(true);f.set(null,value);
+        Field f=c.getDeclaredField(name);f.setAccessible(true);
+        if(java.lang.reflect.Modifier.isFinal(f.getModifiers()))
+            unsafe.putObjectVolatile(unsafe.staticFieldBase(f),unsafe.staticFieldOffset(f),value);
+        else f.set(null,value);
     }
     private static final class Owner extends Player {
         final List<byte[]> menus = new ArrayList<>();
@@ -190,7 +193,7 @@ public final class HomeNpcSupportTest {
     private static void giftcode() throws Exception {
         List<String> received = new ArrayList<>();
         List<Player> recipients = new ArrayList<>();
-        replace(GiftCodeService.class, "instance", new GiftCodeService() {
+        replace(GiftCodeService.class, "INSTANCE", new GiftCodeService(null, p -> true) {
             @Override public void giftCode(Player p, String code) {
                 received.add(code); recipients.add(p);
             }

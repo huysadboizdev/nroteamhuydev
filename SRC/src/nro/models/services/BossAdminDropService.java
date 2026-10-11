@@ -24,6 +24,16 @@ public final class BossAdminDropService {
     }
     static void reward(Boss boss, Player killer, Runnable nativeReward,
             BossAdminConfig.Config policy, IntUnaryOperator random) {
+        // Bone feeding acquires the owner before the wolf; keep that order
+        // before acquiring the boss monitor used by the reward claim.
+        Player owner = MiniBossPinkCapsuleDrop.creditedPlayer(killer);
+        if (owner == null) return;
+        if (boss instanceof nro.models.boss.Boss_mini.SoiHecQuyn) {
+            synchronized (owner) { rewardClaimed(boss, killer, nativeReward, policy, random); }
+        } else rewardClaimed(boss, killer, nativeReward, policy, random);
+    }
+    private static void rewardClaimed(Boss boss, Player killer, Runnable nativeReward,
+            BossAdminConfig.Config policy, IntUnaryOperator random) {
         synchronized (boss) {
             if (MiniBossPinkCapsuleDrop.creditedPlayer(killer) == null || !boss.isQuestSupport()
                     && (boss.zone == null || boss.zone.map == null || boss.location == null)) return;

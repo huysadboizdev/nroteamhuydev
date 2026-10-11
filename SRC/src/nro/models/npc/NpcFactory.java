@@ -108,6 +108,8 @@ public class NpcFactory {
                 .findFirst().orElseThrow(() -> new IllegalArgumentException("Unknown NPC template " + tempId)).avatar;
         try {
             return switch (tempId) {
+                case ConstNpc.NGO_KHONG, ConstNpc.DUONG_TANG ->
+                    new nro.models.npc_list.TayDuGuide(mapId, status, cx, cy, tempId, avatar);
                 case ConstNpc.DAISHINKAN ->
                     new Daishinkan(mapId, status, cx, cy, tempId, avatar);
                 case ConstNpc.GHI_DANH ->
