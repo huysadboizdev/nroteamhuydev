@@ -36,6 +36,7 @@ public class MajinBuu14HService {
     }
 
     public void addMapMaBu2H(int id, Zone zone) {
+        if (zone == null || !MapService.gI().isMapMabu2H(zone.map.mapId)) return;
         if (zone.map.mapId == 128) {
             for (int slot = 0; slot < 4; slot++) {
                 zone.maBuHolds.add(new MaBuHold(slot, null));

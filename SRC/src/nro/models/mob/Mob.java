@@ -179,6 +179,7 @@ public class Mob {
                 this.point.hp = (int)(before - damage);
             }
             nro.models.services.HighDamageNoticeService.hpRemoved(plAtt,this,removed);
+            nro.models.services.KilisAbsorptionService.absorb(this, plAtt, removed, bound -> (int) Util.nextLong(bound));
             addTemporaryEnemies(plAtt);
             if (this.isDie()) {
                 var farmDeath=claimEquipmentFarmDeath(farmGeneration);
@@ -213,32 +214,6 @@ public class Mob {
                 long realDamage = this.point.hp / 100 > 0 ? this.point.hp / 100 : 1;
 
                 damage = this.point.hp / 100 > 0 ? this.point.hp / 100 : 1;
-            }
-        }
-        if (MapService.gI().isMapCadic(this.zone.map.mapId) && plAtt != null) {
-            boolean hasKilisBuff = plAtt.itemTime != null && plAtt.itemTime.isUseKilis;
-            int successRate = hasKilisBuff ? 10 : 1;
-
-            if (Util.isTrue(successRate, 333)) {
-                if (plAtt != null) {
-                    Item item = InventoryService.gI().findItemBag(plAtt, 1795);
-                    if (item != null) {
-                        boolean updated = false;
-                        Item.ItemOption kilisOption = item.getOptionById(250);
-                        if (kilisOption != null) {
-                            kilisOption.param += 1;
-                            updated = true;
-                        } else {
-                            item.itemOptions.add(new Item.ItemOption(250, 1));
-                            updated = true;
-                        }
-
-                        if (updated) {
-                            InventoryService.gI().sendItemBags(plAtt);
-                            Service.gI().sendThongBao(plAtt, "Bạn vừa nhận được 1 chỉ số Kilis!");
-                        }
-                    }
-                }
             }
         }
     }

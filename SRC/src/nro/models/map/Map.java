@@ -101,7 +101,8 @@ public class Map implements Runnable {
         this.tileId = tileId;
         this.bgId = bgId;
         this.bgType = bgType;
-        this.type = type;
+        // Legacy SQL incorrectly labels the always-open energy jar map as Mabu14H.
+        this.type = mapId == 165 ? ConstMap.MAP_NORMAL : type;
         this.tileMap = tileMap;
         this.tileTop = tileTop;
         this.zones = new ArrayList<>();

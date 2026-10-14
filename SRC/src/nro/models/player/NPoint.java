@@ -843,10 +843,11 @@ public class NPoint {
         this.mpHoi += (((long) this.mpMax * this.tlMpHoiBanThanVaDongDoi) / 100);
     }
 
-    private boolean hasSpecialPetFusionBonus() {
-        return player instanceof Pet pet && pet.typePet >= 2 && pet.typePet <= 4
-                && pet.master != null && pet.master.pet == pet && pet.master.fusion != null
-                && pet.master.fusion.typeFusion != ConstPlayer.NON_FUSION;
+    private int petFusionBonusPercent() {
+        if (!(player instanceof Pet pet) || pet.master == null || pet.master.pet != pet
+                || pet.master.fusion == null || pet.master.fusion.typeFusion == ConstPlayer.NON_FUSION) return 0;
+        if (pet.typePet == 1) return 10;
+        return pet.typePet >= 2 && pet.typePet <= 4 ? 20 : 0;
     }
 
     private void setHpMax() {
@@ -897,9 +898,8 @@ public class NPoint {
             }
         }
         // Apply one shared bonus to the current calculation, never to cached stats.
-        if (hasSpecialPetFusionBonus()) {
-            hpMax += (hpMax * 20L / 100L);
-        }
+        hpMax += hpMax * EquipmentUpgradeBonus.percent(player) / 100L;
+        hpMax += hpMax * petFusionBonusPercent() / 100L;
 
         // Xử lý phù
         if (this.player.zone != null && MapService.gI().isMapBlackBallWar(this.player.zone.map.mapId)) {
@@ -1012,16 +1012,12 @@ public class NPoint {
                 == 2) {
             mpMax += (mpMax * 10L / 100L);
             // xử lý pet mabu
-            if (this.player.isPet && ((Pet) this.player).typePet == 1
-                    && (((Pet) this.player).master.fusion.typeFusion == ConstPlayer.HOP_THE_PORATA || ((Pet) this.player).master.fusion.typeFusion == ConstPlayer.HOP_THE_PORATA2 || ((Pet) this.player).master.fusion.typeFusion == ConstPlayer.HOP_THE_PORATA3)) {
-                mpMax += (this.mpMax * 0 / 100L);
-            }
+
         }
 
         // Apply one shared bonus to the current calculation, never to cached stats.
-        if (hasSpecialPetFusionBonus()) {
-            mpMax += (mpMax * 20L / 100L);
-        }
+        mpMax += mpMax * EquipmentUpgradeBonus.percent(player) / 100L;
+        mpMax += mpMax * petFusionBonusPercent() / 100L;
 
         // Xử lý phù
         if (this.player.zone
@@ -1119,9 +1115,8 @@ public class NPoint {
             }
         }
         // Apply one shared bonus to the current calculation, never to cached stats.
-        if (hasSpecialPetFusionBonus()) {
-            dame += (dame * 20L / 100L);
-        }
+        dame += dame * EquipmentUpgradeBonus.percent(player) / 100L;
+        dame += dame * petFusionBonusPercent() / 100L;
 
         // Xử lý set tinh ấn
         if (this.isTinhAn) {

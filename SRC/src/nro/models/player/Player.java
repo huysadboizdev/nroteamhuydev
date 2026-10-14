@@ -773,80 +773,8 @@ public class Player implements Runnable {
     }
 
     public byte getEffFront() {
-        if (this.inventory == null) {
-            return -1;
-        }
-        if (this.inventory.itemsBody.isEmpty() || this.inventory.itemsBody.size() < 10) {
-            return -1;
-        }
-        int levelAo = 0;
-        Item.ItemOption optionLevelAo = null;
-        int levelQuan = 0;
-        Item.ItemOption optionLevelQuan = null;
-        int levelGang = 0;
-        Item.ItemOption optionLevelGang = null;
-        int levelGiay = 0;
-        Item.ItemOption optionLevelGiay = null;
-        int levelNhan = 0;
-        Item.ItemOption optionLevelNhan = null;
-        Item itemAo = this.inventory.itemsBody.get(0);
-        Item itemQuan = this.inventory.itemsBody.get(1);
-        Item itemGang = this.inventory.itemsBody.get(2);
-        Item itemGiay = this.inventory.itemsBody.get(3);
-        Item itemNhan = this.inventory.itemsBody.get(4);
-        for (Item.ItemOption io : itemAo.itemOptions) {
-            if (io.optionTemplate.id == 72) {
-                levelAo = io.param;
-                optionLevelAo = io;
-                break;
-            }
-        }
-        for (Item.ItemOption io : itemQuan.itemOptions) {
-            if (io.optionTemplate.id == 72) {
-                levelQuan = io.param;
-                optionLevelQuan = io;
-                break;
-            }
-        }
-        for (Item.ItemOption io : itemGang.itemOptions) {
-            if (io.optionTemplate.id == 72) {
-                levelGang = io.param;
-                optionLevelGang = io;
-                break;
-            }
-        }
-        for (Item.ItemOption io : itemGiay.itemOptions) {
-            if (io.optionTemplate.id == 72) {
-                levelGiay = io.param;
-                optionLevelGiay = io;
-                break;
-            }
-        }
-        for (Item.ItemOption io : itemNhan.itemOptions) {
-            if (io.optionTemplate.id == 72) {
-                levelNhan = io.param;
-                optionLevelNhan = io;
-                break;
-            }
-        }
-        if (optionLevelAo != null && optionLevelQuan != null && optionLevelGang != null && optionLevelGiay != null && optionLevelNhan != null
-                && levelAo >= 8 && levelQuan >= 8 && levelGang >= 8 && levelGiay >= 8 && levelNhan >= 8) {
-            return 8;
-        } else if (optionLevelAo != null && optionLevelQuan != null && optionLevelGang != null && optionLevelGiay != null && optionLevelNhan != null
-                && levelAo >= 7 && levelQuan >= 7 && levelGang >= 7 && levelGiay >= 7 && levelNhan >= 7) {
-            return 7;
-        } else if (optionLevelAo != null && optionLevelQuan != null && optionLevelGang != null && optionLevelGiay != null && optionLevelNhan != null
-                && levelAo >= 6 && levelQuan >= 6 && levelGang >= 6 && levelGiay >= 6 && levelNhan >= 6) {
-            return 6;
-        } else if (optionLevelAo != null && optionLevelQuan != null && optionLevelGang != null && optionLevelGiay != null && optionLevelNhan != null
-                && levelAo >= 5 && levelQuan >= 5 && levelGang >= 5 && levelGiay >= 5 && levelNhan >= 5) {
-            return 5;
-        } else if (optionLevelAo != null && optionLevelQuan != null && optionLevelGang != null && optionLevelGiay != null && optionLevelNhan != null
-                && levelAo >= 4 && levelQuan >= 4 && levelGang >= 4 && levelGiay >= 4 && levelNhan >= 4) {
-            return 4;
-        } else {
-            return -1;
-        }
+        int level = EquipmentUpgradeBonus.level(this);
+        return level >= 4 ? (byte) level : -1;
     }
 
     public short getHead() {

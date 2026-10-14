@@ -60,7 +60,7 @@ public final class PetFusionBonusTest {
         }
     }
     private static void legacy() {
-        for(int type=0;type<=1;type++)for(int mode:FUSIONS) {
+        for(int type=0;type<=0;type++)for(int mode:FUSIONS) {
             Player p=owner(type);p.fusion.typeFusion=(byte)mode;p.pet.status=Pet.FUSION;
             for(int i=0;i<3;i++){p.nPoint.calPoint();verify(p,400_000,400_000,20_000,500_000,500_000,21_000);}
         }

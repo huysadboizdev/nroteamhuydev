@@ -373,6 +373,19 @@ public class UseItem {
                 return;
             }
             if (item.template.strRequire <= pl.nPoint.power) {
+                if (item.template.type == 27 && nro.models.item.CompanionCatalog.parts(item.template.id) != null) {
+                    InventoryService.gI().itemBagToBody(pl, indexBag);
+                    if (pl.inventory.itemsBody.size() > 7 && pl.inventory.itemsBody.get(7) == item) {
+                        if (pl.newPet != null) {
+                            pl.newPet.dispose();
+                            pl.newPet = null;
+                        }
+                        pl.sendNewPet();
+                        if (pl.newPet != null) pl.newPet.joinMapMaster();
+                    }
+                    return;
+                }
+
                 switch (item.template.type) {
                     case 33: //card
                         UseCard(pl, item);

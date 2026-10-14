@@ -1200,6 +1200,7 @@ public class Service {
                 msg.writer().writeShort(body);//setbody
                 msg.writer().writeShort(leg);//set leg
                 msg.writer().writeByte(player.effectSkill.isMonkey ? 1 : 0);//set khỉ
+                msg.writer().writeByte(player.getEffFront()); // optional upgrade aura, legacy clients ignore tail
                 sendMessAllPlayerInMap(player, msg);
                 msg.cleanup();
             } catch (Exception e) {

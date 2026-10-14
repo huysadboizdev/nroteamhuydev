@@ -13,6 +13,8 @@ import nro.models.utils.Logger;
 import nro.models.utils.Util;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.IdentityHashMap;
 import nro.models.Bot.Bot;
 import nro.models.server.ServerManager;
 
@@ -43,6 +45,9 @@ public class Trade {
     private List<Item> itemsTrade2;
     private int goldTrade1;
     private int goldTrade2;
+    private final Map<Item, Integer> offeredSlots = new IdentityHashMap<>();
+    private boolean player1Locked;
+    private boolean player2Locked;
 
     public byte accept;
 
@@ -109,8 +114,12 @@ public class Trade {
         }
     }
 
-    public void addItemTrade(Player pl, int index, int quantity) {
+    public synchronized void addItemTrade(Player pl, int index, int quantity) {
         if (pl != player1 && pl != player2) return;
+        if (pl == player1 ? player1Locked : player2Locked) return;
+        List<Item> offeredItems = pl == player1 ? itemsTrade1 : itemsTrade2;
+        int offeredBefore = offeredItems.size();
+        quantity = normalizeLegacyItemQuantity(pl, index, quantity);
         if (quantity < 0) return;
         if (index != -1) {
             List<Item> bag = pl.equals(player1) ? itemsBag1 : itemsBag2;
@@ -193,6 +202,50 @@ public class Trade {
             Service.gI().sendThongBaoFromAdmin(pl,
                     "|5|VUI LÒNG KÍCH HOẠT TÀI KHOẢN TẠI\n|7|Liên Hệ Admin\n|5 ĐỂ MỞ GIAO DỊCH");
             removeItemTrade(pl, index);
+        }
+        for (int i = offeredBefore; i < offeredItems.size(); i++) {
+            offeredSlots.put(offeredItems.get(i), index);
+        }
+    }
+
+    /** Older clients send zero when selecting a single item without a quantity dialog. */
+    synchronized int normalizeLegacyItemQuantity(Player pl, int index, int quantity) {
+        if (quantity != 0 || index < 0 || (pl != player1 && pl != player2)) return quantity;
+        List<Item> bag = pl == player1 ? itemsBag1 : itemsBag2;
+        List<Item> before = pl == player1 ? bag1Before : bag2Before;
+        if (bag != null && index < bag.size()) {
+            Item item = bag.get(index);
+            Item original = before.get(index);
+            if (item != null && item.isNotNullItem() && item.quantity == 1
+                    && original != null && original.isNotNullItem() && original.quantity == 1) return 1;
+        }
+        return quantity;
+    }
+
+    /** Restore an edited offer to its original snapshot slot, without changing live inventory. */
+    public synchronized void removeOfferedItemTrade(Player pl, int index) {
+        if (pl != player1 && pl != player2) return;
+        if (pl == player1 ? player1Locked : player2Locked) return;
+        List<Item> bag = pl == player1 ? itemsBag1 : itemsBag2;
+        List<Item> before = pl == player1 ? bag1Before : bag2Before;
+        List<Item> offered = pl == player1 ? itemsTrade1 : itemsTrade2;
+        if (index < 0 || index >= bag.size()) return;
+        int quantity = bag.get(index).isNotNullItem() ? bag.get(index).quantity : 0;
+        boolean removed = false;
+        for (int i = offered.size() - 1; i >= 0; i--) {
+            Item item = offered.get(i);
+            Integer slot = offeredSlots.get(item);
+            if (slot != null && slot == index) {
+                quantity += item.quantity;
+                offered.remove(i);
+                offeredSlots.remove(item);
+                removed = true;
+            }
+        }
+        if (removed) {
+            Item restored = ItemService.gI().copyItem(before.get(index));
+            restored.quantity = quantity;
+            bag.set(index, restored);
         }
     }
 
@@ -323,7 +376,10 @@ public class Trade {
         this.itemsTrade2 = null;
     }
 
-    public void lockTran(Player pl) {
+    public synchronized void lockTran(Player pl) {
+        if (pl != player1 && pl != player2) return;
+        if (pl == player1) player1Locked = true;
+        else player2Locked = true;
         Message msg = null;
         try {
             msg = new Message(-86);

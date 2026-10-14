@@ -221,7 +221,7 @@ public class ItemTime {
             }
         }
         if (isUseKilis) {
-            if (Util.canDoWithTime(lastTimeUseKilis, TIME_KILIS)) {
+            if (Util.canDoWithTime(lastTimeUseKilis, timeLengthKilis > 0 ? timeLengthKilis : TIME_KILIS)) {
                 isUseKilis = false;
             }
         }
