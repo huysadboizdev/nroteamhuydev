@@ -216,8 +216,16 @@ public class Boss extends Player implements IBoss {
     private BossType noticeBossType;
 
     public boolean noticePublic() {
+        return !nro.models.services.BossAnnouncementPolicy.excluded(this) && noticePublicScope();
+    }
+
+    public boolean noticeLookup() {
+        return noticePublic() || (nro.models.services.BossAnnouncementPolicy.lookupSpecial(this) && noticePublicScope());
+    }
+
+    private boolean noticePublicScope() {
         if (questSupport && questSupportRetired) return false;
-        if(nro.models.services.BossAnnouncementPolicy.excluded(this)||zone==null||zone.map==null)return false;
+        if(zone==null||zone.map==null)return false;
         if(noticeBossType==BossType.PLAYERAO||noticeBossType==BossType.CADIC||noticeBossType==BossType.MANAGER_DEBUG
                 ||this instanceof nro.models.boss.luyen_tap_tu_dong.TrainingBoss||this instanceof nro.models.boss.sieu_hang.SuperRank
                 ||this instanceof nro.models.boss.dai_hoi_vo_thuat.The23rdMartialArtCongress

@@ -7,8 +7,23 @@ public final class BossAnnouncementPolicy {
  public static boolean excluded(int id){return id==BossID.AN_TROM||id==BossID.MAT_TROI||id==BossID.O_DO;}
  public static boolean excluded(Boss b){return excluded(b.questBossId())||b instanceof nro.models.boss.Boss_mini.AnTrom
    ||b instanceof nro.models.boss.Boss_mini.MatTroi||b instanceof nro.models.boss.Boss_mini.Odo;}
- public static boolean excludedHistory(nro.models.boss.notice.BossNoticeRow r){
-  if(excluded(r.semanticBossId()))return true;
+ public static boolean lookupSpecial(Boss b){return b instanceof nro.models.boss.Boss_mini.AnTrom
+   ||b instanceof nro.models.boss.Boss_mini.Odo||b instanceof nro.models.boss.Boss_mini.MatTroi
+   ||b instanceof nro.models.boss.Boss_mini.SoiHecQuyn
+   ||b.questBossId()==BossID.AN_TROM||b.questBossId()==BossID.O_DO||b.questBossId()==BossID.O_DO1
+   ||b.questBossId()==BossID.MAT_TROI||b.questBossId()==BossID.SOI_HEC_QUYN1;}
+ public static int lookupSemanticId(Boss b){
+  if(b instanceof nro.models.boss.Boss_mini.AnTrom)return BossID.AN_TROM;
+  if(b instanceof nro.models.boss.Boss_mini.Odo)return BossID.O_DO1;
+  if(b instanceof nro.models.boss.Boss_mini.MatTroi)return BossID.MAT_TROI;
+  if(b instanceof nro.models.boss.Boss_mini.SoiHecQuyn)return BossID.SOI_HEC_QUYN1;
+  return b.questBossId();
+ }
+  public static boolean excludedHistory(nro.models.boss.notice.BossNoticeRow r){
+   int id=r.semanticBossId();
+   // Screen filter hides these four, but the lookup board keeps them visible.
+   if(id==BossID.AN_TROM||id==BossID.O_DO||id==BossID.O_DO1||id==BossID.SOI_HEC_QUYN1||id==BossID.MAT_TROI)return false;
+   if(excluded(id))return true;
   String name=nro.models.utils.Util.removeAccent(r.bossName()).toLowerCase(java.util.Locale.ROOT).trim();
   return name.matches("(?:an trom|mat troi|o do)(?:\\s.*)?");
  }

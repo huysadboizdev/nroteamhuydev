@@ -36,6 +36,13 @@ public final class BossNoticePolicyTest {
         var notify=Boss.class.getDeclaredMethod("canSendNotify");notify.setAccessible(true);check(!(boolean)notify.invoke(b),"quest support still cannot broadcast spawn spam");
         field(b,Boss.class,"questSupportRetired",true);check(!b.noticePublic(),"retired support excluded");field(b,Boss.class,"questSupportRetired",false);
         b.zone.map.mapId=140;check(!b.noticePublic(),"private training map excluded");b.zone.map.mapId=5;b.isNotifyDisabled=true;check(!b.noticePublic(),"hidden bosses excluded");
+        int[] specials=new int[]{BossID.AN_TROM,BossID.O_DO,BossID.O_DO1,BossID.SOI_HEC_QUYN1,BossID.MAT_TROI};
+        String[] names=new String[]{"Ăn trộm","Ở dơ","Ở dơ","Sói hẹc quyn","Mặt Trời 12"};
+        for(int i=0;i<specials.length;i++){
+            BossNoticeRow row=new BossNoticeRow("spawn","run",specials[i],0,names[i],"Map",1000,0,"","ALIVE",0,"UNKNOWN",1,1000);
+            check(!BossAnnouncementPolicy.excludedHistory(row),"lookup keeps special visible "+specials[i]);
+            check(BossScreenNoticePolicy.hide(specials[i],1,ConstMap.MAP_NORMAL),"screen hides special "+specials[i]);
+        }
         System.out.println("PASS BossNotice policy: request0 throttle, bad requests/logout/legacy guard, scoped damage attribution, real/conditional timer and public scope");
     }
 }

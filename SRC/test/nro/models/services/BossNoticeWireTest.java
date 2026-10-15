@@ -23,7 +23,7 @@ public final class BossNoticeWireTest {
         tracker.appear(quest,-900000,0,"Quest","Map",nro.models.boss.BossID.KUKU,true,7);
         tracker.appear(general,-928,0,"General","Map",nro.models.boss.BossID.ZAMASU,false,5);
         tracker.appear(new Object(),-799,0,"Sun","Map",nro.models.boss.BossID.MAT_TROI,false,5);
-        check(service.rows(0).size()==2&&service.rows(1).size()==2,"excluded mini boss filtered from board and history");
+        check(service.rows(0).size()==3&&service.rows(1).size()==3,"screen-hidden special stays in board and history");
         tracker.appear(dead,-20,0,"Dead","Map",nro.models.boss.BossID.KUKU,false,8);tracker.defeat(dead,"admin");
         Capture player=PinkFixture.blank(Capture.class);player.session=PinkFixture.blank(nro.models.shop_ky_gui.ConsignRegressionTest.Connected.class);player.session.player=player;player.session.bossNoticeBoard=true;player.session.bossNoticeCategories=true;
         service.requestV2(player.session,5,1,0,0);
@@ -33,7 +33,7 @@ public final class BossNoticeWireTest {
         check(r.readUnsignedByte()==1&&r.readInt()==nro.models.boss.BossID.KUKU&&r.readBoolean()&&r.readShort()==-1&&r.available()==0,"semantic identity support and masked zone exact V2 fields");
         service.requestV2(player.session,6,2,0,0);check(player.sent==1,"V2 shares server request throttle");
         player.session.lastBossNoticeRequest=0;service.requestV2(player.session,6,0,0,0);service.requestV2(player.session,6,1,2,0);service.requestV2(player.session,6,1,0,500);check(player.sent==1,"invalid category view page denied");
-        service.requestV2(player.session,7,2,0,499);r=new DataInputStream(new ByteArrayInputStream(player.packet));r.readInt();r.readInt();check(r.readUnsignedByte()==2&&r.readUnsignedByte()==0&&r.readUnsignedShort()==0,"general category clamped final page");r.readShort();r.readLong();r.readUTF();check(r.readUnsignedShort()==1,"general excludes quests");
+        service.requestV2(player.session,7,2,0,499);r=new DataInputStream(new ByteArrayInputStream(player.packet));r.readInt();r.readInt();check(r.readUnsignedByte()==2&&r.readUnsignedByte()==0&&r.readUnsignedShort()==0,"general category clamped final page");r.readShort();r.readLong();r.readUTF();check(r.readUnsignedShort()==2,"general excludes quests but keeps screen-hidden special");
         player.session.lastBossNoticeRequest=0;player.session.bossNoticeCategories=false;service.requestV2(player.session,8,1,0,0);check(player.sent==2,"BOSS1 cannot receive V2");
         player.session.bossNoticeCategories=true;player.session.player=null;service.requestV2(player.session,8,1,0,0);check(player.sent==2,"logout denies classified data");
         player.session.player=player;player.session.lastBossNoticeRequest=0;service.requestV2(player.session,9,1,1,0);r=new DataInputStream(new ByteArrayInputStream(player.packet));r.readInt();r.readInt();r.readByte();r.readByte();r.readShort();r.readShort();r.readLong();r.readUTF();check(r.readUnsignedShort()==2,"quest history keeps defeated row");

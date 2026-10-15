@@ -64,22 +64,33 @@ public final class BossNoticeService {
         }catch(Exception failure){log(failure);}
     }
     private static String clean(String s,int max){if(s==null)return "";s=s.replaceAll("[\\r\\n\\t]"," ").trim();return s.length()>max?s.substring(0,max):s;}
+    public static String screenEventKey(int semanticBossId,int form,int mapId,int mapType){
+        return semanticBossId+":"+form+":"+mapId+":"+mapType;
+    }
     public void appeared(Boss b){
-        try{if(b.noticePublic()&&b.zone!=null&&!b.isDie()){
-            boolean fresh=tracker.appearNew(b,b.id,b.currentLevel,clean(b.name,100),clean(b.zone.map.mapName,100),b.questBossId(),b.isQuestSupport(),b.zone.zoneId);
-            if(fresh&&!b.isQuestSupport()&&!BossAnnouncementPolicy.grouped(b))
-                nro.models.server.ServerNotify.gI().notify("BOSS "+clean(b.name,100)+" vừa xuất hiện tại "+clean(b.zone.map.mapName,100));
+        try{if(b.noticeLookup()&&b.zone!=null&&!b.isDie()){
+            boolean fresh=tracker.appearNew(b,b.id,b.currentLevel,clean(b.name,100),clean(b.zone.map.mapName,100),BossAnnouncementPolicy.lookupSemanticId(b),b.isQuestSupport(),b.zone.zoneId);
+            if(fresh&&b.noticePublic()&&!b.isQuestSupport()&&!BossAnnouncementPolicy.grouped(b)){
+                String ticker="BOSS "+clean(b.name,100)+" vừa xuất hiện tại "+clean(b.zone.map.mapName,100);
+                nro.models.server.ServerNotify.gI().notify(ticker);
+                int semanticId=b.questBossId();
+                int form=b.currentLevel;
+                int mapId=b.zone.map.mapId;
+                int mapType=b.zone.map.type;
+                boolean hiddenFromPanel=BossScreenNoticePolicy.hide(b);
+                nro.models.server.ServerNotify.gI().notifyBossScreen(screenEventKey(semanticId,form,mapId,mapType),semanticId,form,mapId,mapType,ticker,hiddenFromPanel);
+            }
         }}
         catch(Exception failure){log(failure);}
     }
     public void defeated(Boss b,Player killer){
         try{
-            if(!b.noticePublic())return;
+            if(!b.noticeLookup())return;
             if(killer instanceof Pet pet&&pet.master!=null)killer=pet.master;
             if(killer instanceof nro.models.player.NewPet pet&&pet.master!=null)killer=pet.master;
             String name=killer!=null&&killer.isPl()&&!killer.isBot?clean(killer.name,80):"Không xác định";
             boolean fresh=tracker.defeatNew(b,name);
-            if(fresh&&!b.isQuestSupport()&&killer!=null&&killer.isPl()&&!killer.isBot)
+            if(fresh&&b.noticePublic()&&!b.isQuestSupport()&&killer!=null&&killer.isPl()&&!killer.isBot)
                 nro.models.server.ServerNotify.gI().notify(name+": Đã tiêu diệt được "+clean(b.name,100)+".");
         }catch(Exception failure){log(failure);}
     }

@@ -77,6 +77,71 @@ public class ServerNotify extends Thread {
         this.notifies.add(text);
     }
 
+    public static final int SCREEN_COMMAND = 115;
+    public static final int SCREEN_SCHEMA = 1;
+    public static final int SCREEN_VERSION = 2;
+
+    public record BossScreenEvent(String eventKey, int semanticBossId, int form, int mapId, int mapType,
+            String ticker, boolean hiddenFromPanel) {
+    }
+
+    public static nro.models.network.Message buildScreenMessage(String eventKey, int semanticBossId, int form,
+            int mapId, int mapType, String ticker, boolean hiddenFromPanel) throws java.io.IOException {
+        return buildScreenMessageWithVersion(SCREEN_SCHEMA, SCREEN_VERSION, eventKey, semanticBossId, form, mapId,
+                mapType, ticker, hiddenFromPanel);
+    }
+
+    public static nro.models.network.Message buildScreenMessageWithVersion(int schema, int version, String eventKey,
+            int semanticBossId, int form, int mapId, int mapType, String ticker, boolean hiddenFromPanel)
+            throws java.io.IOException {
+        nro.models.network.Message message = new nro.models.network.Message(SCREEN_COMMAND);
+        message.writer().writeByte(schema);
+        message.writer().writeByte(version);
+        message.writer().writeUTF(eventKey == null ? "" : eventKey);
+        message.writer().writeInt(semanticBossId);
+        message.writer().writeInt(form);
+        message.writer().writeInt(mapId);
+        message.writer().writeInt(mapType);
+        message.writer().writeUTF(ticker == null ? "" : ticker);
+        message.writer().writeBoolean(hiddenFromPanel);
+        return message;
+    }
+
+    public static BossScreenEvent decodeScreenMessage(byte[] data) {
+        try {
+            java.io.DataInputStream reader = new java.io.DataInputStream(new java.io.ByteArrayInputStream(data));
+            int schema = reader.readUnsignedByte();
+            int version = reader.readUnsignedByte();
+            if (schema != SCREEN_SCHEMA || version != SCREEN_VERSION) {
+                return null;
+            }
+            String eventKey = reader.readUTF();
+            int semanticBossId = reader.readInt();
+            int form = reader.readInt();
+            int mapId = reader.readInt();
+            int mapType = reader.readInt();
+            String ticker = reader.readUTF();
+            boolean hiddenFromPanel = reader.readBoolean();
+            return new BossScreenEvent(eventKey, semanticBossId, form, mapId, mapType, ticker, hiddenFromPanel);
+        } catch (Exception ignored) {
+            return null;
+        }
+    }
+
+    public void notifyBossScreen(String eventKey, int semanticBossId, int form, int mapId, int mapType,
+            String ticker, boolean hiddenFromPanel) {
+        nro.models.network.Message message = null;
+        try {
+            message = buildScreenMessage(eventKey, semanticBossId, form, mapId, mapType, ticker, hiddenFromPanel);
+            Service.gI().sendMessAllPlayer(message);
+        } catch (Exception ignored) {
+        } finally {
+            if (message != null) {
+                message.cleanup();
+            }
+        }
+    }
+
      public void sendNotifyTab(Player player) {
         Message msg;
         try {
