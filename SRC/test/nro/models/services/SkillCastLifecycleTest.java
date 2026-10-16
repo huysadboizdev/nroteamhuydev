@@ -10,9 +10,25 @@ public final class SkillCastLifecycleTest {
     private static final class CapturedSkills extends SkillService {
         final java.util.List<Runnable> queued = new java.util.ArrayList<>();
         int completions;
+        int acceptedAttacks;
+        boolean requirePlayerLock;
+        boolean enteredWithoutPlayerLock;
         @Override protected void scheduleBomb(Runnable release) { queued.add(release); }
         @Override public void affterUseSkill(Player p,int skillId) { completions++; }
         @Override public boolean canAttackPlayer(Player a,Player b) { return true; }
+        @Override public boolean canUseSkillWithMana(Player p) { return true; }
+        @Override public boolean canUseSkillWithCooldown(Player p) {
+            if (requirePlayerLock && !Thread.holdsLock(p)) enteredWithoutPlayerLock=true;
+            return true;
+        }
+        @Override public void useSkillAttack(Player p,Player target,nro.models.mob.Mob mob) {
+            if (requirePlayerLock) {
+                acceptedAttacks++;
+                affterUseSkill(p,p.playerSkill.skillSelect.template.id);
+            } else {
+                super.useSkillAttack(p,target,mob);
+            }
+        }
     }
     private static final class DamageTarget extends Player {
         long received;
@@ -136,6 +152,13 @@ public final class SkillCastLifecycleTest {
             p.playerSkill.prepareTuSat=p.playerSkill.prepareQCKK=p.playerSkill.prepareLaze=true;
             skills.selectSkill(p,Skill.GALICK);
             check(!p.playerSkill.prepareTuSat&&!p.playerSkill.prepareQCKK&&!p.playerSkill.prepareLaze,"selecting another skill must invalidate old preparations");
+        } else if (args[0].equals("serialized-use")) {
+            p.playerSkill.skillSelect=skill(Skill.DRAGON,1);
+            p.playerSkill.skillSelect.template.type=1;
+            skills.requirePlayerLock=true;
+            check(skills.useSkill(p,null,null,-1,null),"valid player skill must be handled");
+            check(skills.acceptedAttacks==1,"one request must execute one attack");
+            check(!skills.enteredWithoutPlayerLock,"player skill validation and damage must share a per-player lock");
         } else {
             p.playerSkill.skillSelect=skill(Skill.BIEN_KHI,7);
             p.playerSkill.skills.add(p.playerSkill.skillSelect);

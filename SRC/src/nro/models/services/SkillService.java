@@ -60,6 +60,15 @@ public class SkillService {
     }
 
     public boolean useSkill(Player player, Player plTarget, Mob mobTarget, int status, Message msg) {
+        if (player == null) {
+            return false;
+        }
+        synchronized (player) {
+            return useSkillLocked(player, plTarget, mobTarget, status, msg);
+        }
+    }
+
+    private boolean useSkillLocked(Player player, Player plTarget, Mob mobTarget, int status, Message msg) {
         if (!PetSkillRules.canExecute(player)) {
             return false;
         }
