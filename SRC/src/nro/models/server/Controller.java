@@ -656,8 +656,25 @@ public class Controller implements IMessageHandler {
                         if (isMobMe) {
                             masterId = _msg.reader().readInt();
                         }
-//                        _msg.reader().readByte();
-                        Service.gI().attackMob(player, mobId, isMobMe, masterId);
+                        if (_msg.reader().available() > 0) {
+                            _msg.reader().readByte(); // legacy direction byte
+                        }
+                        boolean confirmedMobCast = false;
+                        int sequence = 0;
+                        int skillTemplateId = -1;
+                        if (!isMobMe && _msg.reader().available() >= 6) {
+                            int marker = _msg.reader().readUnsignedByte();
+                            if (marker == 0xA7) {
+                                sequence = _msg.reader().readInt();
+                                skillTemplateId = _msg.reader().readUnsignedByte();
+                                confirmedMobCast = true;
+                            }
+                        }
+                        if (confirmedMobCast) {
+                            Service.gI().attackMobConfirmed(player, mobId, sequence, skillTemplateId);
+                        } else {
+                            Service.gI().attackMob(player, mobId, isMobMe, masterId);
+                        }
                     }
                     break;
                 case -60:

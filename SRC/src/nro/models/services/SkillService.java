@@ -41,6 +41,16 @@ import nro.models.map.Zone;
  */
 public class SkillService {
 
+    public enum MobCastResult {
+        REJECTED(0), ACCEPTED(1), OUT_OF_RANGE(2);
+
+        private final int wireCode;
+
+        MobCastResult(int wireCode) { this.wireCode = wireCode; }
+
+        public int wireCode() { return wireCode; }
+    }
+
     private static SkillService instance;
     private static final ScheduledExecutorService BOMB_DELAYS = Executors.newSingleThreadScheduledExecutor(r -> {
         Thread thread = new Thread(r, "Skill bomb delays");
@@ -65,6 +75,46 @@ public class SkillService {
         }
         synchronized (player) {
             return useSkillLocked(player, plTarget, mobTarget, status, msg);
+        }
+    }
+
+    /** Select and execute one owned skill against a mob as a single player-locked action. */
+    public MobCastResult useSkillForMob(Player player, Mob mobTarget, int skillTemplateId) {
+        if (player == null || mobTarget == null) return MobCastResult.REJECTED;
+        synchronized (player) {
+            if (player.playerSkill == null || !selectSkillLocked(player, skillTemplateId)) {
+                return MobCastResult.REJECTED;
+            }
+            Skill selected = player.playerSkill.skillSelect;
+            if (selected == null || selected.template == null
+                    || (selected.template.type != 1 && selected.template.type != 4)) {
+                return MobCastResult.REJECTED;
+            }
+            if (mobTarget.zone == null || mobTarget.zone != player.zone || mobTarget.isDie()) {
+                return MobCastResult.REJECTED;
+            }
+            if (isMeleeMobSkill(skillTemplateId)
+                    && Util.getDistance(player, mobTarget) > Skill.RANGE_ATTACK_CHIEU_DAM) {
+                return MobCastResult.OUT_OF_RANGE;
+            }
+            return useSkillLocked(player, null, mobTarget, -1, null)
+                    ? MobCastResult.ACCEPTED : MobCastResult.REJECTED;
+        }
+    }
+
+    public static boolean isMeleeMobSkill(int skillTemplateId) {
+        return skillTemplateId == Skill.DRAGON || skillTemplateId == Skill.DEMON
+                || skillTemplateId == Skill.GALICK || skillTemplateId == Skill.LIEN_HOAN;
+    }
+
+    public int getMobCastRetryAfterMs(Player player, int skillTemplateId) {
+        if (player == null || player.playerSkill == null) return 250;
+        synchronized (player) {
+            Skill selected = player.playerSkill.skillSelect;
+            if (selected == null || selected.template == null || selected.template.id != skillTemplateId) return 250;
+            long remaining = selected.lastTimeUseThisSkill + selected.coolDown - System.currentTimeMillis();
+            if (remaining <= 0) return 500;
+            return (int) Math.min(5000, Math.max(100, remaining));
         }
     }
 
@@ -105,6 +155,17 @@ public class SkillService {
             return false;
         }
         if (player.playerSkill == null) {
+            return false;
+        }
+        if (mobTarget != null && player.playerSkill.skillSelect != null && player.playerSkill.skillSelect.template != null
+                && mobTarget.zone == player.zone && isMeleeMobSkill(player.playerSkill.skillSelect.template.id)
+                && Util.getDistance(player, mobTarget) > Skill.RANGE_ATTACK_CHIEU_DAM) {
+            return false;
+        }
+        if (plTarget != null && plTarget.isBoss && plTarget.zone == player.zone
+                && player.playerSkill.skillSelect != null && player.playerSkill.skillSelect.template != null
+                && isMeleeMobSkill(player.playerSkill.skillSelect.template.id)
+                && Util.getDistance(player, plTarget) > Skill.RANGE_ATTACK_CHIEU_DAM) {
             return false;
         }
         if (player.playerSkill.skillSelect.template.type == 2 && canUseSkillWithMana(player) && canUseSkillWithCooldown(player)) {
@@ -448,10 +509,8 @@ public class SkillService {
             case Skill.DEMON:
             case Skill.GALICK:
             case Skill.LIEN_HOAN:
-                if (player.zone != null && player.zone.map.mapId != 113 && plTarget != null && Util.getDistance(player, plTarget) > Skill.RANGE_ATTACK_CHIEU_DAM) {
-                    miss = true;
-                }
-                if (mobTarget != null && Util.getDistance(player, mobTarget) > Skill.RANGE_ATTACK_CHIEU_DAM) {
+                if (player.zone != null && player.zone.map.mapId != 113 && plTarget != null && !plTarget.isBoss
+                        && Util.getDistance(player, plTarget) > Skill.RANGE_ATTACK_CHIEU_DAM) {
                     miss = true;
                 }
             case Skill.KAMEJOKO:
@@ -1445,7 +1504,7 @@ public class SkillService {
         }
     }
 
-    private void selectSkillLocked(Player player, int skillId) {
+    private boolean selectSkillLocked(Player player, int skillId) {
         for (Skill skill : player.playerSkill.skills) {
             if (skill != null && skill.skillId != -1 && skill.template != null && skill.template.id == skillId
                     && (!(player instanceof Pet pet) || PetSkillRules.skillAt(pet, player.playerSkill.skills.indexOf(skill)) == skill)) {
@@ -1455,8 +1514,9 @@ public class SkillService {
                     player.playerSkill.prepareLaze = false;
                 }
                 player.playerSkill.skillSelect = skill;
-                break;
+                return true;
             }
         }
+        return false;
     }
 }

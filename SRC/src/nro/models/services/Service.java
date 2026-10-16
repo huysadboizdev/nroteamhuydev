@@ -1185,6 +1185,50 @@ public class Service {
         }
     }
 
+    public void attackMobConfirmed(Player pl, int mobId, int sequence, int skillTemplateId) {
+        nro.models.services.SkillService.MobCastResult result = nro.models.services.SkillService.MobCastResult.REJECTED;
+        nro.models.mob.Mob target = null;
+        try {
+            if (pl != null && pl.zone != null) {
+                for (nro.models.mob.Mob mob : pl.zone.mobs) {
+                    if (mob != null && mob.id == mobId) {
+                        target = mob;
+                        result = SkillService.gI().useSkillForMob(pl, mob, skillTemplateId);
+                        break;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            Logger.logException(Service.class, e);
+            result = nro.models.services.SkillService.MobCastResult.REJECTED;
+        }
+        int retryAfterMs = result == nro.models.services.SkillService.MobCastResult.OUT_OF_RANGE
+                ? 0 : SkillService.gI().getMobCastRetryAfterMs(pl, skillTemplateId);
+        sendMobAttackResult(pl, target, sequence, result, retryAfterMs);
+    }
+
+    private void sendMobAttackResult(Player player, nro.models.mob.Mob mob, int sequence,
+            nro.models.services.SkillService.MobCastResult result, int retryAfterMs) {
+        if (player == null) return;
+        Message message = null;
+        try {
+            message = new Message(-48);
+            message.writer().writeInt(sequence);
+            message.writer().writeByte(result.wireCode());
+            message.writer().writeShort(player.location != null ? player.location.x : -1);
+            message.writer().writeShort(player.location != null ? player.location.y : -1);
+            message.writer().writeByte(mob != null ? mob.id : -1);
+            message.writer().writeShort(mob != null && mob.location != null ? mob.location.x : -1);
+            message.writer().writeShort(mob != null && mob.location != null ? mob.location.y : -1);
+            message.writer().writeInt(retryAfterMs);
+            player.sendMessage(message);
+        } catch (Exception e) {
+            Logger.logException(Service.class, e);
+        } finally {
+            if (message != null) message.cleanup();
+        }
+    }
+
     public void Send_Caitrang(Player player) {
         if (player != null) {
             Message msg;

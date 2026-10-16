@@ -159,6 +159,41 @@ public final class SkillCastLifecycleTest {
             check(skills.useSkill(p,null,null,-1,null),"valid player skill must be handled");
             check(skills.acceptedAttacks==1,"one request must execute one attack");
             check(!skills.enteredWithoutPlayerLock,"player skill validation and damage must share a per-player lock");
+        } else if (args[0].startsWith("boss-cast-")) {
+            p.zone=zone(); p.location=blank(Location.class); p.location.x=100; p.location.y=100;
+            p.playerSkill.skillSelect=skill(Skill.DRAGON,1); p.playerSkill.skillSelect.template.type=1;
+            DamageTarget boss=new DamageTarget(); boss.isBoss=true; boss.zone=p.zone; boss.location=blank(Location.class);
+            boss.location.x=100+(args[0].equals("boss-cast-range")?101:70); boss.location.y=100;
+            skills.requirePlayerLock=true;
+            boolean accepted=skills.useSkill(p,boss,null,-1,null);
+            if (args[0].equals("boss-cast-range")) {
+                check(!accepted,"out-of-range boss attack must be rejected before spending cooldown");
+                check(skills.acceptedAttacks==0,"out-of-range boss attack must not execute with zero damage");
+            } else {
+                check(accepted,"in-range boss attack must still execute");
+                check(skills.acceptedAttacks==1,"in-range boss attack must execute exactly once");
+            }
+        } else if (args[0].startsWith("mob-cast-")) {
+            p.zone=zone();
+            p.location.x=100; p.location.y=100;
+            Skill dragon=skill(Skill.DRAGON,1); dragon.skillId=1; dragon.template.type=1;
+            Skill galick=skill(Skill.GALICK,1); galick.skillId=2; galick.template.type=1;
+            p.playerSkill.skills.add(dragon); p.playerSkill.skills.add(galick);
+            p.playerSkill.skillSelect=dragon;
+            nro.models.mob.Mob target=new nro.models.mob.Mob();
+            target.zone=p.zone; target.point.hp=target.point.maxHp=1000;
+            target.location.x=100+(args[0].equals("mob-cast-range")?101:70); target.location.y=100;
+            skills.requirePlayerLock=true;
+            SkillService.MobCastResult result=skills.useSkillForMob(p,target,Skill.GALICK);
+            if (args[0].equals("mob-cast-range")) {
+                check(result==SkillService.MobCastResult.OUT_OF_RANGE,"out-of-range mob cast must be reported, not dealt as zero damage");
+                check(skills.acceptedAttacks==0,"out-of-range cast must not execute or consume cooldown");
+            } else {
+                check(result==SkillService.MobCastResult.ACCEPTED,"in-range mob cast must execute");
+                check(p.playerSkill.skillSelect==galick,"requested owned skill must be selected atomically with the cast");
+                check(skills.acceptedAttacks==1,"accepted mob cast must execute exactly once");
+                check(!skills.enteredWithoutPlayerLock,"mob skill selection, validation and execution must share a player lock");
+            }
         } else {
             p.playerSkill.skillSelect=skill(Skill.BIEN_KHI,7);
             p.playerSkill.skills.add(p.playerSkill.skillSelect);
