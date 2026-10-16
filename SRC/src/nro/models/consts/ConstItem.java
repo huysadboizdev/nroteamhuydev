@@ -392,6 +392,8 @@ public class ConstItem {
     public static final int NGOC_RONG_7_SAO_DEN = 378;
     public static final int MAY_DO_CAPSULE_KI_BI = 379;
     public static final int VIEN_CAPSULE_KI_BI = 380;
+    public static final int PHIEU_DOI_SKILL_DE_TU_2_3 = 2042;
+    public static final int PHIEU_DOI_SKILL_DE_TU_4_KHI = 2043;
     public static final int CUONG_NO = 381;
     public static final int BO_HUYET = 382;
     public static final int BO_KHI = 383;

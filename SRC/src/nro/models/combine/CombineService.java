@@ -707,15 +707,9 @@ public class CombineService {
     private String getTextInfoTabCombine(int type) {
         switch (type) {
             case NANG_SKH_THUONG:
-                return "Chọn 1–5 món thần linh khác loại.\n"
-                        + "Nhận SKH cấp 1 đúng loại và hành tinh đồ thần; rada theo hành tinh nhân vật.\n"
-                        + "Mỗi món: 50% thành công, 50% xịt, độc lập.\nChọn 5 món có thể nhận 0–5 SKH.\n"
-                        + "Mất mọi nguyên liệu đã chọn; phí không hoàn.\nSau đó chọn Nâng SKH Thường.";
+                return "Nâng cấp từ đồ thần linh, có thể nâng 5 món cùng 1 lúc cho nhanh";
             case NANG_SKH_VIP:
-                return "Chọn 1–5 món hủy diệt trước, rồi cùng số món thần phía sau.\n"
-                        + "Đồ thần tùy hành tinh/loại nhưng không trùng loại.\n"
-                        + "Hủy diệt quyết định loại và hành tinh đầu ra; rada theo hành tinh người chơi.\n"
-                        + "Xịt mất thần, giữ hủy diệt; phí không hoàn.\nSau đó chọn Nâng SKH VIP.";
+                return "Nâng cấp từ đồ hủy diệt làm đồ chính, đồ thần làm đồ phôi";
             case EP_SAO_TRANG_BI:
                 return "Chọn trang bị\n(Áo, quần, găng, giày hoặc rađa) có ô đặt sao pha lê\nChọn loại sao pha lê\n"
                         + "Sau đó chọn 'Nâng cấp'";

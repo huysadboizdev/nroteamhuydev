@@ -11733,3 +11733,29 @@ END$$
 DELIMITER ;
 CALL codex_setup_ngu_hanh_son();
 DROP PROCEDURE codex_setup_ngu_hanh_son;
+
+
+-- PET_SKILL_REROLL_RUBY_SHOP_20261016
+INSERT INTO item_template
+(id,TYPE,gender,NAME,description,level,icon_id,part,is_up_to_up,power_require,gold,gem,head,body,leg)
+VALUES
+(2042,29,3,'Phiếu đổi kỹ năng 2-3 đệ tử','Yêu cầu đệ tử đã học kỹ năng 2 và kỹ năng 3.',1,5223,-1,1,0,0,0,-1,-1,-1),
+(2043,29,3,'Phiếu đổi kỹ năng 4 đệ tử','Yêu cầu đệ tử đã học kỹ năng 4. Đổi thành Biến Khỉ.',1,718,-1,1,0,0,0,-1,-1,-1)
+ON DUPLICATE KEY UPDATE
+ TYPE=VALUES(TYPE),gender=VALUES(gender),NAME=VALUES(NAME),description=VALUES(description),
+ level=VALUES(level),icon_id=VALUES(icon_id),part=VALUES(part),is_up_to_up=VALUES(is_up_to_up),
+ power_require=VALUES(power_require),gold=VALUES(gold),gem=VALUES(gem),
+ head=VALUES(head),body=VALUES(body),leg=VALUES(leg);
+SET @pet_skill_shop=(SELECT id FROM shop WHERE tag_name='SANTA_HONG_NGOC' AND npc_id=39 LIMIT 1);
+SET @pet_skill_tab=(SELECT MIN(t.id) FROM tab_shop t JOIN shop s ON s.id=t.shop_id
+ WHERE s.id=@pet_skill_shop AND t.name NOT LIKE 'Hộp<>%');
+INSERT INTO item_shop(tab_id,temp_id,is_new,is_sell,type_sell,cost,icon_spec)
+SELECT @pet_skill_tab,2042,1,1,3,100,7743 WHERE @pet_skill_tab IS NOT NULL
+AND NOT EXISTS(SELECT 1 FROM item_shop WHERE tab_id=@pet_skill_tab AND temp_id=2042);
+INSERT INTO item_shop(tab_id,temp_id,is_new,is_sell,type_sell,cost,icon_spec)
+SELECT @pet_skill_tab,2043,1,1,3,2000,7743 WHERE @pet_skill_tab IS NOT NULL
+AND NOT EXISTS(SELECT 1 FROM item_shop WHERE tab_id=@pet_skill_tab AND temp_id=2043);
+UPDATE item_shop SET is_new=1,is_sell=1,type_sell=3,cost=100,icon_spec=7743
+WHERE tab_id=@pet_skill_tab AND temp_id=2042;
+UPDATE item_shop SET is_new=1,is_sell=1,type_sell=3,cost=2000,icon_spec=7743
+WHERE tab_id=@pet_skill_tab AND temp_id=2043;

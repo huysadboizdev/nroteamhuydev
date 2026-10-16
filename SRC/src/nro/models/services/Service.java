@@ -1566,7 +1566,10 @@ public class Service {
                 }
                 msg.writer().writeInt(timeLeft);
             }
-            pl.sendMessage(msg);
+            Player client = pl instanceof Pet pet ? pet.master : pl;
+            if (client != null) {
+                client.sendMessage(msg);
+            }
             msg.cleanup();
         } catch (Exception e) {
             e.printStackTrace();

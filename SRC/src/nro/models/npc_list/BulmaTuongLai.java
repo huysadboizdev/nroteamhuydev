@@ -1,6 +1,7 @@
 package nro.models.npc_list;
 
 import nro.models.consts.ConstNpc;
+import nro.models.consts.ConstTask;
 import nro.models.item.Item;
 import nro.models.npc.Npc;
 import nro.models.player.Player;
@@ -32,7 +33,10 @@ public class BulmaTuongLai extends Npc {
                 }
             } else if (this.mapId == 102) {
                 if (!TaskService.gI().checkDoneTaskTalkNpc(player, this)) {
-                    this.createOtherMenu(player, ConstNpc.BASE_MENU, "learn", "Cửa hàng");
+                    this.createOtherMenu(player, ConstNpc.BASE_MENU,
+                            TaskService.gI().getIdTask(player) >= ConstTask.TASK_22_0
+                                    ? "learn" : "Hãy hoàn thành nhiệm vụ Fide để mở cửa hàng máy dò Capsule.",
+                            "Cửa hàng");
                 }
             }
         }
@@ -50,8 +54,14 @@ public class BulmaTuongLai extends Npc {
             } else if (this.mapId == 102) {
                 if (player.idMark.isBaseMenu()) {
                     switch (select) {
-                        case 0 ->
-                            ShopService.gI().opendShop(player, "BUNMA_FUTURE", true);
+                        case 0 -> {
+                            if (TaskService.gI().getIdTask(player) >= ConstTask.TASK_22_0) {
+                                ShopService.gI().opendShop(player, "BUNMA_FUTURE", true);
+                            } else {
+                                Service.gI().sendThongBao(player,
+                                        "Hãy hoàn thành nhiệm vụ Fide để mở cửa hàng máy dò Capsule.");
+                            }
+                        }
                       
                     }
                             }

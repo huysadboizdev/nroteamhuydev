@@ -29,6 +29,7 @@ import nro.models.map.Zone;
 import nro.models.player.Inventory;
 import nro.models.map.service.NpcService;
 import nro.models.player.Player;
+import nro.models.player.Pet;
 import nro.models.skill.Skill;
 import nro.models.network.Message;
 import nro.models.map.service.ChangeMapService;
@@ -881,8 +882,8 @@ public class UseItem {
                             case 345:
                                 nro.models.services.SatelliteService.place(pl, item);
                                 break;
-                            case 380: //cskb
-                                openCSKB(pl, item);
+                            case 380: // capsule kì bí tương lai
+                                openCapsuleKiBi(pl, item);
                                 break;
                             case 1614:
                             case 1615:
@@ -1041,6 +1042,12 @@ public class UseItem {
                             break;
                             case 1795: //đổi đệ tử
                                 changePetRamdom(pl, item);
+                                break;
+                            case ConstItem.PHIEU_DOI_SKILL_DE_TU_2_3:
+                                rerollPetSkills2And3(pl, item);
+                                break;
+                            case ConstItem.PHIEU_DOI_SKILL_DE_TU_4_KHI:
+                                rerollPetSkill4Monkey(pl, item);
                                 break;
                             case 1760: {
                                 Player player = pl;
@@ -1679,6 +1686,25 @@ public class UseItem {
         }
     }
 
+    private void openCapsuleKiBi(Player pl, Item item) {
+        if (item == null || !item.isNotNullItem() || item.quantity <= 0) {
+            return;
+        }
+        if (InventoryService.gI().getCountEmptyBag(pl) <= 0) {
+            Service.gI().sendThongBao(pl, "Hành trang đã đầy");
+            return;
+        }
+        short[] rewards = {381, 382, 384, 385, 1150, 1152, 1153, 1154, 383, 1151};
+        Item reward = ItemService.gI().createNewItem(rewards[Util.nextInt(0, rewards.length - 1)]);
+        reward.itemOptions.add(new ItemOption(73, 0));
+        if (!grantItemReward(pl, reward)) {
+            return;
+        }
+        InventoryService.gI().subQuantityItemsBag(pl, item, 1);
+        InventoryService.gI().sendItemBags(pl);
+        CombineService.gI().sendEffectOpenItem(pl, item.template.iconID, reward.template.iconID);
+    }
+
     private void useItemTime(Player pl, Item item) {
         synchronized (pl) {
         if (item == null || !item.isNotNullItem() || item.quantity <= 0) return;
@@ -2086,6 +2112,52 @@ public class UseItem {
             InventoryService.gI().subQuantityItemsBag(player, pea, 1);
             InventoryService.gI().sendItemBags(player);
         }
+        }
+    }
+
+    private boolean hasLearnedPetSkill(Pet pet, int skillIndex) {
+        if (pet == null || pet.playerSkill == null || pet.playerSkill.skills == null
+                || skillIndex < 0 || skillIndex >= pet.playerSkill.skills.size()) {
+            return false;
+        }
+        Skill skill = pet.playerSkill.skills.get(skillIndex);
+        return skill != null && skill.skillId != -1;
+    }
+
+    private void rerollPetSkills2And3(Player player, Item item) {
+        synchronized (player) {
+            Pet pet = player.pet;
+            if (pet == null) {
+                Service.gI().sendThongBao(player, "Bạn cần có đệ tử để sử dụng vật phẩm này.");
+                return;
+            }
+            if (!hasLearnedPetSkill(pet, 1) || !hasLearnedPetSkill(pet, 2)) {
+                Service.gI().sendThongBao(player, "Đệ tử phải học đủ kỹ năng 2 và kỹ năng 3.");
+                return;
+            }
+            pet.openSkill2();
+            pet.openSkill3();
+            InventoryService.gI().subQuantityItemsBag(player, item, 1);
+            Service.gI().sendTimeSkill(pet);
+            Service.gI().chatJustForMe(player, pet, "Đệ tử đã đổi kỹ năng 2 và kỹ năng 3.");
+        }
+    }
+
+    private void rerollPetSkill4Monkey(Player player, Item item) {
+        synchronized (player) {
+            Pet pet = player.pet;
+            if (pet == null) {
+                Service.gI().sendThongBao(player, "Bạn cần có đệ tử để sử dụng vật phẩm này.");
+                return;
+            }
+            if (!hasLearnedPetSkill(pet, 3)) {
+                Service.gI().sendThongBao(player, "Đệ tử phải học kỹ năng 4 trước.");
+                return;
+            }
+            pet.openSkill4Monkey();
+            InventoryService.gI().subQuantityItemsBag(player, item, 1);
+            Service.gI().sendTimeSkill(pet);
+            Service.gI().chatJustForMe(player, pet, "Đệ tử đã đổi kỹ năng 4 thành Biến Khỉ.");
         }
     }
 

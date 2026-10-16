@@ -987,9 +987,12 @@ public class ShopService {
         if (row == null || row.typeSell != COST_RUBY || row.cost <= 0
                 || row.iconSpec != 7743 || (itemTempId != 710 && itemTempId != 711
                 && itemTempId != 1710 && itemTempId != 1869 && itemTempId != 1775
+                && itemTempId != 2042 && itemTempId != 2043
                 && itemTempId != 880 && itemTempId != 881 && itemTempId != 882
                 && !nro.models.item.AnimeEquipment.contains(itemTempId)
                 && nro.models.shop_ky_gui.ConsignTransactions.rubyMaterialPrice(itemTempId)==0)) return;
+        if (itemTempId == 2042 && row.cost != 100) return;
+        if (itemTempId == 2043 && row.cost != 2000) return;
         if ((itemTempId >= 880 && itemTempId <= 882) && row.cost != 5) return;
         if(nro.models.item.AnimeEquipment.contains(itemTempId)&&row.cost!=200)return;
         int materialPrice=nro.models.shop_ky_gui.ConsignTransactions.rubyMaterialPrice(itemTempId);

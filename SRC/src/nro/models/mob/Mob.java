@@ -619,7 +619,7 @@ public class Mob {
         list.addAll(nro.models.services.EquipmentFarmDropService.rewards(this,player,x,yEnd,farmDeath));
         //========================Capsul Kì Bí========================
         if (player.itemTime.isUseMayDo
-                && (isLuckyDrop(player, 20, 100))
+                && (isLuckyDrop(player, 70, 100))
                 && this.tempId > 57 && this.tempId < 66) {
             list.add(new ItemMap(zone, 380, 1, x, yEnd, player.id));
         }
