@@ -42,7 +42,7 @@ import nro.models.map.Zone;
 public class SkillService {
 
     public enum MobCastResult {
-        REJECTED(0), ACCEPTED(1), OUT_OF_RANGE(2);
+        REJECTED(0), ACCEPTED(1), OUT_OF_RANGE(2), COOLDOWN(3);
 
         private final int wireCode;
 
@@ -52,6 +52,7 @@ public class SkillService {
     }
 
     private static SkillService instance;
+    private static final int MOB_MELEE_COOLDOWN_GRACE_MS = 100;
     private static final ScheduledExecutorService BOMB_DELAYS = Executors.newSingleThreadScheduledExecutor(r -> {
         Thread thread = new Thread(r, "Skill bomb delays");
         thread.setDaemon(true);
@@ -74,7 +75,7 @@ public class SkillService {
             return false;
         }
         synchronized (player) {
-            return useSkillLocked(player, plTarget, mobTarget, status, msg);
+            return useSkillLocked(player, plTarget, mobTarget, status, msg, 50);
         }
     }
 
@@ -93,11 +94,24 @@ public class SkillService {
             if (mobTarget.zone == null || mobTarget.zone != player.zone || mobTarget.isDie()) {
                 return MobCastResult.REJECTED;
             }
+            if (!PetSkillRules.canExecute(player) || !canUseSkillWithMana(player)
+                    || (player.effectSkill != null && player.effectSkill.isHaveEffectSkill()
+                    && selected.template.id != Skill.TU_SAT
+                    && selected.template.id != Skill.QUA_CAU_KENH_KHI
+                    && selected.template.id != Skill.MAKANKOSAPPO)
+                    || (!player.isBoss && !player.isPet && player.nPoint != null && player.nPoint.stamina <= 0)) {
+                return MobCastResult.REJECTED;
+            }
             if (isMeleeMobSkill(skillTemplateId)
                     && Util.getDistance(player, mobTarget) > Skill.RANGE_ATTACK_CHIEU_DAM) {
                 return MobCastResult.OUT_OF_RANGE;
             }
-            return useSkillLocked(player, null, mobTarget, -1, null)
+            int cooldownGraceMs = isMeleeMobSkill(skillTemplateId)
+                    ? MOB_MELEE_COOLDOWN_GRACE_MS : 50;
+            if (!Util.canDoWithTime(selected.lastTimeUseThisSkill, selected.coolDown - cooldownGraceMs)) {
+                return MobCastResult.COOLDOWN;
+            }
+            return useSkillLocked(player, null, mobTarget, -1, null, cooldownGraceMs)
                     ? MobCastResult.ACCEPTED : MobCastResult.REJECTED;
         }
     }
@@ -111,14 +125,26 @@ public class SkillService {
         if (player == null || player.playerSkill == null) return 0;
         synchronized (player) {
             Skill selected = player.playerSkill.skillSelect;
-            if (selected == null || selected.template == null || selected.template.id != skillTemplateId) return 0;
-            long remaining = selected.lastTimeUseThisSkill + selected.coolDown - System.currentTimeMillis();
+            if (selected == null || selected.template == null || selected.template.id != skillTemplateId) {
+                selected = null;
+                if (player.playerSkill.skills != null) {
+                    for (Skill owned : player.playerSkill.skills) {
+                        if (owned != null && owned.template != null && owned.template.id == skillTemplateId) {
+                            selected = owned;
+                            break;
+                        }
+                    }
+                }
+                if (selected == null) return 0;
+            }
+            long remaining = selected.lastTimeUseThisSkill + Math.max(0, selected.coolDown - 50) - System.currentTimeMillis();
             if (remaining <= 0) return 0;
             return (int) Math.min(5000, Math.max(1, remaining));
         }
     }
 
-    private boolean useSkillLocked(Player player, Player plTarget, Mob mobTarget, int status, Message msg) {
+    private boolean useSkillLocked(Player player, Player plTarget, Mob mobTarget, int status, Message msg,
+            int cooldownGraceMs) {
         if (!PetSkillRules.canExecute(player)) {
             return false;
         }
@@ -168,7 +194,7 @@ public class SkillService {
                 && Util.getDistance(player, plTarget) > Skill.RANGE_ATTACK_CHIEU_DAM) {
             return false;
         }
-        if (player.playerSkill.skillSelect.template.type == 2 && canUseSkillWithMana(player) && canUseSkillWithCooldown(player)) {
+        if (player.playerSkill.skillSelect.template.type == 2 && canUseSkillWithMana(player) && canUseSkillWithCooldown(player, cooldownGraceMs)) {
             useSkillBuffToPlayer(player, plTarget);
             return true;
         }
@@ -178,7 +204,7 @@ public class SkillService {
                 && player.playerSkill.skillSelect.template.id != Skill.MAKANKOSAPPO))
                 || (plTarget != null && !canAttackPlayer(player, plTarget))
                 || (mobTarget != null && mobTarget.isDie())
-                || !canUseSkillWithMana(player) || !canUseSkillWithCooldown(player)) {
+                || !canUseSkillWithMana(player) || !canUseSkillWithCooldown(player, cooldownGraceMs)) {
             return false;
         }
         if (player.effectSkill != null && player.effectSkill.isHaveEffectSkill() && player.effectSkill.useTroi) {
@@ -1276,11 +1302,15 @@ public class SkillService {
     }
 
     public boolean canUseSkillWithCooldown(Player player) {
+        return canUseSkillWithCooldown(player, 50);
+    }
+
+    private boolean canUseSkillWithCooldown(Player player, int cooldownGraceMs) {
         if (!PetSkillRules.canExecute(player)) {
             return false;
         }
         return Util.canDoWithTime(player.playerSkill.skillSelect.lastTimeUseThisSkill,
-                player.playerSkill.skillSelect.coolDown - 50);
+                player.playerSkill.skillSelect.coolDown - cooldownGraceMs);
     }
 
     public void affterUseSkill(Player player, int skillId) {

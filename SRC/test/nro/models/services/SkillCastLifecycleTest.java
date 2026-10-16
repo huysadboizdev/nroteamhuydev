@@ -174,6 +174,7 @@ public final class SkillCastLifecycleTest {
                 check(skills.acceptedAttacks==1,"in-range boss attack must execute exactly once");
             }
         } else if (args[0].startsWith("mob-cast-")) {
+            p.nPoint.stamina=100;
             p.zone=zone();
             p.location.x=100; p.location.y=100;
             Skill dragon=skill(Skill.DRAGON,1); dragon.skillId=1; dragon.template.type=1;

@@ -140,7 +140,7 @@ public class Mob {
                         damage = this.point.hp - 1;
                     }
                     if ((this.tempId == ConstMob.MOC_NHAN || this.tempId == ConstMob.BU_NHIN_MA_QUAI) && damage > this.point.maxHp / 10) {
-                        damage = this.point.maxHp / 10;
+                        damage = Math.max(1, this.point.maxHp / 10);
                     }
                 }
             }
@@ -160,7 +160,9 @@ public class Mob {
                 }
             }
             if (!dieWhenHpFull && !isBigBoss() && !MapService.gI().isMapPhoBan(this.zone.map.mapId) && this.lvMob > 0 && plAtt != null && plAtt.charms.tdOaiHung < System.currentTimeMillis()) {
-                damage = (int) ((this.point.maxHp <= 20_000_000 ? this.point.maxHp * 1 : 2) * (10.0 / 100));
+                damage = damage > 0
+                        ? Math.max(1, (int) ((this.point.maxHp <= 20_000_000 ? this.point.maxHp * 1 : 2) * (10.0 / 100)))
+                        : 0;
                 this.mobAttackPlayer(plAtt);
             }
             if (plAtt != null && plAtt.isBoss && this.tempId > 0 && Util.isTrue(1, 2) && Util.canDoWithTime(lastTimeAttackPlayer, 2500)) {

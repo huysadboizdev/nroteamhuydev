@@ -24,8 +24,14 @@ import nro.models.player.PetSkillRules;
 import nro.models.item.Item.ItemOption;
 import java.io.DataOutputStream;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.BiConsumer;
 import nro.models.Bot.BotAttackplayer;
 import nro.models.database.PlayerDAO;
 import nro.models.managers.MyClanTopBanDoKhoBau;
@@ -58,6 +64,15 @@ import nro.models.server.Manager;
  */
 public class Service {
     private static final long TOTAL_DAMAGE_PERSIST_INTERVAL_MS = 1000L;
+    private static final ExecutorService TOTAL_DAMAGE_PERSISTENCE = Executors.newSingleThreadExecutor(task -> {
+        Thread thread = new Thread(task, "Total damage persistence");
+        thread.setDaemon(true);
+        return thread;
+    });
+    static volatile Executor totalDamagePersistenceExecutor = TOTAL_DAMAGE_PERSISTENCE;
+    private static final ConcurrentMap<Long, Long> TOTAL_DAMAGE_PENDING = new ConcurrentHashMap<>();
+    private static final AtomicBoolean TOTAL_DAMAGE_DRAIN_SCHEDULED = new AtomicBoolean();
+    static volatile BiConsumer<Long, Long> totalDamagePersistenceWriter = Service::persistPlayerTotalDamage;
 
     public static final int[] flagTempId = {363, 364, 365, 366, 367, 368, 369, 370, 371, 519, 520, 747};
     public static final int[] flagIconId = {2761, 2330, 2323, 2327, 2326, 2324, 2329, 2328, 2331, 4386, 4385, 2325};
@@ -1205,8 +1220,14 @@ public class Service {
         }
         int retryAfterMs = result == nro.models.services.SkillService.MobCastResult.OUT_OF_RANGE
                 ? 0 : SkillService.gI().getMobCastRetryAfterMs(pl, skillTemplateId);
-        if (result == nro.models.services.SkillService.MobCastResult.REJECTED && retryAfterMs <= 0) {
+        if (result == nro.models.services.SkillService.MobCastResult.COOLDOWN && retryAfterMs <= 0) {
+            retryAfterMs = 1;
+        } else if (result == nro.models.services.SkillService.MobCastResult.REJECTED && retryAfterMs <= 0) {
             retryAfterMs = 500;
+        }
+        if (result != nro.models.services.SkillService.MobCastResult.ACCEPTED && pl != null && pl.nPoint != null) {
+            PlayerService.gI().sendInfoHpMp(pl);
+            PlayerService.gI().sendCurrentStamina(pl);
         }
         sendMobAttackResult(pl, target, sequence, result, retryAfterMs);
     }
@@ -2763,11 +2784,43 @@ public class Service {
 
     public void updatePlayerTotalDamage(Player pl) {
         if (pl == null || !shouldPersistTotalDamage(pl, System.currentTimeMillis())) return;
+        long playerId = pl.id;
+        long totalDamage = pl.total_damage_maydam;
+        TOTAL_DAMAGE_PENDING.put(playerId, totalDamage);
+        scheduleTotalDamagePersistenceDrain();
+    }
+
+    private static void scheduleTotalDamagePersistenceDrain() {
+        if (!TOTAL_DAMAGE_DRAIN_SCHEDULED.compareAndSet(false, true)) return;
+        try {
+            totalDamagePersistenceExecutor.execute(() -> {
+                try {
+                    while (!TOTAL_DAMAGE_PENDING.isEmpty()) {
+                        for (java.util.Map.Entry<Long, Long> entry : TOTAL_DAMAGE_PENDING.entrySet()) {
+                            Long playerId = entry.getKey();
+                            Long totalDamage = entry.getValue();
+                            if (TOTAL_DAMAGE_PENDING.remove(playerId, totalDamage)) {
+                                totalDamagePersistenceWriter.accept(playerId, totalDamage);
+                            }
+                        }
+                    }
+                } finally {
+                    TOTAL_DAMAGE_DRAIN_SCHEDULED.set(false);
+                    if (!TOTAL_DAMAGE_PENDING.isEmpty()) scheduleTotalDamagePersistenceDrain();
+                }
+            });
+        } catch (RuntimeException e) {
+            TOTAL_DAMAGE_DRAIN_SCHEDULED.set(false);
+            throw e;
+        }
+    }
+
+    private static void persistPlayerTotalDamage(long playerId, long totalDamage) {
         java.sql.PreparedStatement ps = null;
         try (java.sql.Connection con = LocalManager.getConnection();) {
             ps = con.prepareStatement("update player SET total_damage_maydam = ? WHERE id = ?");
-            ps.setLong(1, pl.total_damage_maydam);
-            ps.setLong(2, pl.id);
+            ps.setLong(1, totalDamage);
+            ps.setLong(2, playerId);
 
             ps.executeUpdate();
 
