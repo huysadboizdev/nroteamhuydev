@@ -110,6 +110,9 @@ public class Player implements Runnable {
     public int point_vuahung;
     public int point_maydam;
     public long total_damage_maydam;
+
+    /** Last time this player's accumulated MayDam damage was written to SQL. */
+    public transient long lastTotalDamagePersistAt;
     public boolean powerReduced = false;
     public String originalName;
     public boolean beforeDispose;

@@ -108,13 +108,13 @@ public class SkillService {
     }
 
     public int getMobCastRetryAfterMs(Player player, int skillTemplateId) {
-        if (player == null || player.playerSkill == null) return 250;
+        if (player == null || player.playerSkill == null) return 0;
         synchronized (player) {
             Skill selected = player.playerSkill.skillSelect;
-            if (selected == null || selected.template == null || selected.template.id != skillTemplateId) return 250;
+            if (selected == null || selected.template == null || selected.template.id != skillTemplateId) return 0;
             long remaining = selected.lastTimeUseThisSkill + selected.coolDown - System.currentTimeMillis();
-            if (remaining <= 0) return 500;
-            return (int) Math.min(5000, Math.max(100, remaining));
+            if (remaining <= 0) return 0;
+            return (int) Math.min(5000, Math.max(1, remaining));
         }
     }
 

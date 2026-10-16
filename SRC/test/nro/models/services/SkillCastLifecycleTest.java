@@ -194,6 +194,21 @@ public final class SkillCastLifecycleTest {
                 check(skills.acceptedAttacks==1,"accepted mob cast must execute exactly once");
                 check(!skills.enteredWithoutPlayerLock,"mob skill selection, validation and execution must share a player lock");
             }
+        } else if (args[0].equals("mob-retry-expired")) {
+            Skill selected=skill(Skill.GALICK,1);
+            selected.coolDown=500;
+            selected.lastTimeUseThisSkill=System.currentTimeMillis()-1000;
+            p.playerSkill.skillSelect=selected;
+            check(skills.getMobCastRetryAfterMs(p,Skill.GALICK)==0,
+                    "accepted cast whose cooldown expired before ACK must not add a retry delay");
+        } else if (args[0].equals("mob-retry-active")) {
+            Skill selected=skill(Skill.GALICK,1);
+            selected.coolDown=1000;
+            selected.lastTimeUseThisSkill=System.currentTimeMillis()-250;
+            p.playerSkill.skillSelect=selected;
+            int remaining=skills.getMobCastRetryAfterMs(p,Skill.GALICK);
+            check(remaining>0&&remaining<=750,
+                    "ACK must report only the server cooldown still remaining");
         } else {
             p.playerSkill.skillSelect=skill(Skill.BIEN_KHI,7);
             p.playerSkill.skills.add(p.playerSkill.skillSelect);

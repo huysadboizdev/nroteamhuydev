@@ -57,6 +57,7 @@ import nro.models.server.Manager;
  *
  */
 public class Service {
+    private static final long TOTAL_DAMAGE_PERSIST_INTERVAL_MS = 1000L;
 
     public static final int[] flagTempId = {363, 364, 365, 366, 367, 368, 369, 370, 371, 519, 520, 747};
     public static final int[] flagIconId = {2761, 2330, 2323, 2327, 2326, 2324, 2329, 2328, 2331, 4386, 4385, 2325};
@@ -1204,6 +1205,9 @@ public class Service {
         }
         int retryAfterMs = result == nro.models.services.SkillService.MobCastResult.OUT_OF_RANGE
                 ? 0 : SkillService.gI().getMobCastRetryAfterMs(pl, skillTemplateId);
+        if (result == nro.models.services.SkillService.MobCastResult.REJECTED && retryAfterMs <= 0) {
+            retryAfterMs = 500;
+        }
         sendMobAttackResult(pl, target, sequence, result, retryAfterMs);
     }
 
@@ -2758,6 +2762,7 @@ public class Service {
     }
 
     public void updatePlayerTotalDamage(Player pl) {
+        if (pl == null || !shouldPersistTotalDamage(pl, System.currentTimeMillis())) return;
         java.sql.PreparedStatement ps = null;
         try (java.sql.Connection con = LocalManager.getConnection();) {
             ps = con.prepareStatement("update player SET total_damage_maydam = ? WHERE id = ?");
@@ -2768,6 +2773,16 @@ public class Service {
 
         } catch (Exception e) {
             Logger.logException(PlayerDAO.class, e, "Lỗi update Total dame");
+        }
+    }
+
+    static boolean shouldPersistTotalDamage(Player pl, long now) {
+        if (pl == null) return false;
+        synchronized (pl) {
+            long last = pl.lastTotalDamagePersistAt;
+            if (last != 0L && now - last < TOTAL_DAMAGE_PERSIST_INTERVAL_MS) return false;
+            pl.lastTotalDamagePersistAt = now;
+            return true;
         }
     }
 
