@@ -9,6 +9,7 @@ import nro.models.item.SealedEquipment;
 import nro.models.map.ItemMap;
 import nro.models.map.Zone;
 import nro.models.player.Player;
+import nro.models.shop.BossEquipmentBonusRoll;
 import nro.models.utils.Util;
 
 /** Shared equipment pools with an independently configured policy per boss life. */
@@ -78,6 +79,8 @@ public final class SealedBossEquipmentLoot {
             equipment.itemOptions.add(new Item.ItemOption(seal,1));
             SealedEquipment.normalize(equipment);
         }
+        // All three boss equipment categories share the same primary and secondary bonuses.
+        BossEquipmentBonusRoll.apply(equipment);
         for (Item.ItemOption option:equipment.itemOptions)
             if (option==null || option.optionTemplate==null) return null;
         return equipment;

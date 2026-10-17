@@ -10,7 +10,8 @@ import nro.models.player.Player;
 /** Requested equipment pools; rates are basis points per credited defeat. */
 public final class RequestedBossEquipment {
     private RequestedBossEquipment() {}
-    public static final int SEALED_SHOP_BP = 500, DIVINE_BP = 100, SEALED_DIVINE_BP = 50;
+    // Per credited defeat: 40% sealed shop gear, 20% divine, 10% sealed divine.
+    public static final int SEALED_SHOP_BP = 4000, DIVINE_BP = 2000, SEALED_DIVINE_BP = 1000;
     public static boolean hasEquipmentDrops(Boss boss) { return categories(boss) != 0; }
     static int categories(Boss boss) {
         if (boss == null || boss.isQuestSupport()) return 0;

@@ -8,6 +8,7 @@ import nro.models.item.RubyItemRules;
 import nro.models.item.ActivationSet;
 import nro.models.item.SKHCapsuleCatalog;
 import nro.models.shop.Shop;
+import nro.models.shop.BossEquipmentBonusRoll;
 import nro.models.shop.TabShop;
 import nro.models.map.ItemMap;
 import nro.models.player.Player;
@@ -905,96 +906,96 @@ public class ItemService {
             idTempTL = giay[Util.nextInt(3)];
         }
 
-        int tiLe = Util.nextInt(100, 115);
+        int rareBonusRoll = Util.nextInt(100, 115);
         List<ItemOption> itemoptions = new ArrayList<>();
 
         switch (idTempTL) {
             case 555:
-                itemoptions.add(new ItemOption(47, 800 * tiLe / 100));
-                if (tiLe > 100) {
-                    itemoptions.add(new ItemOption(206, tiLe - 100)); // Vật phẩm hiếm rơi từ quái
+                itemoptions.add(new ItemOption(47, 800));
+                if (rareBonusRoll > 100) {
+                    itemoptions.add(new ItemOption(206, rareBonusRoll - 100)); // Vật phẩm hiếm rơi từ quái
                 }
                 break;
             case 557: // Áo Thần Linh NM
-                itemoptions.add(new ItemOption(47, 850 * tiLe / 100));
-                if (tiLe > 100) {
-                    itemoptions.add(new ItemOption(206, tiLe - 100));
+                itemoptions.add(new ItemOption(47, 850));
+                if (rareBonusRoll > 100) {
+                    itemoptions.add(new ItemOption(206, rareBonusRoll - 100));
                 }
                 break;
             case 559: // Áo Thần Linh XD
-                itemoptions.add(new ItemOption(47, 900 * tiLe / 100));
-                if (tiLe > 100) {
-                    itemoptions.add(new ItemOption(206, tiLe - 100));
+                itemoptions.add(new ItemOption(47, 900));
+                if (rareBonusRoll > 100) {
+                    itemoptions.add(new ItemOption(206, rareBonusRoll - 100));
                 }
                 break;
             case 556: // Quần Thần Linh TD
-                int chiso = 52000 * tiLe / 100;
+                int chiso = 52000;
                 itemoptions.add(new ItemOption(22, chiso / 1000));
                 itemoptions.add(new ItemOption(27, chiso / 20));
-                if (tiLe > 100) {
-                    itemoptions.add(new ItemOption(206, tiLe - 100));
+                if (rareBonusRoll > 100) {
+                    itemoptions.add(new ItemOption(206, rareBonusRoll - 100));
                 }
                 break;
             case 558: // Quần Thần Linh NM
-                chiso = 50000 * tiLe / 100;
+                chiso = 50000;
                 itemoptions.add(new ItemOption(22, chiso / 1000));
                 itemoptions.add(new ItemOption(27, chiso / 20));
-                if (tiLe > 100) {
-                    itemoptions.add(new ItemOption(206, tiLe - 100));
+                if (rareBonusRoll > 100) {
+                    itemoptions.add(new ItemOption(206, rareBonusRoll - 100));
                 }
                 break;
             case 560: // Quần Thần Linh XD
-                chiso = 48000 * tiLe / 100;
+                chiso = 48000;
                 itemoptions.add(new ItemOption(22, chiso / 1000));
                 itemoptions.add(new ItemOption(27, chiso / 20));
-                if (tiLe > 100) {
-                    itemoptions.add(new ItemOption(206, tiLe - 100));
+                if (rareBonusRoll > 100) {
+                    itemoptions.add(new ItemOption(206, rareBonusRoll - 100));
                 }
                 break;
             case 562: // Găng tay Thần Linh TD
-                itemoptions.add(new ItemOption(0, 4400 * tiLe / 100));
-                if (tiLe > 100) {
-                    itemoptions.add(new ItemOption(206, tiLe - 100));
+                itemoptions.add(new ItemOption(0, 4400));
+                if (rareBonusRoll > 100) {
+                    itemoptions.add(new ItemOption(206, rareBonusRoll - 100));
                 }
                 break;
             case 564: // Găng tay Thần Linh NM
-                itemoptions.add(new ItemOption(0, 4300 * tiLe / 100));
-                if (tiLe > 100) {
-                    itemoptions.add(new ItemOption(206, tiLe - 100));
+                itemoptions.add(new ItemOption(0, 4300));
+                if (rareBonusRoll > 100) {
+                    itemoptions.add(new ItemOption(206, rareBonusRoll - 100));
                 }
                 break;
             case 566: // Găng tay Thần Linh
-                itemoptions.add(new ItemOption(0, 4500 * tiLe / 100));
-                if (tiLe > 100) {
-                    itemoptions.add(new ItemOption(206, tiLe - 100));
+                itemoptions.add(new ItemOption(0, 4500));
+                if (rareBonusRoll > 100) {
+                    itemoptions.add(new ItemOption(206, rareBonusRoll - 100));
                 }
                 break;
             case 563: // Giày Thần Linh TD
-                chiso = 48000 * tiLe / 100;
+                chiso = 48000;
                 itemoptions.add(new ItemOption(23, chiso / 1000));
                 itemoptions.add(new ItemOption(28, chiso / 20));
-                if (tiLe > 100) {
-                    itemoptions.add(new ItemOption(206, tiLe - 100));
+                if (rareBonusRoll > 100) {
+                    itemoptions.add(new ItemOption(206, rareBonusRoll - 100));
                 }
                 break;
             case 565: // Giày Thần Linh NM
-                chiso = 50000 * tiLe / 100;
+                chiso = 50000;
                 itemoptions.add(new ItemOption(23, chiso / 1000));
                 itemoptions.add(new ItemOption(28, chiso / 20));
-                if (tiLe > 100) {
-                    itemoptions.add(new ItemOption(206, tiLe - 100));
+                if (rareBonusRoll > 100) {
+                    itemoptions.add(new ItemOption(206, rareBonusRoll - 100));
                 }
                 break;
             case 567: // Giày Thần Linh XD
-                chiso = 46000 * tiLe / 100;
+                chiso = 46000;
                 itemoptions.add(new ItemOption(23, chiso / 1000));
                 itemoptions.add(new ItemOption(28, chiso * 150 / 1000));
-                if (tiLe > 100) {
-                    itemoptions.add(new ItemOption(206, tiLe - 100));
+                if (rareBonusRoll > 100) {
+                    itemoptions.add(new ItemOption(206, rareBonusRoll - 100));
                 }
                 break;
             case 561: // Nhẫn Thần Linh
-                itemoptions.add(new ItemOption(14, 14 * tiLe / 100));
+                itemoptions.add(new ItemOption(14, 14));
                 break;
             default:
                 break;
@@ -1007,10 +1008,8 @@ public class ItemService {
         }
 
         itemoptions.add(new ItemOption(21, Util.nextInt(15, 17)));
-        ItemMap it = new ItemMap(zone, idTempTL, quantity, x, y, id);
-        it.options.clear();
-        it.options.addAll(itemoptions);
-        return it;
+        BossEquipmentBonusRoll.apply(itemoptions, ItemService.gI().getTemplate(idTempTL).type);
+        return new ItemMap(zone, idTempTL, quantity, x, y, id, false, itemoptions);
     }
 
     public ItemMap randDoTLBoss(Zone zone, int quantity, int x, int y, long id) {
@@ -1034,97 +1033,97 @@ public class ItemService {
             idTempTL = giay[Util.nextInt(3)];
         }
 
-        int tiLe = Util.nextInt(100, 115);
+        int rareBonusRoll = Util.nextInt(100, 115);
         List<ItemOption> itemoptions = new ArrayList<>();
 
         // Tùy chỉnh chỉ số cho từng ID trang bị cụ thể
         switch (idTempTL) {
             case 555: // Áo Thần Linh TD
-                itemoptions.add(new ItemOption(47, 800 * tiLe / 100));
-                if (tiLe > 100) {
-                    itemoptions.add(new ItemOption(207, tiLe - 100)); // Vật phẩm hiếm rơi từ quái
+                itemoptions.add(new ItemOption(47, 800));
+                if (rareBonusRoll > 100) {
+                    itemoptions.add(new ItemOption(207, rareBonusRoll - 100)); // Vật phẩm hiếm rơi từ quái
                 }
                 break;
             case 557: // Áo Thần Linh NM
-                itemoptions.add(new ItemOption(47, 850 * tiLe / 100));
-                if (tiLe > 100) {
-                    itemoptions.add(new ItemOption(207, tiLe - 100));
+                itemoptions.add(new ItemOption(47, 850));
+                if (rareBonusRoll > 100) {
+                    itemoptions.add(new ItemOption(207, rareBonusRoll - 100));
                 }
                 break;
             case 559: // Áo Thần Linh XD
-                itemoptions.add(new ItemOption(47, 900 * tiLe / 100));
-                if (tiLe > 100) {
-                    itemoptions.add(new ItemOption(207, tiLe - 100));
+                itemoptions.add(new ItemOption(47, 900));
+                if (rareBonusRoll > 100) {
+                    itemoptions.add(new ItemOption(207, rareBonusRoll - 100));
                 }
                 break;
             case 556: // Quần Thần Linh TD
-                int chiso = 52000 * tiLe / 100;
+                int chiso = 52000;
                 itemoptions.add(new ItemOption(22, chiso / 1000));
                 itemoptions.add(new ItemOption(27, chiso / 20));
-                if (tiLe > 100) {
-                    itemoptions.add(new ItemOption(207, tiLe - 100));
+                if (rareBonusRoll > 100) {
+                    itemoptions.add(new ItemOption(207, rareBonusRoll - 100));
                 }
                 break;
             case 558: // Quần Thần Linh NM
-                chiso = 50000 * tiLe / 100;
+                chiso = 50000;
                 itemoptions.add(new ItemOption(22, chiso / 1000));
                 itemoptions.add(new ItemOption(27, chiso / 20));
-                if (tiLe > 100) {
-                    itemoptions.add(new ItemOption(207, tiLe - 100));
+                if (rareBonusRoll > 100) {
+                    itemoptions.add(new ItemOption(207, rareBonusRoll - 100));
                 }
                 break;
             case 560: // Quần Thần Linh XD
-                chiso = 48000 * tiLe / 100;
+                chiso = 48000;
                 itemoptions.add(new ItemOption(22, chiso / 1000));
                 itemoptions.add(new ItemOption(27, chiso / 20));
-                if (tiLe > 100) {
-                    itemoptions.add(new ItemOption(207, tiLe - 100));
+                if (rareBonusRoll > 100) {
+                    itemoptions.add(new ItemOption(207, rareBonusRoll - 100));
                 }
                 break;
             case 562: // Găng tay Thần Linh TD
-                itemoptions.add(new ItemOption(0, 4400 * tiLe / 100));
-                if (tiLe > 100) {
-                    itemoptions.add(new ItemOption(207, tiLe - 100));
+                itemoptions.add(new ItemOption(0, 4400));
+                if (rareBonusRoll > 100) {
+                    itemoptions.add(new ItemOption(207, rareBonusRoll - 100));
                 }
                 break;
             case 564: // Găng tay Thần Linh NM
-                itemoptions.add(new ItemOption(0, 4300 * tiLe / 100));
-                if (tiLe > 100) {
-                    itemoptions.add(new ItemOption(207, tiLe - 100));
+                itemoptions.add(new ItemOption(0, 4300));
+                if (rareBonusRoll > 100) {
+                    itemoptions.add(new ItemOption(207, rareBonusRoll - 100));
                 }
                 break;
             case 566: // Găng tay Thần Linh
-                itemoptions.add(new ItemOption(0, 4500 * tiLe / 100));
-                if (tiLe > 100) {
-                    itemoptions.add(new ItemOption(207, tiLe - 100));
+                itemoptions.add(new ItemOption(0, 4500));
+                if (rareBonusRoll > 100) {
+                    itemoptions.add(new ItemOption(207, rareBonusRoll - 100));
                 }
                 break;
             case 563: // Giày Thần Linh TD
-                chiso = 48000 * tiLe / 100;
+                chiso = 48000;
                 itemoptions.add(new ItemOption(23, chiso / 1000));
                 itemoptions.add(new ItemOption(28, chiso / 20));
-                if (tiLe > 100) {
-                    itemoptions.add(new ItemOption(207, tiLe - 100));
+                if (rareBonusRoll > 100) {
+                    itemoptions.add(new ItemOption(207, rareBonusRoll - 100));
                 }
                 break;
             case 565: // Giày Thần Linh NM
-                chiso = 50000 * tiLe / 100;
+                chiso = 50000;
                 itemoptions.add(new ItemOption(23, chiso / 1000));
                 itemoptions.add(new ItemOption(28, chiso / 20));
-                if (tiLe > 100) {
-                    itemoptions.add(new ItemOption(207, tiLe - 100));
+                if (rareBonusRoll > 100) {
+                    itemoptions.add(new ItemOption(207, rareBonusRoll - 100));
                 }
                 break;
             case 567: // Giày Thần Linh XD
-                chiso = 46000 * tiLe / 100;
+                chiso = 46000;
                 itemoptions.add(new ItemOption(23, chiso / 1000));
                 itemoptions.add(new ItemOption(28, chiso * 150 / 1000));
-                if (tiLe > 100) {
-                    itemoptions.add(new ItemOption(207, tiLe - 100));
+                if (rareBonusRoll > 100) {
+                    itemoptions.add(new ItemOption(207, rareBonusRoll - 100));
                 }
                 break;
             case 561: // Nhẫn Thần Linh
-                itemoptions.add(new ItemOption(14, 14 * tiLe / 100));
+                itemoptions.add(new ItemOption(14, 14));
                 break;
             default:
                 break;
@@ -1139,10 +1138,8 @@ public class ItemService {
         itemoptions.add(new ItemOption(21, Util.nextInt(15, 17)));
 
         // Tạo ItemMap và trả về
-        ItemMap it = new ItemMap(zone, idTempTL, quantity, x, y, id);
-        it.options.clear();
-        it.options.addAll(itemoptions);
-        return it;
+        BossEquipmentBonusRoll.apply(itemoptions, ItemService.gI().getTemplate(idTempTL).type);
+        return new ItemMap(zone, idTempTL, quantity, x, y, id, false, itemoptions);
     }
 
     public Item DoThienSu(int itemId, int gender) {

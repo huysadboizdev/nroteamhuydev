@@ -968,7 +968,7 @@ public class Mob {
                 dropRate = (int) (dropRate * 1.15);
             }
 
-            if (isLuckyDrop(player, dropRate, 100)) { // spl
+            if (player.nPoint.isDoSPL || isLuckyDrop(player, dropRate, 100)) { // spl
                 list.add(new ItemMap(Util.spl(zone, Util.nextInt(441, 447), 1, x, this.location.y, player.id)));
             }
         }

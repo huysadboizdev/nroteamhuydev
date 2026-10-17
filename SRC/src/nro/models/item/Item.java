@@ -58,8 +58,31 @@ public class Item {
         return strInfo;
     }
 
+    private String getSealSetBonusDescription() {
+        if (itemOptions == null) {
+            return "";
+        }
+        for (ItemOption itemOption : itemOptions) {
+            if (itemOption == null || itemOption.optionTemplate == null) {
+                continue;
+            }
+            String description = switch (itemOption.optionTemplate.id) {
+                case 34 -> "Mặc đủ 5 món Tinh Ấn: +15% sức đánh";
+                case 35 -> "Mặc đủ 5 món Nguyệt Ấn: +15% KI tối đa";
+                case 36 -> "Mặc đủ 5 món Nhật Ấn: +15% HP tối đa";
+                default -> "";
+            };
+            if (!description.isEmpty()) {
+                return description;
+            }
+        }
+        return "";
+    }
+
     public String getContent() {
-        return "Yêu cầu sức mạnh " + (this.template.id>=555&&this.template.id<=567?ItemDefaultOptions.requiredPower(this):this.template.strRequire) + " trở lên";
+        String content = "Yêu cầu sức mạnh " + (this.template.id>=555&&this.template.id<=567?ItemDefaultOptions.requiredPower(this):this.template.strRequire) + " trở lên";
+        String setBonusDescription = getSealSetBonusDescription();
+        return setBonusDescription.isEmpty() ? content : content + "\n" + setBonusDescription;
     }
 
     public void dispose() {

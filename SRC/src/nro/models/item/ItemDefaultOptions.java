@@ -2,6 +2,7 @@ package nro.models.item;
 
 import java.sql.*;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 /** SQL-owned base options. Completing a saved item never replaces a saved timer or upgrade. */
 public final class ItemDefaultOptions {
@@ -80,7 +81,10 @@ public final class ItemDefaultOptions {
             item.itemOptions.add(new Item.ItemOption(30,0));
         }
         List<OptionValue> defaults=profiles.get((int)item.template.id);
-        if(defaults==null)return;
+        if(defaults==null) {
+            completeSealBonus(item);
+            return;
+        }
         if(item.itemOptions==null)item.itemOptions=new ArrayList<>();
         // Explicit options appended by a reward override its initial defaults. Only managed IDs deduplicate.
         Set<Integer> managed=new HashSet<>();
@@ -109,6 +113,23 @@ public final class ItemDefaultOptions {
         }
         for(OptionValue option:defaults)if(!kept.contains(option.id()))result.add(new Item.ItemOption(option.id(),option.param()));
         item.itemOptions=result;
+        completeSealBonus(item);
+    }
+
+    public static void completeSealBonus(Item item) {
+        if(item.template==null||item.template.type<0||item.template.type>4||item.itemOptions==null) return;
+        boolean hasSeal=item.itemOptions.stream().anyMatch(option->option!=null&&option.optionTemplate!=null
+                &&(option.optionTemplate.id==34||option.optionTemplate.id==35||option.optionTemplate.id==36));
+        if(!hasSeal) return;
+        boolean alreadyHasBonus=item.itemOptions.stream().anyMatch(option->option!=null&&option.optionTemplate!=null
+                &&(option.optionTemplate.id==50||option.optionTemplate.id==77||option.optionTemplate.id==103));
+        if(!alreadyHasBonus) {
+            int[] bonusOptions={77,103,50};
+            int bonusId=bonusOptions[ThreadLocalRandom.current().nextInt(bonusOptions.length)];
+            int bonusPercent=ThreadLocalRandom.current().nextInt(1,6);
+            item.itemOptions.add(new Item.ItemOption(bonusId,bonusPercent));
+        }
+        item.info=item.getInfo();
     }
 
     private static void audit(Item item,int option,String reason,int actual,int reference) {

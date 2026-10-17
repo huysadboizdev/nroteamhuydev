@@ -3,8 +3,10 @@ package nro.models.services;
 import java.util.*;
 import java.util.function.IntUnaryOperator;
 import nro.models.boss.Boss;
+import nro.models.item.Item.ItemOption;
 import nro.models.map.ItemMap;
 import nro.models.player.Player;
+import nro.models.shop.BossEquipmentBonusRoll;
 import nro.models.utils.Util;
 
 /** One immutable drop policy per life; native rewards retain all non-loot effects. */
@@ -52,8 +54,17 @@ public final class BossAdminDropService {
                     for (BossAdminConfig.Rule rule : roll(policy.drops(), random)) {
                         int quantity = rule.quantityMin() + random.applyAsInt(rule.quantityMax() - rule.quantityMin() + 1);
                         int x = boss.location.x;
+                        List<ItemOption> options = new ArrayList<>();
+                        for (ItemOption option : rule.options()) options.add(new ItemOption(option));
+                        var template = ItemService.gI().getTemplate((short) rule.itemId());
+                        boolean sealedShopGear = rule.itemId() >= 230 && rule.itemId() <= 281 && hasSeal(rule);
+                        boolean divineGear = rule.itemId() >= 555 && rule.itemId() <= 567;
+                        if (template != null && template.type >= 0 && template.type <= 4
+                                && (sealedShopGear || divineGear)) {
+                            BossEquipmentBonusRoll.apply(options, template.type);
+                        }
                         ItemMap item = new ItemMap(boss.zone, rule.itemId(), quantity, x,
-                                boss.zone.map.yPhysicInTop(x, boss.location.y - 24), owner.id, true, rule.options());
+                                boss.zone.map.yPhysicInTop(x, boss.location.y - 24), owner.id, true, options);
                         Service.gI().dropItemMap(boss.zone, item);
                     }
                 }
@@ -75,16 +86,56 @@ public final class BossAdminDropService {
         List<BossAdminConfig.Rule> out = new ArrayList<>();
         Map<String,List<BossAdminConfig.Rule>> groups = new LinkedHashMap<>();
         for (BossAdminConfig.Rule rule : rules) {
-            if (rule.group().isEmpty()) { if (passes(rule.chanceBp(), random)) out.add(rule); }
+            if (rule.group().isEmpty()) {
+                if (passes(boostedChance(rule), random)) out.add(rule);
+            }
             else groups.computeIfAbsent(rule.group(), key -> new ArrayList<>()).add(rule);
         }
         for (List<BossAdminConfig.Rule> group : groups.values()) {
-            if (!passes(group.get(0).chanceBp(), random)) continue;
-            int total = 0; for (BossAdminConfig.Rule rule : group) total = Math.addExact(total, rule.weight());
+            boolean allEquipment = group.stream().allMatch(BossAdminDropService::isTargetEquipment);
+            int minimumChance = group.stream().mapToInt(BossAdminDropService::minimumEquipmentChance).max().orElse(0);
+            int chance = allEquipment ? Math.max(group.get(0).chanceBp(), minimumChance) : group.get(0).chanceBp();
+            if (!passes(chance, random)) continue;
+            // For mixed groups, triple target gear's relative weight while preserving the group's chance.
+            int[] weights = selectionWeights(group, allEquipment);
+            int total = 0;
+            for (int weight : weights) total = Math.addExact(total, weight);
             int pick = random.applyAsInt(total);
-            for (BossAdminConfig.Rule rule : group) { pick -= rule.weight(); if (pick < 0) { out.add(rule); break; } }
+            for (int i = 0; i < group.size(); i++) {
+                pick -= weights[i];
+                if (pick < 0) { out.add(group.get(i)); break; }
+            }
         }
         return out;
+    }
+    private static int boostedChance(BossAdminConfig.Rule rule) {
+        return Math.max(rule.chanceBp(), minimumEquipmentChance(rule));
+    }
+    private static int minimumEquipmentChance(BossAdminConfig.Rule rule) {
+        boolean sealed = hasSeal(rule);
+        if (rule.itemId() >= 555 && rule.itemId() <= 567) return sealed ? 1000 : 2000;
+        return sealed ? 4000 : 0;
+    }
+    private static int[] selectionWeights(List<BossAdminConfig.Rule> group, boolean allEquipment) {
+        long[] raw = new long[group.size()];
+        long rawTotal = 0;
+        for (int i = 0; i < group.size(); i++) {
+            BossAdminConfig.Rule rule = group.get(i);
+            raw[i] = (long) rule.weight() * (!allEquipment && isTargetEquipment(rule) ? 3 : 1);
+            rawTotal += raw[i];
+        }
+        long maxTotal = Integer.MAX_VALUE - group.size();
+        long scale = Math.max(1, (rawTotal + maxTotal - 1) / maxTotal);
+        int[] weights = new int[group.size()];
+        for (int i = 0; i < raw.length; i++) weights[i] = (int) Math.max(1, raw[i] / scale);
+        return weights;
+    }
+    private static boolean isTargetEquipment(BossAdminConfig.Rule rule) {
+        return minimumEquipmentChance(rule) > 0;
+    }
+    private static boolean hasSeal(BossAdminConfig.Rule rule) {
+        return rule.options().stream().anyMatch(option -> option != null && option.optionTemplate != null
+                && option.optionTemplate.id >= 34 && option.optionTemplate.id <= 36);
     }
     private static boolean passes(int chance, IntUnaryOperator random) {
         return chance == 10000 || chance > 0 && random.applyAsInt(10000) < chance;
