@@ -1393,10 +1393,17 @@ public class Service {
     }
 
     public void sendMoney(Player pl) {
+        if (pl == null) {
+            return;
+        }
+        MySession session = pl.getSession();
+        if (session == null) {
+            return;
+        }
         Message msg;
         try {
             msg = new Message(6);
-            if (pl.getSession().version >= 214) {
+            if (session.version >= 214) {
                 msg.writer().writeLong(pl.inventory.gold);
             } else {
                 msg.writer().writeInt((int) pl.inventory.gold);
@@ -2930,6 +2937,7 @@ public class Service {
             msg.writer().writeByte(bot.getEffFront());
 
             msg.writer().writeShort(bot.getHat());
+            msg.writer().writeByte(bot.isNewMember ? 1 : 0); // same -5 appearance layout as Zone.infoPlayer
 
             plReceive.sendMessage(msg);
 

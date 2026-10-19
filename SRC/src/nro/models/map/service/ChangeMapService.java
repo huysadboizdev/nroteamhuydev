@@ -895,6 +895,7 @@ public class ChangeMapService {
         boolean missingBoss = player.isBoss && !destination.getBosses().contains(player);
         destination.addPlayer(player);
         if (missingBoss && player instanceof nro.models.boss.Boss boss) {
+            destination.load_Me_To_Another(boss);
             nro.models.services.BossNoticeService.gI().appeared(boss);
         }
     }

@@ -31,8 +31,8 @@ public class RequestedBossEquipmentTest {
     if(BossAdminDropService.suppressConstruction(555))suppressed.add(555);
     check(!BossAdminDropService.suppressConstruction(190)&&!BossAdminDropService.suppressConstruction(18)&&!BossAdminDropService.suppressConstruction(230),"gold, objectives and plain equipment retained");
    },null,bound->0);
-   check(suppressed.size()==(id==BossID.XEN_BO_HUNG?0:1),"native divine suppression only selected bosses");
-   int expected=id==BossID.XEN_BO_HUNG?1:id==BossID.MABU?2:3;
+   check(suppressed.size()==1,"native divine suppression only selected bosses");
+   int expected=id==BossID.MABU?2:3;
    check(b.zone.items.size()==expected,"requested categories for boss "+id);
    for(ItemMap item:b.zone.items)check(kept(item)&&item.playerId==123,"owner preserved");
    BossAdminDropService.reward(b,p,()->{throw new AssertionError("duplicate native callback");},null,bound->0);

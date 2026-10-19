@@ -1,6 +1,7 @@
 package nro.models.services;
 
 import nro.models.consts.ConstPlayer;
+import nro.models.Bot.Bot;
 import nro.models.boss.Broly.Broly;
 import nro.models.boss.Broly.SuperBroly;
 import nro.models.boss.sieu_hang.Rival;
@@ -146,6 +147,10 @@ public class SkillService {
     private boolean useSkillLocked(Player player, Player plTarget, Mob mobTarget, int status, Message msg,
             int cooldownGraceMs) {
         if (!PetSkillRules.canExecute(player)) {
+            return false;
+        }
+        if (player.playerSkill.skillSelect.template.id == Skill.DICH_CHUYEN_TUC_THOI
+                && !canInstantTransmission(player, plTarget, mobTarget)) {
             return false;
         }
         if (plTarget != null && player.clan != null && plTarget.clan != null && player.clan == plTarget.clan && MapService.gI().isMapBlackBallWar(plTarget.zone.map.mapId)) {
@@ -346,7 +351,7 @@ public class SkillService {
                             this.playerAttackPlayer(player, playerMap, false, player.newSkill.skillSelect.template.id);
                         }
                     }
-                    if (!player.isBoss) {
+                    if (!player.isBoss && (!(player instanceof Bot bot) || !bot.isBossHunter())) {
                         for (Mob mobMap : player.zone.mobs) {
                             if (mobMap == null) {
                                 continue;
@@ -476,6 +481,10 @@ public class SkillService {
 
     public void useSkillAttack(Player player, Player plTarget, Mob mobTarget) {
         int executingSkillId=HighDamageNoticeService.selectedSkill(player);
+        if (executingSkillId == Skill.DICH_CHUYEN_TUC_THOI
+                && !canInstantTransmission(player, plTarget, mobTarget)) {
+            return;
+        }
         try(HighDamageNoticeService.Scope cast=HighDamageNoticeService.begin(player,null,executingSkillId)) {
             useSkillAttackWithNoticeContext(player,plTarget,mobTarget,executingSkillId);
         }
@@ -634,6 +643,7 @@ public class SkillService {
                 affterUseSkill(player, player.playerSkill.skillSelect.template.id);
                 break;
             case Skill.DICH_CHUYEN_TUC_THOI:
+                Zone instantTransmissionZone = player.zone;
                 int timeChoangDCTT = SkillUtil.getTimeDCTT(player.playerSkill.skillSelect.point);
                 if (plTarget != null) {
                     if (player.isBoss) {
@@ -641,16 +651,20 @@ public class SkillService {
                     }
                     Service.gI().setPos(player, plTarget.location.x, plTarget.location.y);
                     playerAttackPlayer(player, plTarget, miss,executingSkillId);
-                    EffectSkillService.gI().setBlindDCTT(plTarget, System.currentTimeMillis(), timeChoangDCTT);
-                    EffectSkillService.gI().sendEffectPlayer(player, plTarget, EffectSkillService.TURN_ON_EFFECT, EffectSkillService.BLIND_EFFECT);
+                    if (player.zone == instantTransmissionZone && canInstantTransmission(player, plTarget, null)) {
+                        EffectSkillService.gI().setBlindDCTT(plTarget, System.currentTimeMillis(), timeChoangDCTT);
+                        EffectSkillService.gI().sendEffectPlayer(player, plTarget, EffectSkillService.TURN_ON_EFFECT, EffectSkillService.BLIND_EFFECT);
+                        ItemTimeService.gI().sendItemTime(plTarget, 3779, timeChoangDCTT / 1000);
+                    }
                     PlayerService.gI().sendInfoHpMpMoney(plTarget);
-                    ItemTimeService.gI().sendItemTime(plTarget, 3779, timeChoangDCTT / 1000);
                 }
                 if (mobTarget != null) {
                     Service.gI().setPos(player, mobTarget.location.x, mobTarget.location.y);
                     playerAttackMob(player, mobTarget, false, false,executingSkillId);
-                    mobTarget.effectSkill.setStartBlindDCTT(System.currentTimeMillis(), timeChoangDCTT);
-                    EffectSkillService.gI().sendEffectMob(player, mobTarget, EffectSkillService.TURN_ON_EFFECT, EffectSkillService.BLIND_EFFECT);
+                    if (player.zone == instantTransmissionZone && canInstantTransmission(player, null, mobTarget)) {
+                        mobTarget.effectSkill.setStartBlindDCTT(System.currentTimeMillis(), timeChoangDCTT);
+                        EffectSkillService.gI().sendEffectMob(player, mobTarget, EffectSkillService.TURN_ON_EFFECT, EffectSkillService.BLIND_EFFECT);
+                    }
                 }
                 player.nPoint.isCrit100 = true;
                 affterUseSkill(player, player.playerSkill.skillSelect.template.id);
@@ -715,6 +729,21 @@ public class SkillService {
             } else {
             }
         }
+    }
+
+    /** A vanished/dead target must never consume a teleport or receive a fresh stun. */
+    private static boolean canInstantTransmission(Player player, Player target, Mob mob) {
+        if (player == null || player.zone == null || player.location == null || player.nPoint == null
+                || player.nPoint.hp <= 0 || player.beforeDispose || (target == null) == (mob == null)) {
+            return false;
+        }
+        if (target != null) {
+            return target != player && target.zone == player.zone && target.location != null
+                    && target.nPoint != null && target.nPoint.hp > 0 && !target.beforeDispose
+                    && target.effectSkill != null;
+        }
+        return mob.zone == player.zone && mob.location != null && mob.point != null
+                && mob.point.hp > 0 && mob.effectSkill != null;
     }
 
     public void useSkillAlone(Player player) {

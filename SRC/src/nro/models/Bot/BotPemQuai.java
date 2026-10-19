@@ -1,6 +1,5 @@
 package nro.models.Bot;
 
-import com.mysql.jdbc.Messages;
 import java.util.Random;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,11 +8,11 @@ import java.util.TimerTask;
 import nro.models.map.ItemMap;
 import nro.models.map.service.ItemMapService;
 import nro.models.mob.Mob;
+import nro.models.services.EffectSkillService;
 import nro.models.services.PlayerService;
-import nro.models.services.*;
+import nro.models.services.Service;
 import nro.models.services.SkillService;
 import nro.models.skill.Skill;
-import nro.models.utils.Logger;
 import nro.models.utils.Util;
 
 public class BotPemQuai {
@@ -23,44 +22,12 @@ public class BotPemQuai {
     public Bot bot;
     private boolean isPickingItem = false;
     private long lastSpecialSkillTime;
-    private long lastChatTime = 0;
-    private final long chatInterval = 3000;
 
     public BotPemQuai(Bot b) {
         this.bot = b;
     }
 
-    private static final String[] chatMessages = {
-        "|1|Con chó tài tỏi súc vật cali",
-        "|2|bê ka tê địt mẹ tài tỏi tung lồn",
-        "|3|arriety địt nhau với mẹ tài tỏi"
-    };
-
-    private void autoChat() {
-        long now = System.currentTimeMillis();
-        if (now - lastChatTime >= chatInterval) {
-            String message;
-
-            if (new Random().nextBoolean()) {
-                message = chatMessages[new Random().nextInt(chatMessages.length)];
-            } else if (this.bot != null) {
-                message = this.bot.getChat();
-            } else {
-                return;
-            }
-
-            Service.gI().chat(this.bot, message);
-            lastChatTime = now;
-        }
-    }
-
     public void update() {
-        try {
-            autoChat();
-        } catch (Exception e) {
-            Logger.logException(BotPemQuai.class, e);
-        }
-
         Attack();
         chanGeMap();
         NhatItem();

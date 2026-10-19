@@ -27,6 +27,11 @@ public class Kuku extends Boss {
     }
 
     @Override
+    protected boolean limitsDamageForNRNMHolder() {
+        return false;
+    }
+
+    @Override
     public void rewardDefault(Player plKill) {
         int diem = 5;
         plKill.event.addEventPoint(diem);

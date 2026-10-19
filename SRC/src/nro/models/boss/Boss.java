@@ -216,11 +216,13 @@ public class Boss extends Player implements IBoss {
     private BossType noticeBossType;
 
     public boolean noticePublic() {
-        return !nro.models.services.BossAnnouncementPolicy.excluded(this) && noticePublicScope();
+        return !nro.models.services.BossAnnouncementPolicy.suppressedNotice(this)
+                && !nro.models.services.BossAnnouncementPolicy.excluded(this) && noticePublicScope();
     }
 
     public boolean noticeLookup() {
-        return noticePublic() || (nro.models.services.BossAnnouncementPolicy.lookupSpecial(this) && noticePublicScope());
+        return !nro.models.services.BossAnnouncementPolicy.suppressedNotice(this)
+                && (noticePublic() || (nro.models.services.BossAnnouncementPolicy.lookupSpecial(this) && noticePublicScope()));
     }
 
     private boolean noticePublicScope() {
@@ -907,7 +909,7 @@ public class Boss extends Player implements IBoss {
                 return 0;
             }
 
-            if (plAtt != null && plAtt.idNRNM != -1) {
+            if (plAtt != null && plAtt.idNRNM != -1 && limitsDamageForNRNMHolder()) {
                 return 1;
             }
             markQuestSupportCombat(plAtt, damage);
@@ -922,6 +924,10 @@ public class Boss extends Player implements IBoss {
         } else {
             return 0;
         }
+    }
+
+    protected boolean limitsDamageForNRNMHolder() {
+        return true;
     }
 
     @Override

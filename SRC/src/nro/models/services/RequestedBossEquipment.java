@@ -17,7 +17,7 @@ public final class RequestedBossEquipment {
         if (boss == null || boss.isQuestSupport()) return 0;
         if (nro.models.boss.PrisonBill.PrisonBillBossCatalog.contains(boss.questBossId())) return 7;
         return switch (boss.questBossId()) {
-            case BossID.XEN_BO_HUNG -> 1;
+            case BossID.XEN_BO_HUNG -> 7;
             case BossID.MABU -> 6;
             case BossID.SIEU_BO_HUNG, BossID.BLACK_GOKU, BossID.ZAMASU,
                     BossID.CUMBER, BossID.COOLER, BossID.DRABURA, BossID.DRABURA_2, BossID.DRABURA_3 -> 7;

@@ -4,6 +4,10 @@ import nro.models.boss.BossID;
 /** Explicit user exclusions and loot exceptions shared by the board and ticker. */
 public final class BossAnnouncementPolicy {
  private BossAnnouncementPolicy(){}
+ private static final java.util.Set<Integer> SUPPRESSED_NOTICE_IDS=java.util.Set.of(
+      BossID.DRABURA,BossID.BUI_BUI,BossID.YA_CON,BossID.MABU_12H,BossID.DRABURA_2,
+      BossID.BUI_BUI_2,BossID.DRABURA_3,BossID.GOKU,BossID.CADIC,BossID.AN_TROM,
+      BossID.O_DO,BossID.MAT_TROI,BossID.SOI_HEC_QUYN1);
  public static boolean excluded(int id){return id==BossID.AN_TROM||id==BossID.MAT_TROI||id==BossID.O_DO;}
  public static boolean excluded(Boss b){return excluded(b.questBossId())||b instanceof nro.models.boss.Boss_mini.AnTrom
    ||b instanceof nro.models.boss.Boss_mini.MatTroi||b instanceof nro.models.boss.Boss_mini.Odo;}
@@ -12,20 +16,23 @@ public final class BossAnnouncementPolicy {
    ||b instanceof nro.models.boss.Boss_mini.SoiHecQuyn
    ||b.questBossId()==BossID.AN_TROM||b.questBossId()==BossID.O_DO||b.questBossId()==BossID.O_DO1
    ||b.questBossId()==BossID.MAT_TROI||b.questBossId()==BossID.SOI_HEC_QUYN1;}
+ /** Bosses whose notices are disabled everywhere, independently of loot policy. */
+ public static boolean suppressedNotice(Boss b){
+  if(b==null)return false;
+  return suppressedNoticeId(lookupSemanticId(b),b.zone!=null&&b.zone.map!=null?b.zone.map.type:-1)
+    ||b instanceof nro.models.boss.Boss_mini.AnTrom||b instanceof nro.models.boss.Boss_mini.Odo
+    ||b instanceof nro.models.boss.Boss_mini.MatTroi||b instanceof nro.models.boss.Boss_mini.SoiHecQuyn;
+ }
+ public static boolean suppressedNoticeId(int id,int mapType){
+  return SUPPRESSED_NOTICE_IDS.contains(id)
+    ||((id==BossID.MABU||id==BossID.SUPERBU)&&mapType==nro.models.consts.ConstMap.MAP_MABU_14H);
+ }
  public static int lookupSemanticId(Boss b){
   if(b instanceof nro.models.boss.Boss_mini.AnTrom)return BossID.AN_TROM;
   if(b instanceof nro.models.boss.Boss_mini.Odo)return BossID.O_DO1;
   if(b instanceof nro.models.boss.Boss_mini.MatTroi)return BossID.MAT_TROI;
   if(b instanceof nro.models.boss.Boss_mini.SoiHecQuyn)return BossID.SOI_HEC_QUYN1;
   return b.questBossId();
- }
-  public static boolean excludedHistory(nro.models.boss.notice.BossNoticeRow r){
-   int id=r.semanticBossId();
-   // Screen filter hides these four, but the lookup board keeps them visible.
-   if(id==BossID.AN_TROM||id==BossID.O_DO||id==BossID.O_DO1||id==BossID.SOI_HEC_QUYN1||id==BossID.MAT_TROI)return false;
-   if(excluded(id))return true;
-  String name=nro.models.utils.Util.removeAccent(r.bossName()).toLowerCase(java.util.Locale.ROOT).trim();
-  return name.matches("(?:an trom|mat troi|o do)(?:\\s.*)?");
  }
  public static boolean equipment(Boss b){
   if(b==null||b.isQuestSupport()||excluded(b))return false;

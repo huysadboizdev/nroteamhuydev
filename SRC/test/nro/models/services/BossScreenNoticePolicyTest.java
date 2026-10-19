@@ -32,15 +32,15 @@ public final class BossScreenNoticePolicyTest {
                     "12-hour boss is hidden in Oshin map 114: " + bossId);
             check(BossScreenNoticePolicy.hide(bossId, 120, ConstMap.MAP_NORMAL),
                     "12-hour boss is hidden in Oshin map 120: " + bossId);
-            check(!BossScreenNoticePolicy.hide(bossId, 5, ConstMap.MAP_NORMAL),
-                    "12-hour boss remains visible outside Oshin (map 5): " + bossId);
-            check(!BossScreenNoticePolicy.hide(bossId, 1, ConstMap.MAP_NORMAL),
-                    "12-hour boss remains visible outside Oshin (map 1): " + bossId);
+            check(BossScreenNoticePolicy.hide(bossId, 5, ConstMap.MAP_NORMAL),
+                    "12-hour boss is hidden outside Oshin (map 5): " + bossId);
+            check(BossScreenNoticePolicy.hide(bossId, 1, ConstMap.MAP_NORMAL),
+                    "12-hour boss is hidden outside Oshin (map 1): " + bossId);
         }
-        check(!BossScreenNoticePolicy.hide(BossID.DRABURA, 113, ConstMap.MAP_NORMAL),
-                "12-hour boss remains visible below Oshin range (map 113)");
-        check(!BossScreenNoticePolicy.hide(BossID.DRABURA, 121, ConstMap.MAP_NORMAL),
-                "12-hour boss remains visible above Oshin range (map 121)");
+        check(BossScreenNoticePolicy.hide(BossID.DRABURA, 113, ConstMap.MAP_NORMAL),
+                "12-hour boss hidden below Oshin range (map 113)");
+        check(BossScreenNoticePolicy.hide(BossID.DRABURA, 121, ConstMap.MAP_NORMAL),
+                "12-hour boss hidden above Oshin range (map 121)");
 
         check(BossScreenNoticePolicy.hide(BossID.MABU, 127, ConstMap.MAP_MABU_14H),
                 "Mabu 14-hour encounter is hidden");

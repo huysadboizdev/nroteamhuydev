@@ -69,6 +69,9 @@ public class MySession extends Session {
     public volatile boolean bossNoticeBoard;
     public volatile boolean bossNoticeCategories;
     public long lastBossNoticeRequest;
+    public volatile boolean bossNoticeSubscribed;
+    public volatile int bossNoticeCategory=2,bossNoticeKind,bossNoticePage;
+    public volatile long bossNoticeRevision;
 
     @Override public boolean supportsInventory200() { return inventory200; }
     public int vnd;
@@ -81,6 +84,11 @@ public class MySession extends Session {
     public MySession(Socket socket) {
         super(socket);
         ipAddress = socket.getInetAddress().getHostAddress();
+    }
+
+    @Override public void dispose() {
+        nro.models.services.BossNoticeService.unsubscribe(this);
+        super.dispose();
     }
 
     @Override

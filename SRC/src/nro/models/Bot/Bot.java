@@ -49,6 +49,10 @@ public class Bot extends Player {
         this.flag_ = flag;
     }
 
+    public boolean isBossHunter() {
+        return this.type == 2;
+    }
+
     public int MapToPow() {
         Random random = new Random();
         long power = this.nPoint.power;
@@ -154,7 +158,22 @@ public class Bot extends Player {
     @Override
     public void update() {
         super.update();
-        this.increasePoint();
+        if (this.type == 2) {
+            if (this.nPoint != null && (this.nPoint.dameg != 800_000
+                    || this.nPoint.hpg != 3_000_000 || this.nPoint.mpg != 3_000_000
+                    || this.nPoint.hpMax != 3_000_000 || this.nPoint.mpMax != 3_000_000)) {
+                this.nPoint.dameg = 800_000;
+                this.nPoint.hpg = 3_000_000;
+                this.nPoint.mpg = 3_000_000;
+                this.nPoint.calPoint();
+                this.nPoint.hpMax = 3_000_000;
+                this.nPoint.mpMax = 3_000_000;
+                this.nPoint.hp = this.nPoint.hpMax;
+                this.nPoint.mp = this.nPoint.mpMax;
+            }
+        } else {
+            this.increasePoint();
+        }
         switch (this.type) {
             case 0:
                 this.mo1.update();
@@ -175,11 +194,29 @@ public class Bot extends Player {
         for (NClass n : Manager.gI().NCLASS) {
             if (n.classId == this.gender) {
                 for (SkillTemplate template : n.skillTemplatess) {
+                    if (template == null || template.skillss == null || template.skillss.isEmpty()) {
+                        continue;
+                    }
+                    Skill highestSkill = null;
                     for (Skill skill : template.skillss) {
-                        if (skill.point == 7) {
-                            this.playerSkill.skills.add(new Skill(skill));
-                            break;
+                        if (skill == null || skill.template == null) {
+                            continue;
                         }
+                        if (this.type != 2 && skill.point != 7) {
+                            continue;
+                        }
+                        if (highestSkill == null || skill.point > highestSkill.point) {
+                            highestSkill = skill;
+                        }
+                    }
+                    if (highestSkill == null) {
+                        continue;
+                    }
+                    boolean alreadyAdded = this.playerSkill.skills.stream()
+                            .anyMatch(skill -> skill != null && skill.template != null
+                                    && skill.template.id == template.id);
+                    if (!alreadyAdded) {
+                        this.playerSkill.skills.add(new Skill(highestSkill));
                     }
                 }
                 break;
@@ -188,8 +225,12 @@ public class Bot extends Player {
     }
 
     public boolean UseLastTimeSkill() {
-        if (this.playerSkill.skillSelect.lastTimeUseThisSkillbot < (System.currentTimeMillis() - this.playerSkill.skillSelect.coolDown)) {
-            this.playerSkill.skillSelect.lastTimeUseThisSkillbot = System.currentTimeMillis();
+        return UseLastTimeSkill(this.playerSkill.skillSelect);
+    }
+
+    public boolean UseLastTimeSkill(Skill skill) {
+        if (skill != null && skill.lastTimeUseThisSkillbot < (System.currentTimeMillis() - skill.coolDown)) {
+            skill.lastTimeUseThisSkillbot = System.currentTimeMillis();
             return true;
         } else {
             return false;
@@ -257,15 +298,6 @@ public class Bot extends Player {
                     break;
             }
         }).start();
-    }
-
-    public String getChat() {
-        String[] messages = {
-            "|1|Con chó tài tỏi súc vật cali",
-            "|2|bê ka tê địt mẹ tài tỏi tung lồn",
-            "|3|arriety địt nhau với mẹ tài tỏi"
-        };
-        return messages[new Random().nextInt(messages.length)];
     }
 
 }

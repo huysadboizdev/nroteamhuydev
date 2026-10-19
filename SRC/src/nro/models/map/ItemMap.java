@@ -48,64 +48,66 @@ public class ItemMap {
             boolean keepOwnerUntilDespawn, List<ItemOption> initialOptions) {
         this.bossAdminSuppressed = nro.models.services.BossAdminDropService.suppressConstruction(tempId);
         this.zone = zone;
-        this.itemMapId = allocateItemMapId(zone);
-        this.itemTemplate = ItemService.gI().getTemplate((short) tempId);
-        this.quantity = quantity;
-        this.x = x;
-        this.y = y;
-        this.keepOwnerUntilDespawn = keepOwnerUntilDespawn;
-        this.playerId = keepOwnerUntilDespawn ? playerId : playerId != -1 ? Math.abs(playerId) : playerId;
-        this.createTime = System.currentTimeMillis();
-        this.options = new ArrayList<>();
-        for (ItemOption option : initialOptions) this.options.add(new ItemOption(option));
-        this.isBlackBall = ItemMapService.gI().isBlackBall(this.itemTemplate.id);
-        this.isNamecBall = ItemMapService.gI().isNamecBall(this.itemTemplate.id);
-        this.lastTimeMoveToPlayer = System.currentTimeMillis();
-        if (!bossAdminSuppressed) this.zone.addItem(this);
+        synchronized (zone) {
+            this.itemMapId = zone.allocateItemMapId();
+            this.itemTemplate = ItemService.gI().getTemplate((short) tempId);
+            this.quantity = quantity;
+            this.x = x;
+            this.y = y;
+            this.keepOwnerUntilDespawn = keepOwnerUntilDespawn;
+            this.playerId = keepOwnerUntilDespawn ? playerId : playerId != -1 ? Math.abs(playerId) : playerId;
+            this.createTime = System.currentTimeMillis();
+            this.options = new ArrayList<>();
+            for (ItemOption option : initialOptions) this.options.add(new ItemOption(option));
+            this.isBlackBall = ItemMapService.gI().isBlackBall(this.itemTemplate.id);
+            this.isNamecBall = ItemMapService.gI().isNamecBall(this.itemTemplate.id);
+            this.lastTimeMoveToPlayer = System.currentTimeMillis();
+            if (!bossAdminSuppressed) this.zone.addItem(this);
+        }
     }
 
     public ItemMap(Zone zone, ItemTemplate temp, int quantity, int x, int y, long playerId) {
         this.bossAdminSuppressed = nro.models.services.BossAdminDropService.suppressConstruction(temp.id);
         this.zone = zone;
-        this.itemMapId = allocateItemMapId(zone);
-        this.itemTemplate = temp;
-        this.quantity = quantity;
-        this.x = x;
-        this.y = y;
-        this.playerId = playerId != -1 ? Math.abs(playerId) : playerId;
-        this.createTime = System.currentTimeMillis();
-        this.options = new ArrayList<>();
-        this.isBlackBall = ItemMapService.gI().isBlackBall(this.itemTemplate.id);
-        this.isNamecBall = ItemMapService.gI().isNamecBall(this.itemTemplate.id);
-        this.lastTimeMoveToPlayer = System.currentTimeMillis();
-        if (!bossAdminSuppressed) this.zone.addItem(this);
-    }
-
-    private static int allocateItemMapId(Zone zone) {
         synchronized (zone) {
-            int id = zone.countItemAppeaerd++;
-            if (zone.countItemAppeaerd >= 2000000000) zone.countItemAppeaerd = 0;
-            return id;
+            this.itemMapId = zone.allocateItemMapId();
+            this.itemTemplate = temp;
+            this.quantity = quantity;
+            this.x = x;
+            this.y = y;
+            this.playerId = playerId != -1 ? Math.abs(playerId) : playerId;
+            this.createTime = System.currentTimeMillis();
+            this.options = new ArrayList<>();
+            this.isBlackBall = ItemMapService.gI().isBlackBall(this.itemTemplate.id);
+            this.isNamecBall = ItemMapService.gI().isNamecBall(this.itemTemplate.id);
+            this.lastTimeMoveToPlayer = System.currentTimeMillis();
+            if (!bossAdminSuppressed) this.zone.addItem(this);
         }
     }
 
     public ItemMap(ItemMap itemMap) {
         this.bossAdminSuppressed = itemMap.bossAdminSuppressed || nro.models.services.BossAdminDropService.suppressConstruction(itemMap.itemTemplate.id);
         this.zone = itemMap.zone;
-        this.itemMapId = itemMap.itemMapId;
-        this.itemTemplate = itemMap.itemTemplate;
-        this.quantity = itemMap.quantity;
-        this.x = itemMap.x;
-        this.y = itemMap.y;
-        this.playerId = itemMap.playerId;
-        this.keepOwnerUntilDespawn = itemMap.keepOwnerUntilDespawn;
-        this.commesonMatchId = itemMap.commesonMatchId;
-        this.options = itemMap.options;
-        this.isBlackBall = itemMap.isBlackBall;
-        this.isNamecBall = itemMap.isNamecBall;
-        this.lastTimeMoveToPlayer = itemMap.lastTimeMoveToPlayer;
-        this.createTime = System.currentTimeMillis();
-        if (!bossAdminSuppressed) this.zone.addItem(this);
+        synchronized (zone) {
+            this.itemMapId = itemMap.itemMapId;
+            if (this.itemMapId < 0 || this.itemMapId > Short.MAX_VALUE
+                    || zone.getItemMapByItemMapId(this.itemMapId) != null) {
+                this.itemMapId = zone.allocateItemMapId();
+            }
+            this.itemTemplate = itemMap.itemTemplate;
+            this.quantity = itemMap.quantity;
+            this.x = itemMap.x;
+            this.y = itemMap.y;
+            this.playerId = itemMap.playerId;
+            this.keepOwnerUntilDespawn = itemMap.keepOwnerUntilDespawn;
+            this.commesonMatchId = itemMap.commesonMatchId;
+            this.options = itemMap.options;
+            this.isBlackBall = itemMap.isBlackBall;
+            this.isNamecBall = itemMap.isNamecBall;
+            this.lastTimeMoveToPlayer = itemMap.lastTimeMoveToPlayer;
+            this.createTime = System.currentTimeMillis();
+            if (!bossAdminSuppressed) this.zone.addItem(this);
+        }
     }
 
     public void update() {

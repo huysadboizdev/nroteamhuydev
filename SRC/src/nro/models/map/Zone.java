@@ -441,9 +441,31 @@ public class Zone {
         try(var eventPermit=nro.models.event.EventItemPolicy.admit()) {
         if(itemMap!=null && itemMap.itemTemplate!=null && nro.models.event.EventItemPolicy.isBlocked(itemMap.itemTemplate.id))return;
         if (itemMap != null && !items.contains(itemMap)) {
+            if (itemMap.itemMapId < 0 || itemMap.itemMapId > Short.MAX_VALUE
+                    || getItemMapByItemMapId(itemMap.itemMapId) != null) {
+                itemMap.itemMapId = allocateItemMapId();
+            }
             items.add(0, itemMap);
         }
         }
+    }
+
+    int allocateItemMapId() {
+        if (!Thread.holdsLock(this)) {
+            throw new IllegalStateException("Item-map IDs must be allocated while holding the zone lock");
+        }
+        if (countItemAppeaerd < 0 || countItemAppeaerd > Short.MAX_VALUE) {
+            countItemAppeaerd = 0;
+        }
+        for (int checked = 0; checked <= Short.MAX_VALUE; checked++) {
+            int candidate = countItemAppeaerd;
+            countItemAppeaerd = candidate == Short.MAX_VALUE ? 0 : candidate + 1;
+            if (getItemMapByItemMapId(candidate) == null) {
+                return candidate;
+            }
+        }
+        throw new IllegalStateException("No signed-short item-map IDs available in map "
+                + this.map.mapId + ", zone " + this.zoneId);
     }
 
     public synchronized void removeItemMap(ItemMap itemMap) {
@@ -603,6 +625,7 @@ public class Zone {
             msg.writer().writeShort(plInfo.getAura()); //idauraeff
             msg.writer().writeByte(plInfo.getEffFront()); //seteff
             msg.writer().writeShort(plInfo.getHat()); //id hat
+            msg.writer().writeByte(plInfo.isNewMember ? 1 : 0); // trailing badge required by the -5 client reader
 
             plReceive.sendMessage(msg);
             msg.cleanup();

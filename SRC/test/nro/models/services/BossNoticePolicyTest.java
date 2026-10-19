@@ -36,11 +36,19 @@ public final class BossNoticePolicyTest {
         var notify=Boss.class.getDeclaredMethod("canSendNotify");notify.setAccessible(true);check(!(boolean)notify.invoke(b),"quest support still cannot broadcast spawn spam");
         field(b,Boss.class,"questSupportRetired",true);check(!b.noticePublic(),"retired support excluded");field(b,Boss.class,"questSupportRetired",false);
         b.zone.map.mapId=140;check(!b.noticePublic(),"private training map excluded");b.zone.map.mapId=5;b.isNotifyDisabled=true;check(!b.noticePublic(),"hidden bosses excluded");
+        int[] twelveHour={BossID.DRABURA,BossID.BUI_BUI,BossID.YA_CON,BossID.MABU_12H,BossID.DRABURA_2,BossID.BUI_BUI_2,BossID.DRABURA_3,BossID.GOKU,BossID.CADIC};
+        for(int id:twelveHour){
+            check(BossAnnouncementPolicy.suppressedNoticeId(id,ConstMap.MAP_NORMAL),"12h identity suppressed at any location "+id);
+        }
+        check(BossAnnouncementPolicy.suppressedNoticeId(BossID.MABU,ConstMap.MAP_MABU_14H),"Mabu 14h identity and map type suppressed");
+        check(BossAnnouncementPolicy.suppressedNoticeId(BossID.SUPERBU,ConstMap.MAP_MABU_14H),"SuperBu 14h identity and map type suppressed");
+        check(!BossAnnouncementPolicy.suppressedNoticeId(BossID.MABU,ConstMap.MAP_NORMAL),"Mabu outside 14h map remains allowed");
+        check(!BossAnnouncementPolicy.suppressedNoticeId(BossID.KUKU,ConstMap.MAP_NORMAL),"ordinary boss remains allowed");
         int[] specials=new int[]{BossID.AN_TROM,BossID.O_DO,BossID.O_DO1,BossID.SOI_HEC_QUYN1,BossID.MAT_TROI};
         String[] names=new String[]{"Ăn trộm","Ở dơ","Ở dơ","Sói hẹc quyn","Mặt Trời 12"};
         for(int i=0;i<specials.length;i++){
             BossNoticeRow row=new BossNoticeRow("spawn","run",specials[i],0,names[i],"Map",1000,0,"","ALIVE",0,"UNKNOWN",1,1000);
-            check(!BossAnnouncementPolicy.excludedHistory(row),"lookup keeps special visible "+specials[i]);
+            check(BossAnnouncementPolicy.suppressedNoticeId(specials[i],ConstMap.MAP_NORMAL),"special semantic identity suppressed "+specials[i]);
             check(BossScreenNoticePolicy.hide(specials[i],1,ConstMap.MAP_NORMAL),"screen hides special "+specials[i]);
         }
         System.out.println("PASS BossNotice policy: request0 throttle, bad requests/logout/legacy guard, scoped damage attribution, real/conditional timer and public scope");

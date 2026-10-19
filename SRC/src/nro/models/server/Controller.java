@@ -987,8 +987,6 @@ public class Controller implements IMessageHandler {
                 SuperRankDAO.insertData(player);
             }
             ServerNotify.gI().sendNotifyTab(player);
-            if(player.session.bossNoticeCategories)nro.models.services.BossNoticeService.gI().requestV2(player.session,0,2,0,0);
-            else if(player.session.bossNoticeBoard)nro.models.services.BossNoticeService.gI().request(player.session,0,0,0);
             player.setClothes.setup();
             if (player.pet != null) {
                 player.pet.setClothes.setup();

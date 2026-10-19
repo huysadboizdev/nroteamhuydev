@@ -166,7 +166,7 @@ public class Drabura3 extends Boss {
 
         if (plKill != null) {
             reward(plKill);
-            ServerNotify.gI().notify(plKill.name + ": Đã tiêu diệt được " + this.name + " mọi người đều ngưỡng mộ.");
+            if (!nro.models.services.BossAnnouncementPolicy.suppressedNotice(this)) ServerNotify.gI().notify(plKill.name + ": Đã tiêu diệt được " + this.name + " mọi người đều ngưỡng mộ.");
         }
 
         

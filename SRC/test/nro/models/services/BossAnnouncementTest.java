@@ -23,16 +23,27 @@ public class BossAnnouncementTest {
   for(int id:new int[]{BossID.AN_TROM,BossID.MAT_TROI,BossID.O_DO}){
    Probe nuisance=boss(id);check(!nuisance.noticePublic(),"excluded identity "+id);nuisance.spawnNotice();nuisance.die(player(1));check(messages.isEmpty(),"excluded spawn and defeat never broadcast");
   }
+  int[] twelveHour={BossID.DRABURA,BossID.BUI_BUI,BossID.YA_CON,BossID.MABU_12H,BossID.DRABURA_2,BossID.BUI_BUI_2,BossID.DRABURA_3,BossID.GOKU,BossID.CADIC};
+  for(int id:twelveHour){Probe selected=boss(id);check(!selected.noticePublic(),"12h notice suppressed independent of location "+id);}
+  Probe hiddenNotice=boss(BossID.DRABURA);BossNoticeService.gI().appeared(hiddenNotice);
+  check(BossNoticeService.gI().rows(0).stream().anyMatch(r->r.semanticBossId()==BossID.DRABURA&&r.status().equals("ALIVE")),"12h boss remains visible in the Boss status board");
+  check(messages.isEmpty(),"tracking a suppressed boss does not show a notice");
+  hiddenNotice.nPoint.hp=0;hiddenNotice.die(player(9));
+  check(BossNoticeService.gI().rows(0).stream().noneMatch(r->r.semanticBossId()==BossID.DRABURA),"dead 12h boss leaves the alive list");
+  check(BossNoticeService.gI().rows(1).stream().anyMatch(r->r.semanticBossId()==BossID.DRABURA&&r.status().equals("DEFEATED")),"dead 12h boss remains visible in history");
+  check(messages.isEmpty(),"defeating a suppressed boss does not show a notice");
+  for(int id:new int[]{BossID.MABU,BossID.SUPERBU}){Probe selected=boss(id);selected.zone.map.type=ConstMap.MAP_MABU_14H;check(!selected.noticePublic(),"14h notice suppressed by map type "+id);}
   for(Class<? extends Boss> type:List.of(nro.models.boss.Boss_mini.AnTrom.class,nro.models.boss.Boss_mini.MatTroi.class,nro.models.boss.Boss_mini.Odo.class)){
    Boss mini=blank(type);mini.id=-2000123;mini.zone=zone();mini.isNotifyDisabled=false;
    check(!mini.noticePublic(),"dynamic mini boss excluded by class "+type.getSimpleName());
   }
-  Probe equipment=boss(BossID.DRABURA);equipment.isNotifyDisabled=true;equipment.zone.map.mapId=114;
-  check(equipment.noticePublic(),"equipment boss bypasses legacy hidden/Mabu filters");
+  Probe equipment=boss(BossID.BABY);equipment.isNotifyDisabled=true;equipment.zone.map.mapId=114;
+  check(BossAnnouncementPolicy.equipment(equipment),"equipment eligibility remains independent of notice suppression");
+  check(equipment.noticePublic(),"allowed equipment boss bypasses legacy hidden/Mabu filters");
   equipment.spawnNotice();equipment.spawnNotice();BossNoticeService.gI().appeared(equipment);check(messages.size()==1,"spawn exactly once across callbacks");
   Player killer=player(2);killer.name="Winner";equipment.nPoint.hp=0;equipment.die(killer);equipment.die(killer);check(messages.size()==2,"defeat exactly once");
   check(BossNoticeService.gI().rows(0).isEmpty(),"dead boss removed from alive board");
-  check(BossNoticeService.gI().rows(1).stream().anyMatch(r->r.semanticBossId()==BossID.DRABURA&&r.status().equals("DEFEATED")),"history records defeat");
+  check(BossNoticeService.gI().rows(1).stream().anyMatch(r->r.semanticBossId()==BossID.BABY&&r.status().equals("DEFEATED")),"history records defeat");
   equipment.nPoint.hp=100;equipment.bossStatus=BossStatus.ACTIVE;equipment.spawnNotice();check(messages.size()==3,"new life gets a fresh notice");
   Probe task=boss(BossID.KUKU);check(task.noticePublic(),"normal task boss public");task.spawnNotice();check(messages.size()==4,"task boss broadcast");
   Probe hidden=boss(123);hidden.isNotifyDisabled=true;check(!hidden.noticePublic(),"unrelated hidden boss remains hidden");

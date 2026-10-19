@@ -20,10 +20,17 @@ public final class BossNoticeService {
     private final BossNoticeDAO dao=new BossNoticeDAO();
     private final BossNoticeOutbox outbox=new BossNoticeOutbox(Path.of("data/boss-notice-outbox"));
     private final ConcurrentMap<String,BossNoticeRow> unstaged=new ConcurrentHashMap<>();
-    private final BossNoticeTracker tracker=new BossNoticeTracker(run,System::currentTimeMillis,this::persist);
+    private final ConcurrentMap<MySession,Subscription> subscriptions=new ConcurrentHashMap<>();
+    private final java.util.concurrent.atomic.AtomicLong revision=new java.util.concurrent.atomic.AtomicLong();
+    private final BossNoticeTracker tracker=new BossNoticeTracker(run,System::currentTimeMillis,this::persistAndPush);
     private volatile List<BossNoticeRow> stored=List.of();
     private volatile boolean historyReady;
     private long lastLog,lastPrune;
+    private ScheduledExecutorService worker;
+    private static final class Subscription {
+        volatile long lastPush;
+        final java.util.concurrent.atomic.AtomicBoolean scheduled=new java.util.concurrent.atomic.AtomicBoolean();
+    }
     private record Attack(Boss boss,Player attacker,Integer skillId){}
     private static final ThreadLocal<Attack> ATTACK=new ThreadLocal<>();
     public static Player deathAttacker(Boss b){Attack a=ATTACK.get();return a!=null&&a.boss()==b?a.attacker():null;}
@@ -48,8 +55,24 @@ public final class BossNoticeService {
         try{return target.injured(attacker,damage,piercing,mobAttack);}finally{try{b.ensureDeathTransition();}finally{if(previous==null)ATTACK.remove();else ATTACK.set(previous);}}
     }
     private BossNoticeService(){
-        var worker=Executors.newSingleThreadScheduledExecutor(r->{Thread t=new Thread(r,"Boss notice persistence");t.setDaemon(true);return t;});
+        worker=Executors.newSingleThreadScheduledExecutor(r->{Thread t=new Thread(r,"Boss notice persistence");t.setDaemon(true);return t;});
         worker.scheduleWithFixedDelay(this::flush,1,2,TimeUnit.SECONDS);
+    }
+    private void persistAndPush(BossNoticeRow row){persist(row);revision.incrementAndGet();for(MySession s:subscriptions.keySet())schedulePush(s);}
+    public static void unsubscribe(MySession session){if(session!=null)gI().subscriptions.remove(session);if(session!=null)session.bossNoticeSubscribed=false;}
+    private void schedulePush(MySession s){
+        Subscription sub=subscriptions.get(s);if(sub==null||!sub.scheduled.compareAndSet(false,true))return;
+        long delay=Math.max(0,2000-(System.currentTimeMillis()-sub.lastPush));
+        worker.schedule(()->{sub.scheduled.set(false);if(subscriptions.get(s)==sub)sendPush(s,sub);},delay,TimeUnit.MILLISECONDS);
+    }
+    private void sendPush(MySession s,Subscription sub){
+        Player p=s.player;if(p==null||p.session!=s||!s.isConnected()||p.beforeDispose||p.isOffline)return;
+        int category=s.bossNoticeCategory,kind=s.bossNoticeKind,page=s.bossNoticePage;long now=System.currentTimeMillis();
+        List<BossNoticeRow> all=rows(kind).stream().filter(r->r.category()==category).toList();int pages=Math.max(1,(all.size()+PAGE_SIZE-1)/PAGE_SIZE);page=Math.min(page,pages-1);
+        List<BossNoticeRow> selected=all.subList(page*PAGE_SIZE,Math.min(all.size(),(page+1)*PAGE_SIZE));long rev=revision.get();Message m=null;
+        try{m=new Message(COMMAND);var w=m.writer();w.writeInt(-3);w.writeByte(category);w.writeByte(kind);w.writeShort(page);w.writeShort(pages);w.writeLong(rev);w.writeLong(now);w.writeUTF("");w.writeShort(selected.size());
+            for(BossNoticeRow row:selected){write(m,row,run);writeCategoryMetadata(m,row);}p.sendMessage(m);s.bossNoticeRevision=rev;sub.lastPush=now;
+        }catch(Exception failure){log(failure);}finally{if(m!=null)m.cleanup();}
     }
     private void persist(BossNoticeRow row){
         try{outbox.stage(row);}catch(Exception failure){unstaged.merge(row.spawnId(),row,(a,b)->a.version()>b.version()?a:b);log(failure);}
@@ -68,7 +91,7 @@ public final class BossNoticeService {
         return semanticBossId+":"+form+":"+mapId+":"+mapType;
     }
     public void appeared(Boss b){
-        try{if(b.noticeLookup()&&b.zone!=null&&!b.isDie()){
+        try{if(boardEligible(b)&&b.zone!=null&&!b.isDie()){
             boolean fresh=tracker.appearNew(b,b.id,b.currentLevel,clean(b.name,100),clean(b.zone.map.mapName,100),BossAnnouncementPolicy.lookupSemanticId(b),b.isQuestSupport(),b.zone.zoneId);
             if(fresh&&b.noticePublic()&&!b.isQuestSupport()&&!BossAnnouncementPolicy.grouped(b)){
                 String ticker="BOSS "+clean(b.name,100)+" vừa xuất hiện tại "+clean(b.zone.map.mapName,100);
@@ -85,7 +108,7 @@ public final class BossNoticeService {
     }
     public void defeated(Boss b,Player killer){
         try{
-            if(!b.noticeLookup())return;
+            if(!boardEligible(b))return;
             if(killer instanceof Pet pet&&pet.master!=null)killer=pet.master;
             if(killer instanceof nro.models.player.NewPet pet&&pet.master!=null)killer=pet.master;
             String name=killer!=null&&killer.isPl()&&!killer.isBot?clean(killer.name,80):"Không xác định";
@@ -94,14 +117,15 @@ public final class BossNoticeService {
                 nro.models.server.ServerNotify.gI().notify(name+": Đã tiêu diệt được "+clean(b.name,100)+".");
         }catch(Exception failure){log(failure);}
     }
-    public void departed(Boss b){try{tracker.depart(b);}catch(Exception failure){log(failure);}}
-    public void resting(Boss b){try{tracker.rest(b,b.noticeNextSpawnAt(),b.noticeNextSpawnAt()>0?"COOLDOWN":"CONDITION");}catch(Exception failure){log(failure);}}
+    public void departed(Boss b){try{if(boardEligible(b))tracker.depart(b);}catch(Exception failure){log(failure);}}
+    public void resting(Boss b){try{if(boardEligible(b))tracker.rest(b,b.noticeNextSpawnAt(),b.noticeNextSpawnAt()>0?"COOLDOWN":"CONDITION");}catch(Exception failure){log(failure);}}
+    private static boolean boardEligible(Boss b){return b!=null&&(b.noticeLookup()||BossAnnouncementPolicy.suppressedNotice(b));}
     public List<BossNoticeRow> rows(int kind){
         long since=System.currentTimeMillis()-RETENTION;
         Map<String,BossNoticeRow> rows=new HashMap<>();
         if(kind==1)for(var r:stored)if(r.appearedAt()>=since)rows.put(r.spawnId(),r);
         for(var r:kind==0?tracker.current():tracker.history())if(kind==0||r.appearedAt()>=since)rows.merge(r.spawnId(),r,(a,b)->a.version()>b.version()?a:b);
-        return rows.values().stream().filter(r->!BossAnnouncementPolicy.excludedHistory(r)).filter(r->kind!=0||(r.serverRun().equals(run)&&r.status().equals("ALIVE"))).sorted(Comparator.comparingLong((BossNoticeRow r)->Math.max(r.appearedAt(),r.defeatedAt())).reversed().thenComparing(BossNoticeRow::spawnId)).limit(10_000).toList();
+        return rows.values().stream().filter(r->kind!=0||(r.serverRun().equals(run)&&r.status().equals("ALIVE"))).sorted(Comparator.comparingLong((BossNoticeRow r)->Math.max(r.appearedAt(),r.defeatedAt())).reversed().thenComparing(BossNoticeRow::spawnId)).limit(10_000).toList();
     }
     public void request(MySession s,int request,int kind,int page){request(s,request,0,kind,page,false);}
     public void requestV2(MySession s,int request,int category,int kind,int page){request(s,request,category,kind,page,true);}
@@ -109,6 +133,7 @@ public final class BossNoticeService {
         Player p=s.player;long now=System.currentTimeMillis();
         if((v2?!s.bossNoticeCategories:!s.bossNoticeBoard)||(v2&&!BossNoticeCategory.valid(category))||p==null||p.session!=s||!s.isConnected()||p.beforeDispose||p.isOffline||request<0||kind<0||kind>1||page<0||page>499)return;
         synchronized(s){if(now-s.lastBossNoticeRequest<2000)return;s.lastBossNoticeRequest=now;}
+        if(v2){s.bossNoticeCategory=category;s.bossNoticeKind=kind;s.bossNoticePage=page;s.bossNoticeSubscribed=true;subscriptions.computeIfAbsent(s,k->new Subscription());}
         List<BossNoticeRow> all=rows(kind).stream().filter(r->!v2||r.category()==category).toList();int pages=Math.max(1,(all.size()+PAGE_SIZE-1)/PAGE_SIZE);page=Math.min(page,pages-1);
         List<BossNoticeRow> selected=all.subList(page*PAGE_SIZE,Math.min(all.size(),(page+1)*PAGE_SIZE));
         Message m=null;try{

@@ -2025,18 +2025,21 @@ public class UseItem {
         ChangeMapService.gI().openChangeMapTab(pl);
     }
 
+    private void rejectCapsuleMapSelection(Player pl, String notice) {
+        Service.gI().sendThongBao(pl, notice);
+        Service.gI().hideWaitDialog(pl);
+    }
+
     public void choseMapCapsule(Player pl, int index) {
 
         if (pl.idNRNM != -1) {
-            Service.gI().sendThongBao(pl, "Không thể mang ngọc rồng này lên Phi thuyền");
-            Service.gI().hideWaitDialog(pl);
+            rejectCapsuleMapSelection(pl, "Không thể mang ngọc rồng này lên Phi thuyền");
             return;
         }
 
         int zoneId = -1;
         if (index > pl.mapCapsule.size() - 1 || index < 0) {
-            Service.gI().sendThongBao(pl, "Không thể thực hiện");
-            Service.gI().hideWaitDialog(pl);
+            rejectCapsuleMapSelection(pl, "Không thể thực hiện");
             return;
         }
         Zone zoneChose = pl.mapCapsule.get(index);
@@ -2046,7 +2049,7 @@ public class UseItem {
                 || MapService.gI().isMapDoanhTrai(zoneChose.map.mapId)
                 || MapService.gI().isMapMaBu(zoneChose.map.mapId)
                 || MapService.gI().isMapHuyDiet(zoneChose.map.mapId)) {
-            Service.gI().sendThongBao(pl, "Hiện tại không thể vào được khu!");
+            rejectCapsuleMapSelection(pl, "Hiện tại không thể vào được khu!");
             return;
         }
         if (index != 0 || zoneChose.map.mapId == 21

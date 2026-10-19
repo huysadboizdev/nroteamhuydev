@@ -59,7 +59,7 @@ public final class BossScreenNoticePolicy {
         boolean mabu14h = (semanticBossId == BossID.MABU || semanticBossId == BossID.SUPERBU)
                 && mapType == ConstMap.MAP_MABU_14H;
         return SPECIAL_BOSSES.contains(semanticBossId)
-                || (TWELVE_HOUR_BOSSES.contains(semanticBossId) && mapId >= OSHIN_MAP_ID_MIN && mapId <= OSHIN_MAP_ID_MAX)
+                || TWELVE_HOUR_BOSSES.contains(semanticBossId)
                 || mabu14h
                 || DUNGEON_MAP_TYPES.contains(mapType);
     }

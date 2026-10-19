@@ -90,18 +90,25 @@ public class NewBot {
             b.nPoint.limitPower = 8;
             b.nPoint.power = 1000 + congThem;
             b.nPoint.tiemNang = 20000000 + congThem;
-            b.nPoint.dameg = 600000;
-            b.nPoint.mpg = 600000;
-            b.nPoint.mpMax = 2000000000;
-            b.nPoint.mp = 600000;
-            b.nPoint.hpg = 675000;
+            b.nPoint.dameg = type == 2 ? 800_000 : 600_000;
+            b.nPoint.mpg = type == 2 ? 3_000_000 : 600_000;
+            b.nPoint.mpMax = type == 2 ? 3_000_000 : 2_000_000_000;
+            b.nPoint.mp = type == 2 ? 3_000_000 : 600_000;
+            b.nPoint.hpg = type == 2 ? 3_000_000 : 675_000;
             b.nPoint.hpMax = 10000;
-            b.nPoint.hp = 600000;
+            b.nPoint.hp = type == 2 ? 3_000_000 : 600_000;
             b.nPoint.maxStamina = 20000;
             b.nPoint.stamina = 20000;
             b.nPoint.critg = 10;
             b.nPoint.defg = 10;
             b.gender = (byte) Gender;
+            if (type == 2) {
+                b.nPoint.calPoint();
+                b.nPoint.hpMax = 3_000_000;
+                b.nPoint.mpMax = 3_000_000;
+                b.nPoint.hp = b.nPoint.hpMax;
+                b.nPoint.mp = b.nPoint.mpMax;
+            }
             b.charms.tdThuHut = System.currentTimeMillis() + (30L * 24 * 60 * 60 * 1000);
 
             b.leakSkill();

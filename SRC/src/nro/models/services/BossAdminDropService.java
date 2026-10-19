@@ -48,7 +48,10 @@ public final class BossAdminDropService {
                 nativeReward.run();
                 // Restore outer scope before custom construction: nested boss rewards remain isolated.
                 SCOPE.set(new Scope(boss, false, false));
-                if (!replace) RequestedBossEquipment.drop(boss, killer, random);
+                if (!replace) {
+                    RequestedBossEquipment.drop(boss, killer, random);
+                    BossShopLevelLoot.drop(boss, killer, random);
+                }
                 Player owner = MiniBossPinkCapsuleDrop.creditedPlayer(killer);
                 if (custom && owner != null && boss.zone != null && boss.zone.map != null && boss.location != null) {
                     for (BossAdminConfig.Rule rule : roll(policy.drops(), random)) {
