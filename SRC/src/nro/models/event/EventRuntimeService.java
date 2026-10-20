@@ -82,8 +82,11 @@ public final class EventRuntimeService {
     }
     public synchronized int activeCount(String key) { return active.getOrDefault(key,List.of()).size(); }
     public synchronized void tick() {
+        try(var permit=nro.models.services.ServerMaintenanceGate.enter()) {
+        if(!permit.allowed())return;
         for(var entry: active.entrySet()) if(enabled.test(entry.getKey()))
             for(Handle handle:entry.getValue()) try { handle.update(); } catch(Exception e) { Logger.logException(getClass(),e,"Seasonal boss update"); }
+        }
     }
     public synchronized void start() {
         if(running)return; running=true;

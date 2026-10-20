@@ -37,6 +37,8 @@ public class SuperRankManager implements Runnable {
         while (!Maintenance.isRunning) {
             long startTime = System.currentTimeMillis();
             try {
+                try (var permit = nro.models.services.ServerMaintenanceGate.enter()) {
+                if (!permit.allowed()) { Functions.sleep(500); continue; }
                 Iterator<WaitSuperRank> iterator = waitList.iterator();
                 while (iterator.hasNext()) {
                     WaitSuperRank wsp = iterator.next();
@@ -50,7 +52,7 @@ public class SuperRankManager implements Runnable {
                         iterator.remove();
                     }
                 }
-
+                }
             } catch (Exception e) {
             e.printStackTrace();
             }

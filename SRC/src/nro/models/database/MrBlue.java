@@ -66,6 +66,9 @@ public class MrBlue {
             rs = LocalManager.executeQuery("select * from account where username = ? and password = ?", session.uu, session.pp);
             if (rs.first()) {
                 session.userId = rs.getInt("account.id");
+                if(Client.hasUnsavedLogoutForAccount(session.userId)) {
+                    Service.gI().sendThongBaoOK(session,"Dữ liệu lần thoát trước chưa lưu xong. Vui lòng thử lại sau.");return null;
+                }
                 if(nro.models.services.LiveSyncCommandGate.hasPendingAccount(session.userId)||nro.models.services.LiveSyncCommandGate.isRetiringAccount(session.userId)||nro.models.services.GiftCodeService.hasPendingAccount(session.userId)) {
                     Service.gI().sendThongBaoOK(session,"Dữ liệu đang được đồng bộ. Vui lòng đăng nhập lại sau.");return null;
                 }

@@ -25,7 +25,10 @@ public class BotManager implements Runnable {
 
                 for (Bot bot : new ArrayList<>(this.bot)) {
                     if (bot != null) {
+                        try(var permit=nro.models.services.ServerMaintenanceGate.enter()) {
+                        if(!permit.allowed())break;
                         bot.update();
+                        }
                     }
                 }
 

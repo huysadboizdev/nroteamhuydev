@@ -53,8 +53,8 @@ public class PVPManager implements Runnable {
         while (isRunning) {
             try {
                 long st = System.currentTimeMillis();
-                for (PVP pvp : pvps) {
-                    pvp.update();
+                try (var permit = nro.models.services.ServerMaintenanceGate.enter()) {
+                    if (permit.allowed()) for (PVP pvp : pvps) pvp.update();
                 }
                 Functions.sleep(Math.max(1000 - (System.currentTimeMillis() - st), 10));
             } catch (Exception e) {

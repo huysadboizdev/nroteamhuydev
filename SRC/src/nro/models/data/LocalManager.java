@@ -44,7 +44,11 @@ public class LocalManager {
     }
 
     public static Connection getConnection() throws SQLException {
-        return LocalManager.ds.getConnection();
+        long start=System.nanoTime();
+        Connection connection=LocalManager.ds.getConnection();
+        long elapsed=(System.nanoTime()-start)/1_000_000;
+        if(elapsed>1000)System.err.println("[SQL] Connection wait "+elapsed+"ms; active="+ds.getHikariPoolMXBean().getActiveConnections()+", pending="+ds.getHikariPoolMXBean().getThreadsAwaitingConnection());
+        return connection;
     }
     
     public void release(Connection con) {
@@ -58,7 +62,7 @@ public class LocalManager {
     private static void loadProperties() {
         Properties properties = new Properties();
         try {
-            properties.load(new FileInputStream("Config.properties"));
+            try(FileInputStream input=new FileInputStream("Config.properties")){properties.load(input);}
             Object value;
             if ((value = properties.get("database.driver")) != null) {
                 LocalManager.DRIVER = String.valueOf(value);
@@ -179,13 +183,16 @@ public class LocalManager {
     private static HikariConfig createConfig(String poolName, String databaseName) {
         HikariConfig config = new HikariConfig();
         config.setDriverClassName(DRIVER);
-        config.setJdbcUrl(String.format("jdbc:mysql://%s:%s/%s?useUnicode=yes&characterEncoding=UTF-8",
+        config.setJdbcUrl(String.format("jdbc:mysql://%s:%s/%s?useUnicode=yes&characterEncoding=UTF-8&connectTimeout=5000&socketTimeout=15000&tcpKeepAlive=true",
                 DB_HOST, DB_PORT, databaseName));
         config.setUsername(DB_USER);
         config.setPassword(DB_PASSWORD);
         config.setMinimumIdle(MIN_CONN);
         config.setMaximumPoolSize(MAX_CONN);
         config.setMaxLifetime(MAX_LIFE_TIME);
+        config.setConnectionTimeout(10000);
+        config.setValidationTimeout(3000);
+        config.setLeakDetectionThreshold(30000);
         config.setPoolName(poolName);
         config.addDataSourceProperty("cachePrepStmts", "true");
         config.addDataSourceProperty("prepStmtCacheSize", "250");

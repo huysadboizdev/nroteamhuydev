@@ -74,6 +74,13 @@ public class Controller implements IMessageHandler {
 
     @Override
     public void onMessage(ISession s, Message _msg) {
+        try(var permit=nro.models.services.ServerMaintenanceGate.enter()) {
+            if(!permit.allowed()) { _msg.cleanup(); return; }
+            onAdmittedMessage(s,_msg);
+        }
+    }
+
+    private void onAdmittedMessage(ISession s, Message _msg) {
         Player current = ((MySession) s).player;
         if (current == null) {
             dispatchMessage(s, _msg);

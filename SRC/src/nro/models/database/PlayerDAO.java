@@ -29,6 +29,42 @@ import nro.models.utils.Util;
 import com.google.gson.Gson;
 
 public class PlayerDAO {
+    // Weak identity evidence survives an operation finalizer disposing the detached
+    // object, without retaining completed players indefinitely.
+    private static final java.util.Map<Player, Boolean> DURABLE_LOGOUT_SAVES =
+            java.util.Collections.synchronizedMap(new java.util.WeakHashMap<>());
+
+    public static boolean hasDurableLogoutSave(Player player) {
+        return player != null && DURABLE_LOGOUT_SAVES.containsKey(player);
+    }
+
+    /** A detached save observes every existing pending-operation guard. */
+    public static boolean saveDetachedChecked(Player player) {
+        if (player == null || !Thread.holdsLock(player) || !player.beforeDispose
+                || CHECKED_SAVE.get() != null || hasPendingLogoutOperation(player)) return false;
+        if (hasDurableLogoutSave(player)) return true;
+        if (player.liveLogoutCompleted || player.inventory == null || player.idMark == null) return false;
+        DeferredRubySave context = new DeferredRubySave(player);
+        CHECKED_SAVE.set(context);
+        try { updatePlayer(player); return context.saved && !hasPendingLogoutOperation(player); }
+        finally { CHECKED_SAVE.remove(); }
+    }
+
+    public static boolean hasPendingLogoutOperation(Player player) {
+        long id = player.id;
+        return nro.models.event.EventCleanupService.pending(id)
+                || nro.models.event.EventCleanupLogoutService.pending(id)
+                || nro.models.services.LiveSyncCommandGate.hasPendingId(id)
+                || nro.models.services.GiftCodeService.hasPendingId(id)
+                || nro.models.services.WalletPurchaseService.hasPendingId(id)
+                || player.walletPurchasePending != null
+                || nro.models.shop_ky_gui.ConsignTransactions.hasPendingId(id)
+                || nro.models.services.RubyGiftService.hasPendingId(id)
+                || nro.models.services.AdminPlayerActions.hasRenamePendingId(id)
+                || nro.models.services.KolQuestService.hasProgressPendingId(id)
+                || player.kolProgressPending || player.kolRewardPending
+                || nro.models.services.CommesonChallengeService.hasPending(player);
+    }
     private static final ThreadLocal<DeferredRubySave> EVENT_LOGOUT_SAVE=new ThreadLocal<>();
     public static boolean savePendingEventLogout(Player player){
         if(player==null||EVENT_LOGOUT_SAVE.get()!=null||!nro.models.event.EventCleanupLogoutService.finalizing(player))return false;
@@ -1150,6 +1186,7 @@ public class PlayerDAO {
                         player.point_sukien2,
                         player.id);
                 if (updated != 1) throw new SQLException("Full player save updated no row");
+                if (player.beforeDispose) DURABLE_LOGOUT_SAVES.put(player, Boolean.TRUE);
                 if(finalizingEvent)eventSave.saved=true;
                 // The main row is already durable; an auxiliary ranking failure must not undo RAM.
                 DeferredRubySave checkedSave = CHECKED_SAVE.get();

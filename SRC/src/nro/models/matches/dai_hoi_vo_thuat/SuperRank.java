@@ -76,7 +76,9 @@ public final class SuperRank implements Runnable {
         while (!Maintenance.isRunning && isCompeting) {
             long start = System.currentTimeMillis();
             try {
-                update();
+                try (var permit = nro.models.services.ServerMaintenanceGate.enter()) {
+                    if (permit.allowed()) update();
+                }
             } catch (Exception e) {
                 if (error++ < 5) {
                     e.printStackTrace();

@@ -62,7 +62,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.concurrent.Executors;
+import nro.models.utils.OwnedWorker;
+import nro.models.services.ServerMaintenanceGate;
 import nro.models.minigame.ChonAiDay_Gem;
 import nro.models.minigame.ChonAiDay_Gold;
 import nro.models.npc.DuaHauEgg;
@@ -115,7 +116,9 @@ public class Player implements Runnable {
     public transient long lastTotalDamagePersistAt;
     public boolean powerReduced = false;
     public String originalName;
-    public boolean beforeDispose;
+    public volatile boolean beforeDispose;
+    private final OwnedWorker updateWorker = new OwnedWorker();
+    private volatile boolean updateWorkerStopped;
     public volatile boolean liveLogoutCompleted;
     public volatile boolean liveLogoutCleanupCompleted;
     public volatile boolean giftLogoutSaved;
@@ -436,21 +439,42 @@ public class Player implements Runnable {
         return isPlayer && !isBot && !isPet && !isBoss && !isNewPet && !isNewPet1 && !(this instanceof NonInteractiveNPC);
     }
 
+    private boolean updateWorkerActive() {
+        return !updateWorkerStopped && !beforeDispose && !Maintenance.isRunning
+                && session != null && session.isConnected() && this.name != null;
+    }
+
     @Override
     public void run() {
         Functions.sleep(500);
-        while (!Maintenance.isRunning && session != null && session.isConnected() && this.name != null) {
+        long lastErrorLog = 0;
+        while (!Thread.currentThread().isInterrupted() && updateWorkerActive()) {
             long st = System.currentTimeMillis();
-            update();
-            Functions.sleep(Math.max(1000 - (System.currentTimeMillis() - st), 10));
+            try {
+                if (!ServerMaintenanceGate.paused()) update();
+            } catch (Exception e) {
+                if (System.currentTimeMillis() - lastErrorLog >= 30000) {
+                    lastErrorLog = System.currentTimeMillis();
+                    Logger.logException(Player.class, e, "Player tick failed");
+                }
+            } finally {
+                Functions.sleep(Math.max(1000 - (System.currentTimeMillis() - st), 10));
+            }
         }
     }
 
     public void start() {
-        Executors.newSingleThreadExecutor().submit(this, "Update player " + this.name);
+        updateWorker.start("Update player " + this.name, this, this::updateWorkerActive);
     }
 
     public void update() {
+        try (ServerMaintenanceGate.Lease permit = ServerMaintenanceGate.enter()) {
+            if (!permit.allowed()) return;
+            updateActive();
+        }
+    }
+
+    private void updateActive() {
         if(nro.models.services.LiveSyncCommandGate.hasPendingId(id))return;
         if(nro.models.services.GiftCodeService.hasPendingId(id))return;
         if(isPl()) nro.models.services.CommesonChallengeService.gI().update(this);
@@ -676,7 +700,7 @@ public class Player implements Runnable {
         {867, 868, 869},
         {1866, 1859, 1860}, //td btc3
         {1861, 1864, 1865}, //nm btc3
-        {1856, 1859, 1860} 
+        {1856, 1859, 1860}
     };
 
     public static final short[][] idOutfitGod = {
@@ -1354,6 +1378,10 @@ public class Player implements Runnable {
     }
 
     public void dispose() {
+        // A failed logout snapshot must remain available for Client's retry worker.
+        // Other cleanup paths can also call dispose while the logout record is retained.
+        if (nro.models.server.Client.hasUnsavedPlayerSnapshot(this)
+                && !nro.models.database.PlayerDAO.hasDurableLogoutSave(this)) return;
         if(nro.models.event.EventCleanupLogoutService.pending(id))return;
         if(nro.models.services.LiveSyncCommandGate.hasPendingId(id))return;
         if(!nro.models.services.GiftCodeService.gI().reconcilePending(this))return;
@@ -1369,9 +1397,12 @@ public class Player implements Runnable {
         if (!nro.models.shop_ky_gui.ConsignTransactions.reconcilePending(this)) return;
         if (!nro.models.services.RubyGiftService.gI().reconcilePending(this)) return;
         synchronized (this) {
+        if (nro.models.server.Client.hasUnsavedPlayerSnapshot(this)
+                && !nro.models.database.PlayerDAO.hasDurableLogoutSave(this)) return;
         if (nro.models.shop_ky_gui.ConsignTransactions.hasPending(this) || nro.models.services.RubyGiftService.hasPending(this)) return;
         if(nro.models.event.EventCleanupLogoutService.pending(id))return;
         if(nro.models.services.LiveSyncCommandGate.hasPendingId(id))return;
+        updateWorkerStopped = true;
         nro.models.services.RubyGiftService.gI().cancel(this);
         if (itemsTradeWVP != null) {
             if (!itemsTradeWVP.isEmpty()) {

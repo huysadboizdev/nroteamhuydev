@@ -108,6 +108,8 @@ public class WorldMartialArtsTournamentManager implements Runnable {
     }
 
     public void update() {
+        try (var permit = nro.models.services.ServerMaintenanceGate.enter()) {
+        if (!permit.allowed()) return;
         if (TimeUtil.getCurrMin() > ConstTournament.MINS_END) {
             round = 0;
             for (int i = listTournaments.size() - 1; i >= 0; i--) {
@@ -184,6 +186,7 @@ public class WorldMartialArtsTournamentManager implements Runnable {
                     }
                 }
             }
+        }
         }
     }
 

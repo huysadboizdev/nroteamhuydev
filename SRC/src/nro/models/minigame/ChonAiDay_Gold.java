@@ -52,7 +52,9 @@ public class ChonAiDay_Gold implements Runnable {
     @Override
     public void run() {
         while (true) {
+            nro.models.services.ServerMaintenanceGate.Lease permit = nro.models.services.ServerMaintenanceGate.enter();
             try {
+                if (!permit.allowed()) { Thread.sleep(1000); continue; }
                 if ((lastTimeEnd - System.currentTimeMillis()) / 1000 <= 0) {
                     List<Player> listN = new ArrayList<>();
 
@@ -99,7 +101,7 @@ public class ChonAiDay_Gold implements Runnable {
                 Thread.sleep(1000);
             } catch (Exception e) {
                 e.printStackTrace();
-            }
+            } finally { permit.close(); }
         }
     }
 

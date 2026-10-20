@@ -167,6 +167,13 @@ public class Zone {
     }
 
     public void update() {
+        try (nro.models.services.ServerMaintenanceGate.Lease permit = nro.models.services.ServerMaintenanceGate.enter()) {
+            if (!permit.allowed()) return;
+            updateActive();
+        }
+    }
+
+    private void updateActive() {
         udMob();
         udItem();
         udPlayer();
@@ -249,7 +256,7 @@ public class Zone {
         List<Player> current = getNotBosses();
         for (int i = current.size() - 1; i >= 0; i--) {
             Player pl = current.get(i);
-            if (!pl.isPet && !pl.isBot && !pl.isNewPet) {
+            if (pl != null && !pl.isPl() && !pl.isPet && !pl.isBot && !pl.isNewPet) {
                 pl.update();
             }
         }
@@ -430,7 +437,7 @@ public class Zone {
                         Service.gI().sendThongBao(player, "Không thể thực hiện");
                     }
                 }
-            
+
                 }
             }
         }

@@ -34,13 +34,20 @@ public final class LiveSyncService {
     public synchronized void processQueue(){
         try{
             for(Pending p:new ArrayList<>(unresolved.values()))recover(p);
+            if(ServerMaintenanceGate.paused())return;
             List<Long> ids;try(Connection c=connections.open()){ids=LiveSyncCommandDAO.pending(c);}
             for(long id:ids){if(scheduler!=null&&!isRunning)break;if(!unresolved.containsKey(id))process(id);}
         }catch(Exception e){System.err.println("[LiveSync] Queue unavailable: "+e.getClass().getSimpleName());}
     }
+    /** Recover existing commits without admitting new admin mutations or stopping this worker. */
+    public synchronized void drainForMaintenance() throws Exception {
+        for(Pending p:new ArrayList<>(unresolved.values()))recover(p);
+        if(!unresolved.isEmpty())throw new IllegalStateException("Web commands still awaiting reconciliation");
+    }
     private static long positive(JSONObject p,String key){try{long value=Long.parseLong(String.valueOf(p.get(key)));if(value<=0)throw new IllegalArgumentException();return value;}catch(RuntimeException e){throw new IllegalArgumentException("Invalid "+key,e);}}
     private static boolean accountCommand(String type){return "UPDATE_ACCOUNT".equals(type)||"ACCOUNT_ACTION".equals(type);}
     private void process(long command){synchronized(LiveSyncCommandGate.LIFECYCLE_LOCK){
+        if(ServerMaintenanceGate.paused())return;
         try{
             long playerId=0;int account=0;boolean hasReceipt;LiveSyncCommandDAO.Command descriptor;
             try(Connection probe=connections.open()){

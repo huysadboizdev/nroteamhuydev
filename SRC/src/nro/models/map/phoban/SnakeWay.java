@@ -18,7 +18,9 @@ import nro.models.map.service.ChangeMapService;
 import nro.models.utils.Util;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Executors;
+import nro.models.utils.OwnedWorker;
+import nro.models.services.ServerMaintenanceGate;
+import nro.models.utils.Logger;
 import lombok.Data;
 import nro.models.server.Maintenance;
 import nro.models.map.service.ItemMapService;
@@ -26,6 +28,7 @@ import nro.models.utils.TimeUtil;
 
 @Data
 public class SnakeWay implements Runnable {
+    private final OwnedWorker updateWorker = new OwnedWorker();
 
     public static final long POWER_CAN_GO_TO_CDRD = 2000000000;
     public static final int AVAILABLE = 50;
@@ -60,18 +63,30 @@ public class SnakeWay implements Runnable {
 
     @Override
     public void run() {
-        while (!Maintenance.isRunning && isOpened) {
-            try {
-                long startTime = System.currentTimeMillis();
-                update();
-                Functions.sleep(Math.max(150 - (System.currentTimeMillis() - startTime), 10));
+        long lastErrorLog = 0;
+        while (!Thread.currentThread().isInterrupted() && !Maintenance.isRunning && isOpened) {
+            long startTime = System.currentTimeMillis();
+            try (ServerMaintenanceGate.Lease permit = ServerMaintenanceGate.enter()) {
+                if (permit.allowed()) update();
             } catch (Exception e) {
-                e.printStackTrace();
+                if (System.currentTimeMillis() - lastErrorLog >= 30000) {
+                    lastErrorLog = System.currentTimeMillis();
+                    Logger.logException(SnakeWay.class, e, "Dungeon tick failed");
+                }
+            } finally {
+                Functions.sleep(Math.max(150 - (System.currentTimeMillis() - startTime), 10));
             }
         }
     }
 
     public synchronized void update() {
+        try (ServerMaintenanceGate.Lease permit = ServerMaintenanceGate.enter()) {
+            if (!permit.allowed()) return;
+            updateActive();
+        }
+    }
+
+    private void updateActive() {
         if (isInitializing) return;
         if (isOpened) {
             if (isClosing || Util.canDoWithTime(lastTimeOpen, TIME_CON_DUONG_RAN_DOC) || (kickoutcdrd && Util.canDoWithTime(timeKickOutCDRD, 60000))) {
@@ -213,7 +228,7 @@ public class SnakeWay implements Runnable {
                 }
             }
         }
-        Executors.newSingleThreadExecutor().submit(this, "Con Đường Rắn Độc: " + this.clan.name);
+        updateWorker.start("Con Đường Rắn Độc: " + this.clan.name, this, () -> !Maintenance.isRunning && isOpened);
     }
 
     public synchronized void finish() {

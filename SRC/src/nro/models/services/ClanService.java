@@ -984,6 +984,11 @@ public class ClanService {
     }
 
     public void close() {
+        try { saveForMaintenance(); }
+        catch(Exception failure) { Logger.logException(ClanService.class,failure,"Clan save failed"); }
+    }
+
+    public void saveForMaintenance() throws Exception {
         PreparedStatement ps;
         try (Connection con = LocalManager.getConnection();) {
             ps = con.prepareStatement("update clan set slogan = ?, img_id = ?, power_point = ?, max_member = ?, clan_point = ?, level = ?, members = ?, name_2 = ?, tops = ? where id = ? limit 1");
@@ -1026,6 +1031,7 @@ public class ClanService {
             ps.executeBatch();
             ps.close();
         } catch (Exception e) {
+            throw e;
         }
     }
 

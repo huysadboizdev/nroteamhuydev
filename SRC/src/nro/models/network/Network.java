@@ -4,6 +4,7 @@ import java.net.Socket;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.ServerSocketChannel;
+import java.nio.channels.SocketChannel;
 import java.nio.channels.Selector;
 import java.nio.channels.SelectionKey;
 import java.util.Iterator;
@@ -125,12 +126,14 @@ public class Network implements INetwork, Runnable {
                     }
 
                     ServerSocketChannel server = (ServerSocketChannel) key.channel();
-                    Socket socket = server.accept().socket();
+                    SocketChannel accepted = server.accept();
+                    if(accepted==null)continue;
+                    Socket socket = accepted.socket();
                     socket.setTcpNoDelay(true);
 
                     ISession session = SessionFactory.gI().cloneSession(this.sessionClone, socket);
                     this.acceptHandler.sessionInit(session);
-                    SessionManager.gI().putSession(session);
+                    if(session.isConnected())SessionManager.gI().putSession(session);
                 }
             } catch (IOException ex) {
                 Logger.error("IOException in Network loop: " + ex.getMessage());

@@ -113,8 +113,22 @@ public class MySession extends Session {
     }
 
     public void login(String username, String password) {
+        if(nro.models.services.ServerMaintenanceGate.paused()) {
+            Service.gI().sendThongBaoOK(this,"Máy chủ đang bảo trì. Vui lòng quay lại sau.");
+            return;
+        }
+        try (var permit = nro.models.services.ServerMaintenanceGate.enter()) {
+        if (!permit.allowed()) {
+            Service.gI().sendThongBaoOK(this,"Máy chủ đang bảo trì. Vui lòng quay lại sau.");
+            return;
+        }
         synchronized(nro.models.services.LiveSyncCommandGate.LIFECYCLE_LOCK) {
+            if(nro.models.services.ServerMaintenanceGate.paused()) {
+                Service.gI().sendThongBaoOK(this,"Máy chủ đang bảo trì. Vui lòng quay lại sau.");
+                return;
+            }
             loginInternal(username,password);
+        }
         }
     }
 

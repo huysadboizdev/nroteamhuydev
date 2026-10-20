@@ -418,6 +418,12 @@ public class BossManager implements Runnable {
         }
     }
     public final void updateBosses(){
+        try(var permit=nro.models.services.ServerMaintenanceGate.enter()) {
+            if(!permit.allowed())return;
+            updateAdmittedBosses();
+        }
+    }
+    private void updateAdmittedBosses(){
         if (getClass() == BossManager.class) {
             try { nro.models.boss.Mabu.FatMabuService.gI().tick(); }
             catch (Exception failure) { Logger.logException(BossManager.class, failure, "Fat Mabu tick"); }

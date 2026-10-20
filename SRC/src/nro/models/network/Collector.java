@@ -10,7 +10,7 @@ import nro.models.interfaces.ISession;
 public final class Collector
         implements Runnable {
 
-    private ISession session;
+    private final ISession session;
     private DataInputStream dis;
     private IMessageSendCollect collect;
     private IMessageHandler messageHandler;
@@ -33,12 +33,10 @@ public final class Collector
         try {
             while (this.session != null && this.session.isConnected()) {
                 Message msg = this.collect.readMessage(this.session, this.dis);
-                if (msg.command == -27) {
-                    this.session.sendKey();
-                } else {
-                    this.messageHandler.onMessage(this.session, msg);
-                }
-                msg.cleanup();
+                try {
+                    if (msg.command == -27) this.session.sendKey();
+                    else this.messageHandler.onMessage(this.session, msg);
+                } finally { msg.cleanup(); }
             }
         } catch (Exception exception) {
         }
@@ -69,8 +67,7 @@ public final class Collector
     }
 
     public void dispose() {
-        this.session = null;
-        this.dis = null;
-        this.collect = null;
+        // Keep session/streams stable until run() finishes normal logout.
+        this.close();
     }
 }

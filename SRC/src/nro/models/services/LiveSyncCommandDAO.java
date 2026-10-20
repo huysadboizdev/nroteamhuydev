@@ -10,7 +10,7 @@ public final class LiveSyncCommandDAO {
     private LiveSyncCommandDAO() {}
     public static List<Long> pending(Connection c)throws SQLException {
         List<Long> ids=new ArrayList<>();
-        try(PreparedStatement q=c.prepareStatement("SELECT id FROM server_command_queue WHERE status IN ('pending','processing') ORDER BY id LIMIT 10");ResultSet r=q.executeQuery()){
+        try(PreparedStatement q=c.prepareStatement("SELECT id FROM server_command_queue WHERE status IN ('pending','processing') AND command_type NOT IN ('MAINTENANCE_START','MAINTENANCE_OPEN') ORDER BY id LIMIT 10");ResultSet r=q.executeQuery()){
             while(r.next())ids.add(r.getLong(1));
         }return ids;
     }

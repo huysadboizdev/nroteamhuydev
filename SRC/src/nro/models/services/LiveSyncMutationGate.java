@@ -7,6 +7,7 @@ public final class LiveSyncMutationGate {
     private LiveSyncMutationGate() {}
     public static Player owner(Player player){return player instanceof Pet pet&&pet.master!=null?pet.master:player;}
     public static boolean blocked(Player player) {
+        if(ServerMaintenanceGate.paused())return true;
         Player owner=owner(player);
         return owner!=null&&(LiveSyncCommandGate.hasPendingId(owner.id)
                 ||nro.models.event.EventCleanupService.pending(owner.id)

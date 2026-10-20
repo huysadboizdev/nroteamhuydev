@@ -1,9 +1,9 @@
 package nro.models.network;
 
-import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.concurrent.atomic.AtomicBoolean;
 import nro.models.interfaces.IKeySessionHandler;
 import nro.models.interfaces.IMessageHandler;
 import nro.models.interfaces.IMessageSendCollect;
@@ -19,8 +19,10 @@ public class Session implements ISession {
     private final Socket socket;
     private final String ip;
     private byte[] KEYS = "NRO".getBytes();
-    private boolean sentKey;
-    private boolean connected;
+    private volatile boolean sentKey;
+    private volatile boolean connected;
+    private final AtomicBoolean disconnected = new AtomicBoolean();
+    private final AtomicBoolean disposed = new AtomicBoolean();
 
     private Sender sender;
     private Collector collector;
@@ -57,20 +59,20 @@ public class Session implements ISession {
 
     @Override
     public ISession start() {
-        this.tSender.start();
-        this.tCollector.start();
+        startSend();
+        startCollect();
         return this;
     }
 
     @Override
-    public ISession startSend() {
-        this.tSender.start();
+    public synchronized ISession startSend() {
+        if (connected && this.tSender.getState() == Thread.State.NEW) this.tSender.start();
         return this;
     }
 
     @Override
-    public ISession startCollect() {
-        this.tCollector.start();
+    public synchronized ISession startCollect() {
+        if (connected && this.tCollector.getState() == Thread.State.NEW) this.tCollector.start();
         return this;
     }
 
@@ -128,7 +130,7 @@ public class Session implements ISession {
 
     @Override
     public boolean isConnected() {
-        return this.connected;
+        return this.connected && !this.socket.isClosed();
     }
 
     @Override
@@ -153,6 +155,7 @@ public class Session implements ISession {
 
     @Override
     public void disconnect() {
+        if (!this.disconnected.compareAndSet(false, true)) return;
         this.connected = false;
         this.sentKey = false;
 
@@ -163,16 +166,13 @@ public class Session implements ISession {
             this.collector.close();
         }
 
-        try {
-            this.socket.close();
-        } catch (IOException ignored) {
-        }
-
         this.dispose();
     }
 
     @Override
     public void dispose() {
+        if (!this.disposed.compareAndSet(false, true)) return;
+        this.connected = false;
         if (this.sender != null) {
             this.sender.dispose();
         }
@@ -180,12 +180,11 @@ public class Session implements ISession {
             this.collector.dispose();
         }
 
-        if (this.tSender.isAlive()) {
+        if (this.tSender != Thread.currentThread() && this.tSender.isAlive()) {
             this.tSender.interrupt();
         }
-        if (this.tCollector.isAlive()) {
-            this.tCollector.interrupt();
-        }
+        // Socket close wakes readMessage. Do not interrupt Collector: it may already
+        // be saving the player in the normal disconnect callback.
 
         SessionManager.gI().removeSession(this);
     }

@@ -57,6 +57,8 @@ public class Map implements Runnable {
     private static final int SIZE = 24;
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     private ScheduledExecutorService hirudegarnScheduler;
+    private boolean updateStarted;
+    private volatile long lastZoneErrorLog;
     public final List<BotAttackplayer> bots = new ArrayList<>();
     public List<Player> players = new ArrayList<>();
 
@@ -201,22 +203,38 @@ public class Map implements Runnable {
         hirudegarnScheduler = Executors.newSingleThreadScheduledExecutor(task ->
                 new Thread(task, "hirudegarn-event-126"));
         hirudegarnScheduler.scheduleAtFixedRate(() -> {
-            try { nro.models.services.HirudegarnEventService.gI().tick(this); }
+            try (nro.models.services.ServerMaintenanceGate.Lease permit = nro.models.services.ServerMaintenanceGate.enter()) {
+                if (permit.allowed()) nro.models.services.HirudegarnEventService.gI().tick(this);
+            }
             catch (Exception e) { Logger.logException(Map.class, e, "Hirudegarn event tick"); }
         }, 0, 100, TimeUnit.MILLISECONDS);
     }
 
-    public void run() {
+    public synchronized void run() {
+        if (updateStarted) return;
+        updateStarted = true;
         startHirudegarnEvent();
-        scheduler.scheduleAtFixedRate(() -> {
+        scheduler.scheduleAtFixedRate(this::updateZones, 0, 5000, TimeUnit.MILLISECONDS);
+    }
+
+    private void updateZones() {
+        if (nro.models.services.ServerMaintenanceGate.paused()) return;
+        long started = System.currentTimeMillis();
+        for (Zone zone : this.zones) {
             try {
-                for (Zone zone : this.zones) {
-                    zone.update();
-                }
+                zone.update();
             } catch (Exception e) {
-                Logger.logException(Map.class, e, "Lỗi update map " + this.mapName);
+                if (System.currentTimeMillis() - lastZoneErrorLog >= 30000) {
+                    lastZoneErrorLog = System.currentTimeMillis();
+                    Logger.logException(Map.class, e, "Zone tick failed in map " + mapId);
+                }
             }
-        }, 0, 5000, TimeUnit.MILLISECONDS);  // Cập nhật mỗi 1 giây
+        }
+        long elapsed = System.currentTimeMillis() - started;
+        if (elapsed > 5000 && System.currentTimeMillis() - lastZoneErrorLog >= 30000) {
+            lastZoneErrorLog = System.currentTimeMillis();
+            System.err.println("Slow map tick map=" + mapId + " elapsedMs=" + elapsed);
+        }
     }
 
     public void initMob(byte[] mobTemp, byte[] mobLevel, int[] mobHp, short[] mobX, short[] mobY) {

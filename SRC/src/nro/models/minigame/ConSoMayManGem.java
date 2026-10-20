@@ -44,7 +44,9 @@ public class ConSoMayManGem implements Runnable {
     @Override
     public void run() {
         while (true) {
+            nro.models.services.ServerMaintenanceGate.Lease permit = nro.models.services.ServerMaintenanceGate.enter();
             try {
+                if (!permit.allowed()) { Thread.sleep(1000); continue; }
                 if (inBettingPhase) {
                     if (second > 0) {
                         second--;
@@ -66,7 +68,7 @@ public class ConSoMayManGem implements Runnable {
                 break;
             } catch (Exception e) {
                 e.printStackTrace();
-            }
+            } finally { permit.close(); }
         }
     }
 

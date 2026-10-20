@@ -39,7 +39,50 @@ public class Client implements Runnable {
     @Getter
     private final List<Player> players = new java.util.concurrent.CopyOnWriteArrayList<>();
 
+    private static final Map<MySession, LogoutRecord> UNSAVED_LOGOUTS = new java.util.concurrent.ConcurrentHashMap<>();
+    private final LogoutActions logoutActions;
+
+    interface LogoutActions {
+        void cleanup(Player player) throws Exception;
+        boolean savePlayer(Player player) throws Exception;
+        boolean saveAccount(int account, Timestamp logoutTime) throws Exception;
+        void dispose(Player player);
+        void disconnect(MySession session);
+    }
+
+    private static final LogoutActions DEFAULT_LOGOUT_ACTIONS = new LogoutActions() {
+        public void cleanup(Player player) { cleanupDetachedPlayer(player); }
+        public boolean savePlayer(Player player) { return PlayerDAO.saveDetachedChecked(player); }
+        public boolean saveAccount(int account, Timestamp logoutTime) throws Exception {
+            return LocalManager.executeUpdate("update account set last_time_logout = ? where id = ?", logoutTime, account) == 1;
+        }
+        public void dispose(Player player) { player.dispose(); }
+        public void disconnect(MySession session) {
+            try { ServerManager.gI().disconnect(session); }
+            finally { session.disconnect(); }
+        }
+    };
+
+    private static final class LogoutRecord {
+        final MySession session;
+        final Player player;
+        final int account;
+        final Timestamp logoutTime = new Timestamp(System.currentTimeMillis());
+        final LogoutActions actions;
+        volatile boolean cleanupComplete;
+        boolean playerSaved;
+        boolean metadataSaved;
+        LogoutRecord(MySession session, LogoutActions actions) {
+            this.session = session; this.player = session.player; this.account = session.userId;
+            this.actions = actions; this.playerSaved = player == null;
+            this.metadataSaved = !session.joinedGame;
+        }
+    }
+
+    Client(LogoutActions actions) { this.logoutActions = actions; }
+
     private Client() {
+        this(DEFAULT_LOGOUT_ACTIONS);
         Executors.newSingleThreadExecutor().submit(this, "Update Client");
     }
 
@@ -69,39 +112,22 @@ public class Client implements Runnable {
       }}
     }
 
-    private void remove(MySession session) {
-        if (session.player != null) {
-            Player retiring=session.player;
-            this.remove(retiring);
-            retiring.dispose();
-            if(!nro.models.event.EventCleanupLogoutService.pending(retiring.id)&&!nro.models.services.LiveSyncCommandGate.hasPendingId(retiring.id)&&!nro.models.services.GiftCodeService.hasPendingId(retiring.id))retiring.liveLogoutCompleted=true;
-        }
-        if (session.joinedGame) {
-            session.joinedGame = false;
-            try {
-                LocalManager.executeUpdate("update account set last_time_logout = ? where id = ?", new Timestamp(System.currentTimeMillis()), session.userId);
-            } catch (Exception e) {
-                Logger.logException(Client.class, e);
+    private void detach(Player player, int account) {
+        synchronized (player) {
+            nro.models.services.LiveSyncCommandGate.retire(player.id, account);
+            synchronized (registryLock) {
+                this.players_id.remove(player.id, player);
+                this.players_name.remove(player.name, player);
+                this.players_userId.remove(account, player);
+                this.players.remove(player);
+                player.beforeDispose = true;
             }
         }
-        ServerManager.gI().disconnect(session);
     }
 
-    private void remove(Player player) {
-        boolean cleanup;
-        synchronized (player) {
-            nro.models.services.LiveSyncCommandGate.retire(player.id,player.getSession().userId);
-            synchronized (registryLock) {
-            this.players_id.remove(player.id, player);
-            this.players_name.remove(player.name, player);
-            this.players_userId.remove(player.getSession().userId, player);
-            this.players.remove(player);
-            cleanup = !player.beforeDispose;
-            player.beforeDispose = true;
-            }
-        }
-        if (cleanup) {
-            player.mapIdBeforeLogout = player.zone.map.mapId;
+    private static void cleanupDetachedPlayer(Player player) {
+        {
+            if (player.zone != null) player.mapIdBeforeLogout = player.zone.map.mapId;
             if (player.idNRNM != -1) {
                 ItemMap itemMap = new ItemMap(player.zone, player.idNRNM, 1, player.location.x, player.location.y, -1);
                 Service.gI().dropItemMap(player.zone, itemMap);
@@ -136,24 +162,87 @@ public class Client implements Runnable {
             }
         }
         nro.models.event.EventCleanupLogoutService.retainIfPending(player);
-        PlayerDAO.updatePlayer(player);
     }
 
     public void kickSession(MySession session) {
-        if (session != null && session.claimLogout()) {
-            Player retiring=session.player;
-            try { this.remove(session); }
+        if (session == null || !session.claimLogout()) return;
+        LogoutRecord record = new LogoutRecord(session, logoutActions);
+        // Publish the reservation before cleanup or pending-operation recovery can run.
+        UNSAVED_LOGOUTS.put(session, record);
+        try {
+            if (record.player != null) {
+                detach(record.player, record.account);
+                // Trade cancellation may acquire two players; never hold either here.
+                record.actions.cleanup(record.player);
+                record.player.liveLogoutCleanupCompleted = true;
+            }
+            record.cleanupComplete = true;
+            completeLogout(record);
+        } catch (Exception failure) {
+            Logger.logException(Client.class, failure);
+        } finally {
+            try { record.actions.disconnect(session); }
             finally {
-                try { session.disconnect(); }
-                finally {
-                    if(retiring!=null) {
-                        retiring.liveLogoutCleanupCompleted=true;
-                        if(!nro.models.event.EventCleanupLogoutService.pending(retiring.id)&&!nro.models.services.LiveSyncCommandGate.hasPendingId(retiring.id)&&!nro.models.services.GiftCodeService.hasPendingId(retiring.id))
-                            nro.models.services.LiveSyncCommandGate.retired(retiring.id,session.userId);
-                    }
-                }
+                if (record.player != null && UNSAVED_LOGOUTS.containsKey(session))
+                    nro.models.services.LiveSyncCommandGate.retire(record.player.id, record.account);
             }
         }
+    }
+
+    private void completeLogout(LogoutRecord record) throws Exception {
+        synchronized (record) {
+            if (!record.cleanupComplete || UNSAVED_LOGOUTS.get(record.session) != record) return;
+            if (!record.playerSaved) {
+                synchronized (record.player) {
+                    record.playerSaved = record.actions.savePlayer(record.player);
+                }
+            }
+            if (!record.playerSaved) return;
+            if (!record.metadataSaved) record.metadataSaved = record.actions.saveAccount(record.account, record.logoutTime);
+            if (!record.metadataSaved) return;
+            if (record.player != null) {
+                synchronized (record.player) {
+                    record.actions.dispose(record.player);
+                    record.player.liveLogoutCompleted = true;
+                }
+            }
+            record.session.joinedGame = false;
+            UNSAVED_LOGOUTS.remove(record.session, record);
+            if (record.player != null) nro.models.services.LiveSyncCommandGate.retired(record.player.id, record.account);
+        }
+    }
+
+    public void retryUnsavedLogouts() {
+        for (LogoutRecord record : new ArrayList<>(UNSAVED_LOGOUTS.values())) {
+            try { completeLogout(record); }
+            catch (Exception failure) { Logger.logException(Client.class, failure); }
+        }
+    }
+
+    public boolean hasUnsavedLogouts() { return !UNSAVED_LOGOUTS.isEmpty(); }
+    public int getUnsavedLogoutCount() { return UNSAVED_LOGOUTS.size(); }
+    public static boolean hasUnsavedLogoutForAccount(int account) {
+        if (account <= 0) return false;
+        for (LogoutRecord record : UNSAVED_LOGOUTS.values()) if (record.account == account) return true;
+        return false;
+    }
+    public static boolean hasUnsavedPlayerSnapshot(Player player) {
+        for (LogoutRecord record : UNSAVED_LOGOUTS.values()) if (record.player == player) return true;
+        return false;
+    }
+
+    /** Admission/mutation must already be closed by the maintenance coordinator. */
+    public void drainForWebMaintenance() {
+        for (Player player : new ArrayList<>(players)) {
+            MySession session = player.getSession();
+            if (session == null) throw new IllegalStateException("Registered player has no session");
+            kickSession(session);
+        }
+        for (ISession session : new ArrayList<>(SessionManager.gI().getSessions()))
+            if (session instanceof MySession) kickSession((MySession) session);
+        retryUnsavedLogouts();
+        if (!players.isEmpty() || hasUnsavedLogouts())
+            throw new IllegalStateException("Logout saves/metadata remain incomplete: " + getUnsavedLogoutCount());
     }
 
     @FunctionalInterface
@@ -188,16 +277,7 @@ public class Client implements Runnable {
 
     public void close() {
         Logger.log(Logger.YELLOW, "BEGIN KICK OUT SESSION " + players.size() + "\n");
-        synchronized(nro.models.services.LiveSyncCommandGate.LIFECYCLE_LOCK) {
-        for(Player pl:getPlayers()) {
-            synchronized(pl) {
-            if(pl.getSession()==null)throw new IllegalStateException("Registered player has no session; maintenance cannot verify save");
-            TransactionService.gI().cancelTrade(pl);
-            if(!PlayerDAO.saveChecked(pl))throw new IllegalStateException("Player full save failed; event cleanup must not start");
-            this.kickSession(pl.getSession());
-            }
-        }
-        }
+        drainForWebMaintenance();
         Logger.success("SUCCESSFUL\n");
     }
 

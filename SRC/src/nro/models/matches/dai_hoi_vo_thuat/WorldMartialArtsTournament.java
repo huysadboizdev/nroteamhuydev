@@ -52,7 +52,9 @@ public final class WorldMartialArtsTournament implements Runnable {
         while (!Maintenance.isRunning && competing) {
             try {
                 long startTime = System.currentTimeMillis();
-                update();
+                try (var permit = nro.models.services.ServerMaintenanceGate.enter()) {
+                    if (permit.allowed()) update();
+                }
                 Functions.sleep(Math.max(150 - (System.currentTimeMillis() - startTime), 10));
             } catch (Exception e) {
                 e.printStackTrace();

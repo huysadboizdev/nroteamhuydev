@@ -13,7 +13,9 @@ import nro.models.player.Player;
 import nro.models.map.service.ChangeMapService;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Executors;
+import nro.models.utils.OwnedWorker;
+import nro.models.services.ServerMaintenanceGate;
+import nro.models.utils.Logger;
 import lombok.Data;
 import nro.models.map.ItemMap;
 import nro.models.server.Maintenance;
@@ -26,6 +28,7 @@ import nro.models.utils.Util;
 
 @Data
 public class RedRibbonHQ implements Runnable {
+    private final OwnedWorker updateWorker = new OwnedWorker();
 
     //bang hội đủ số người mới đc mở
     public static final int N_PLAYER_CLAN = 5;
@@ -70,13 +73,18 @@ public class RedRibbonHQ implements Runnable {
 
     @Override
     public void run() {
-        while (!Maintenance.isRunning && isOpened) {
-            try {
-                long startTime = System.currentTimeMillis();
-                update();
-                Functions.sleep(Math.max(150 - (System.currentTimeMillis() - startTime), 10));
+        long lastErrorLog = 0;
+        while (!Thread.currentThread().isInterrupted() && !Maintenance.isRunning && isOpened) {
+            long startTime = System.currentTimeMillis();
+            try (ServerMaintenanceGate.Lease permit = ServerMaintenanceGate.enter()) {
+                if (permit.allowed()) update();
             } catch (Exception e) {
-                e.printStackTrace();
+                if (System.currentTimeMillis() - lastErrorLog >= 30000) {
+                    lastErrorLog = System.currentTimeMillis();
+                    Logger.logException(RedRibbonHQ.class, e, "Dungeon tick failed");
+                }
+            } finally {
+                Functions.sleep(Math.max(150 - (System.currentTimeMillis() - startTime), 10));
             }
         }
     }
@@ -222,10 +230,17 @@ public class RedRibbonHQ implements Runnable {
                 }
             }
         }
-        Executors.newSingleThreadExecutor().submit(this, "Doanh Trại: " + this.clan.name);
+        updateWorker.start("Doanh Trại: " + this.clan.name, this, () -> !Maintenance.isRunning && isOpened);
     }
 
     public synchronized void update() {
+        try (ServerMaintenanceGate.Lease permit = ServerMaintenanceGate.enter()) {
+            if (!permit.allowed()) return;
+            updateActive();
+        }
+    }
+
+    private void updateActive() {
         if (isInitializing) return;
         if (isOpened) {
             if (isClosing || (!isTimePicking && Util.canDoWithTime(lastTimeOpen, TIME_DOANH_TRAI)) || (isTimePicking && Util.canDoWithTime(lastTimePick, TIME_PICK_DOANH_TRAI))) {

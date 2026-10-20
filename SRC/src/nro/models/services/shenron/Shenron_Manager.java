@@ -43,6 +43,8 @@ public class Shenron_Manager implements Runnable {
     }
 
     public void update() {
+        try (var permit = nro.models.services.ServerMaintenanceGate.enter()) {
+        if (!permit.allowed()) return;
         if (Util.canDoWithTime(lastUpdate, 1000)) {
             lastUpdate = System.currentTimeMillis();
             List<Shenron_Event> listCopy = new ArrayList<>(list);
@@ -55,6 +57,7 @@ public class Shenron_Manager implements Runnable {
                 }
             }
             listCopy.clear();
+        }
         }
     }
 

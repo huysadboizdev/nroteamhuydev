@@ -34,7 +34,7 @@ public class AutoMaintenance extends Thread {
 
         while (true) {
             try {
-                if (AutoMaintenance) {
+                if (AutoMaintenance && !nro.models.services.ServerMaintenanceGate.paused()) {
                     LocalTime currentTime = LocalTime.now();
                     LocalTime maintenanceTime = LocalTime.of(hours, mins);
                     LocalTime maintenanceEndTime = maintenanceTime.plusMinutes(5);

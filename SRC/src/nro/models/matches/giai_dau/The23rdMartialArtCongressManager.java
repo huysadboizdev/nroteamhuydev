@@ -37,6 +37,8 @@ public class The23rdMartialArtCongressManager implements Runnable {
     }
 
     public void update() {
+        try (var permit = nro.models.services.ServerMaintenanceGate.enter()) {
+        if (!permit.allowed()) return;
         if (Util.canDoWithTime(lastUpdate, 1000)) {
             lastUpdate = System.currentTimeMillis();
             for (int i = list.size() - 1; i >= 0; i--) {
@@ -44,6 +46,7 @@ public class The23rdMartialArtCongressManager implements Runnable {
                     list.get(i).update();
                 }
             }
+        }
         }
     }
 

@@ -3,101 +3,145 @@ package nro.models.network;
 import java.net.Socket;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.concurrent.BlockingDeque;
-import java.util.concurrent.LinkedBlockingDeque;
+import java.util.ArrayDeque;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import lombok.NonNull;
+import java.util.logging.Logger;
 import nro.models.interfaces.IMessageSendCollect;
 import nro.models.interfaces.ISession;
 
 public final class Sender implements Runnable {
+    // Allow resource frames up to 16 MiB while bounding each slow client's memory.
+    private static final int MAX_MESSAGES = positiveInt("nro.sender.maxMessages", 4096);
+    private static final long MAX_BYTES = positiveLong("nro.sender.maxBytes", 32L * 1024 * 1024);
+    private static final long WRITE_TIMEOUT = positiveLong("nro.sender.writeTimeoutMillis", 30000);
+    private static final long MAX_QUEUE_AGE = positiveLong("nro.sender.maxQueueAgeMillis", 60000);
+    private static final ScheduledThreadPoolExecutor WATCHDOG = createWatchdog();
+    private static final Logger LOG = Logger.getLogger(Sender.class.getName());
+    private final ISession session;
+    private final Object queueLock = new Object();
+    private final ArrayDeque<Pending> messages = new ArrayDeque<>();
+    private volatile Socket socket;
+    private volatile DataOutputStream dos;
+    private volatile IMessageSendCollect sendCollect;
+    private volatile boolean closed;
+    private long queuedBytes;
+    private ScheduledFuture<?> queueTimeout;
 
-    @NonNull
-    private ISession session;
-    @NonNull
-    private BlockingDeque<Message> messages;
-    private DataOutputStream dos;
-    private IMessageSendCollect sendCollect;
-
-    public Sender(@NonNull ISession session, @NonNull Socket socket) {
-        if (session == null) {
-            throw new NullPointerException("session is marked non-null but is null");
-        }
-        if (socket == null) {
-            throw new NullPointerException("socket is marked non-null but is null");
-        }
-        try {
-            this.session = session;
-            this.messages = new LinkedBlockingDeque<Message>();
-            this.setSocket(socket);
-        } catch (Exception exception) {
-        }
+    public Sender(ISession session, Socket socket) {
+        if (session == null || socket == null) throw new NullPointerException("session/socket");
+        this.session = session;
+        setSocket(socket);
     }
-
-    public Sender setSocket(@NonNull Socket socket) {
-        if (socket == null) {
-            throw new NullPointerException("socket is marked non-null but is null");
-        }
-        try {
-            this.dos = new DataOutputStream(socket.getOutputStream());
-        } catch (IOException iOException) {
-        }
+    public Sender setSocket(Socket socket) {
+        if (socket == null) throw new NullPointerException("socket");
+        this.socket = socket;
+        try { this.dos = new DataOutputStream(socket.getOutputStream()); }
+        catch (IOException e) { failTransport("output unavailable"); }
         return this;
     }
-
-    @Override
-    public void run() {
+    @Override public void run() {
         try {
-            while (this.session.isConnected()) {
-                while (!this.messages.isEmpty()) {
-                    Message message = this.messages.poll(5L, TimeUnit.SECONDS);
-                    if (message == null) {
-                        continue;
-                    }
-                    this.doSendMessage(message);
-                    message.cleanup();
+            while (!closed && session.isConnected()) {
+                Pending pending;
+                synchronized (queueLock) {
+                    while (messages.isEmpty() && !closed && session.isConnected()) queueLock.wait();
+                    if (closed || !session.isConnected()) break;
+                    pending = messages.removeFirst();
+                    queuedBytes -= pending.bytes;
+                    scheduleQueueTimeout();
                 }
-                TimeUnit.MILLISECONDS.sleep(10L);
+                try { doSendMessage(pending.message); }
+                finally { pending.message.cleanup(); }
             }
-        } catch (Exception exception) {
-        }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        } catch (Exception e) {
+            failTransport("send failed: " + e.getClass().getSimpleName());
+        } finally { close(); }
     }
-
+    // Serialize handshake and queued writes to preserve cipher position.
     public synchronized void doSendMessage(Message message) throws Exception {
-        this.sendCollect.doSendMessage(this.session, this.dos, message);
+        if (closed) throw new IOException("Sender closed");
+        ScheduledFuture<?> timeout = WATCHDOG.schedule(() -> failTransport("write timed out"), WRITE_TIMEOUT, TimeUnit.MILLISECONDS);
+        try { sendCollect.doSendMessage(session, dos, message); }
+        catch (Exception e) { failTransport("send failed: " + e.getClass().getSimpleName()); throw e; }
+        finally { timeout.cancel(false); }
     }
-
-    public void sendMessage(Message msg) {
-        try {
-            if (this.session.isConnected()) {
-                this.messages.add(msg);
+    public void sendMessage(Message message) {
+        if (message == null || closed || !session.isConnected()) return;
+        byte[] data;
+        try { data = message.getData(); }
+        catch (RuntimeException e) { failTransport("invalid outgoing message"); return; }
+        long bytes = (long) data.length + 4;
+        boolean overflow;
+        synchronized (queueLock) {
+            if (closed || !session.isConnected()) return;
+            overflow = messages.size() >= MAX_MESSAGES || bytes > MAX_BYTES - queuedBytes;
+            if (!overflow) {
+                // Broadcast callers may mutate/dispose their Message after enqueueing.
+                Message snapshot = new Message(message.command);
+                try { snapshot.write(data); }
+                catch (IOException e) { throw new IllegalStateException(e); }
+                messages.addLast(new Pending(snapshot, bytes));
+                queuedBytes += bytes;
+                if (messages.size() == 1) scheduleQueueTimeout();
+                queueLock.notifyAll();
             }
-        } catch (Exception exception) {
         }
+        if (overflow) failTransport("outgoing queue limit exceeded");
     }
-
-    public void setSend(IMessageSendCollect sendCollect) {
-        this.sendCollect = sendCollect;
+    private void scheduleQueueTimeout() {
+        if (queueTimeout != null) queueTimeout.cancel(false);
+        Pending oldest = messages.peekFirst();
+        queueTimeout = oldest == null ? null : WATCHDOG.schedule(this::checkQueueAge,
+                Math.max(1, MAX_QUEUE_AGE - TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - oldest.enqueued)), TimeUnit.MILLISECONDS);
     }
-
-    public int getNumMessages() {
-        return this.messages.size();
-    }
-
-    public void close() {
-        this.messages.clear();
-        if (this.dos != null) {
-            try {
-                this.dos.close();
-            } catch (IOException iOException) {
-            }
+    private void checkQueueAge() {
+        boolean expired;
+        synchronized (queueLock) {
+            Pending oldest = messages.peekFirst();
+            expired = !closed && oldest != null && System.nanoTime() - oldest.enqueued >= TimeUnit.MILLISECONDS.toNanos(MAX_QUEUE_AGE);
+            if (!expired && !closed) scheduleQueueTimeout();
         }
+        if (expired) failTransport("outgoing queue aged out");
     }
-
-    public void dispose() {
-        this.session = null;
-        this.messages = null;
-        this.sendCollect = null;
-        this.dos = null;
+    private void failTransport(String reason) {
+        if (closeTransport()) LOG.warning("Session " + session.getID() + ": " + reason);
+        // Socket close wakes Collector, which owns normal logout/save. Never save here.
+    }
+    public void setSend(IMessageSendCollect sendCollect) { this.sendCollect = sendCollect; }
+    public int getNumMessages() { synchronized (queueLock) { return messages.size(); } }
+    public void close() { closeTransport(); }
+    private boolean closeTransport() {
+        synchronized (queueLock) {
+            if (closed) return false;
+            closed = true;
+            messages.clear(); queuedBytes = 0;
+            if (queueTimeout != null) queueTimeout.cancel(false);
+            queueLock.notifyAll();
+        }
+        // Never take the write monitor or close the output stream before the socket.
+        try { socket.close(); } catch (IOException ignored) { }
+        return true;
+    }
+    public void dispose() { close(); }
+    private static ScheduledThreadPoolExecutor createWatchdog() {
+        ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1, runnable -> {
+            Thread thread = new Thread(runnable, "Sender-watchdog"); thread.setDaemon(true); return thread;
+        });
+        executor.setRemoveOnCancelPolicy(true);
+        return executor;
+    }
+    private static long positiveLong(String name, long fallback) {
+        long value = Long.getLong(name, fallback); return value > 0 ? value : fallback;
+    }
+    private static int positiveInt(String name, int fallback) {
+        int value = Integer.getInteger(name, fallback); return value > 0 ? value : fallback;
+    }
+    private static final class Pending {
+        final Message message; final long bytes; final long enqueued = System.nanoTime();
+        Pending(Message message, long bytes) { this.message = message; this.bytes = bytes; }
     }
 }

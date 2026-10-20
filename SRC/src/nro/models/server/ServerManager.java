@@ -106,6 +106,7 @@ public class ServerManager {
     public void run() {
         try {
             isRunning = true;
+            nro.models.services.ServerMaintenanceService.gI().initialize();
             nro.models.event.EventCleanupService.resumeMaintenanceIfNeeded();
 
             // Gửi các nhiệm vụ cập nhật theo từng dịch vụ
@@ -146,6 +147,7 @@ public class ServerManager {
 
             startTopUpdater();
             nro.models.services.LiveSyncService.gI().start();
+            nro.models.services.ServerMaintenanceService.gI().start();
         } catch (Exception e) {
             Logger.logException(this.getClass(), e);
         }
@@ -154,10 +156,13 @@ public class ServerManager {
     private void startTopUpdater() {
         topUpdater = Executors.newSingleThreadScheduledExecutor();
         topUpdater.scheduleAtFixedRate(() -> {
+            try(var permit=nro.models.services.ServerMaintenanceGate.enter()) {
+            if(!permit.allowed())return;
             updateWhisWeekly();
             if (shouldUpdateTop()) {
                 updateTop();
                 Manager.resetTopFlags();
+            }
             }
         }, 0, 3000, TimeUnit.MILLISECONDS);
     }
@@ -225,6 +230,7 @@ public class ServerManager {
             Network.gI().init().setAcceptHandler(new ISessionAcceptHandler() {
                 @Override
                 public void sessionInit(ISession is) {
+                    if(nro.models.services.ServerMaintenanceGate.paused()) { is.disconnect();return; }
                     if (!canConnectWithIp(is.getIP())) {
                         is.disconnect();
                         return;
