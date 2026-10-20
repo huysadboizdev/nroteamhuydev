@@ -43,7 +43,7 @@ import nro.models.map.Zone;
 public class SkillService {
 
     public enum MobCastResult {
-        REJECTED(0), ACCEPTED(1), OUT_OF_RANGE(2), COOLDOWN(3);
+        REJECTED(0), ACCEPTED(1), OUT_OF_RANGE(2), COOLDOWN(3), PREPARING(4);
 
         private final int wireCode;
 
@@ -88,8 +88,9 @@ public class SkillService {
                 return MobCastResult.REJECTED;
             }
             Skill selected = player.playerSkill.skillSelect;
-            if (selected == null || selected.template == null
-                    || (selected.template.type != 1 && selected.template.type != 4)) {
+            if (selected == null || selected.template == null || !isOffensiveMobSkill(skillTemplateId)
+                    || (selected.template.type != 1 && selected.template.type != 3 && selected.template.type != 4)
+                    || (selected.template.type == 3 && skillTemplateId != Skill.TU_SAT)) {
                 return MobCastResult.REJECTED;
             }
             if (mobTarget.zone == null || mobTarget.zone != player.zone || mobTarget.isDie()) {
@@ -107,14 +108,77 @@ public class SkillService {
                     && Util.getDistance(player, mobTarget) > Skill.RANGE_ATTACK_CHIEU_DAM) {
                 return MobCastResult.OUT_OF_RANGE;
             }
+            int prepareRemainingMs = getMobCastPrepareRetryAfterMs(player, skillTemplateId);
+            if (prepareRemainingMs > 0) return MobCastResult.PREPARING;
             int cooldownGraceMs = isMeleeMobSkill(skillTemplateId)
                     ? MOB_MELEE_COOLDOWN_GRACE_MS : 50;
             if (!Util.canDoWithTime(selected.lastTimeUseThisSkill, selected.coolDown - cooldownGraceMs)) {
                 return MobCastResult.COOLDOWN;
             }
-            return useSkillLocked(player, null, mobTarget, -1, null, cooldownGraceMs)
-                    ? MobCastResult.ACCEPTED : MobCastResult.REJECTED;
+            if (!useSkillLocked(player, null, mobTarget, -1, null, cooldownGraceMs)) {
+                return MobCastResult.REJECTED;
+            }
+            prepareRemainingMs = getMobCastPrepareRetryAfterMs(player, skillTemplateId);
+            return prepareRemainingMs > 0 ? MobCastResult.PREPARING : MobCastResult.ACCEPTED;
         }
+    }
+
+    /** Confirm a self-centered offensive cast while retaining its normal self-target semantics. */
+    public MobCastResult useSelfSkillForMob(Player player, int status, int skillTemplateId) {
+        if (player == null || player.zone == null || player.playerSkill == null) return MobCastResult.REJECTED;
+        synchronized (player) {
+            if (!selectSkillLocked(player, skillTemplateId)) return MobCastResult.REJECTED;
+            Skill selected = player.playerSkill.skillSelect;
+            if (selected == null || selected.template == null || selected.template.type != 3
+                    || skillTemplateId != Skill.TU_SAT || !isOffensiveMobSkill(skillTemplateId)) {
+                return MobCastResult.REJECTED;
+            }
+            if (!PetSkillRules.canExecute(player) || !canUseSkillWithMana(player)
+                    || (!player.isBoss && !player.isPet && player.nPoint != null && player.nPoint.stamina <= 0)) {
+                return MobCastResult.REJECTED;
+            }
+            int remaining = getMobCastPrepareRetryAfterMs(player, skillTemplateId);
+            if (remaining > 0) return MobCastResult.PREPARING;
+            if (!useSkillLocked(player, null, null, status, null, 50)) return MobCastResult.REJECTED;
+            remaining = getMobCastPrepareRetryAfterMs(player, skillTemplateId);
+            return remaining > 0 ? MobCastResult.PREPARING : MobCastResult.ACCEPTED;
+        }
+    }
+
+    private boolean isOffensiveMobSkill(int skillTemplateId) {
+        return switch (skillTemplateId) {
+            case Skill.DRAGON, Skill.KAMEJOKO, Skill.DEMON, Skill.MASENKO, Skill.GALICK,
+                    Skill.ANTOMIC, Skill.KAIOKEN, Skill.QUA_CAU_KENH_KHI, Skill.MAKANKOSAPPO,
+                    Skill.TU_SAT, Skill.LIEN_HOAN, Skill.DICH_CHUYEN_TUC_THOI,
+                    Skill.SUPER_KAME, Skill.LIEN_HOAN_CHUONG -> true;
+            default -> false;
+        };
+    }
+
+    public int getMobCastPrepareRetryAfterMs(Player player, int skillTemplateId) {
+        if (player == null || player.playerSkill == null) return 0;
+        long startedAt;
+        int durationMs;
+        switch (skillTemplateId) {
+            case Skill.QUA_CAU_KENH_KHI -> {
+                if (!player.playerSkill.prepareQCKK) return 0;
+                startedAt = player.playerSkill.lastTimePrepareQCKK;
+                durationMs = 4000;
+            }
+            case Skill.MAKANKOSAPPO -> {
+                if (!player.playerSkill.prepareLaze) return 0;
+                startedAt = player.playerSkill.lastTimePrepareLaze;
+                durationMs = 3000;
+            }
+            case Skill.TU_SAT -> {
+                if (!player.playerSkill.prepareTuSat || player.playerSkill.delayedBombPending) return 0;
+                startedAt = player.playerSkill.lastTimePrepareTuSat;
+                durationMs = 1500;
+            }
+            default -> { return 0; }
+        }
+        long remaining = startedAt + durationMs - System.currentTimeMillis();
+        return remaining <= 0 ? 0 : (int) Math.min(5000, remaining);
     }
 
     public static boolean isMeleeMobSkill(int skillTemplateId) {
@@ -227,8 +291,11 @@ public class SkillService {
                     useSkillAttack(player, plTarget, mobTarget);
                 case 3 ->
                     useSkillAlone(player);
-                case 4 ->
-                    useNewSkillNotFocus(player, plTarget, mobTarget, status, skillId, dx, dy, dir, x, y);
+                case 4 -> {
+                    if (!useNewSkillNotFocus(player, plTarget, mobTarget, status, skillId, dx, dy, dir, x, y)) {
+                        return false;
+                    }
+                }
                 default -> {
                     return false;
                 }
@@ -237,7 +304,7 @@ public class SkillService {
         return true;
     }
 
-    private void useNewSkillNotFocus(Player player, Player plTarget, Mob mobTarget, int status, byte skillId, Short dx, Short dy, byte dir, Short x, Short y) {
+    private boolean useNewSkillNotFocus(Player player, Player plTarget, Mob mobTarget, int status, byte skillId, Short dx, Short dy, byte dir, Short x, Short y) {
         try {
             if (skillId == -1 && (plTarget != null || mobTarget != null)) {
                 skillId = player.playerSkill.skillSelect.template.id;
@@ -253,18 +320,21 @@ public class SkillService {
                 dir = (byte) (dx > x ? -1 : 1);
             }
             if (skillId == -1) skillId = player.playerSkill.skillSelect.template.id;
-            if (dx == null || dy == null || x == null || y == null) return;
+            if (dx == null || dy == null || x == null || y == null) return false;
             switch (skillId) {
                 case Skill.SUPER_KAME, Skill.LIEN_HOAN_CHUONG, Skill.MA_PHONG_BA -> {
+                    if (player.newSkill == null || player.newSkill.skillSelect == null) return false;
                     player.newSkill.setSkillSpecial(dir, dx, dy, x, y);
-                    if (!player.newSkill.isStartSkillSpecial) return;
+                    if (!player.newSkill.isStartSkillSpecial) return false;
                     newSkillNotFocus(player, status);
                     AchievementService.gI().checkDoneTask(player, ConstAchievement.TUYET_KY_THANH_THAO);
                 }
-                default -> { return; }
+                default -> { return false; }
             }
             affterUseSkill(player, player.playerSkill.skillSelect.template.id);
+            return true;
         } catch (Exception e) {
+            return false;
         }
     }
 

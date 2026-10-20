@@ -1219,7 +1219,9 @@ public class Service {
             result = nro.models.services.SkillService.MobCastResult.REJECTED;
         }
         int retryAfterMs = result == nro.models.services.SkillService.MobCastResult.OUT_OF_RANGE
-                ? 0 : SkillService.gI().getMobCastRetryAfterMs(pl, skillTemplateId);
+                ? 0 : result == nro.models.services.SkillService.MobCastResult.PREPARING
+                ? SkillService.gI().getMobCastPrepareRetryAfterMs(pl, skillTemplateId)
+                : SkillService.gI().getMobCastRetryAfterMs(pl, skillTemplateId);
         if (result == nro.models.services.SkillService.MobCastResult.COOLDOWN && retryAfterMs <= 0) {
             retryAfterMs = 1;
         } else if (result == nro.models.services.SkillService.MobCastResult.REJECTED && retryAfterMs <= 0) {
@@ -1230,6 +1232,21 @@ public class Service {
             PlayerService.gI().sendCurrentStamina(pl);
         }
         sendMobAttackResult(pl, target, sequence, result, retryAfterMs);
+    }
+
+    public void attackMobSelfConfirmed(Player pl, int status, int sequence, int skillTemplateId) {
+        nro.models.services.SkillService.MobCastResult result = SkillService.gI()
+                .useSelfSkillForMob(pl, status, skillTemplateId);
+        int retryAfterMs = result == nro.models.services.SkillService.MobCastResult.PREPARING
+                ? SkillService.gI().getMobCastPrepareRetryAfterMs(pl, skillTemplateId)
+                : SkillService.gI().getMobCastRetryAfterMs(pl, skillTemplateId);
+        if (result == nro.models.services.SkillService.MobCastResult.COOLDOWN && retryAfterMs <= 0) retryAfterMs = 1;
+        if (result == nro.models.services.SkillService.MobCastResult.REJECTED && retryAfterMs <= 0) retryAfterMs = 500;
+        if (result != nro.models.services.SkillService.MobCastResult.ACCEPTED && pl != null && pl.nPoint != null) {
+            PlayerService.gI().sendInfoHpMp(pl);
+            PlayerService.gI().sendCurrentStamina(pl);
+        }
+        sendMobAttackResult(pl, null, sequence, result, retryAfterMs);
     }
 
     private void sendMobAttackResult(Player player, nro.models.mob.Mob mob, int sequence,

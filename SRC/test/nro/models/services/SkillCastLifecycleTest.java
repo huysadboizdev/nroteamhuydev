@@ -14,6 +14,8 @@ public final class SkillCastLifecycleTest {
         boolean requirePlayerLock;
         boolean enteredWithoutPlayerLock;
         @Override protected void scheduleBomb(Runnable release) { queued.add(release); }
+        @Override public void sendPlayerPrepareSkill(Player p,int durationMs) {}
+        @Override public void sendPlayerPrepareBom(Player p,int durationMs) {}
         @Override public void affterUseSkill(Player p,int skillId) { completions++; }
         @Override public boolean canAttackPlayer(Player a,Player b) { return true; }
         @Override public boolean canUseSkillWithMana(Player p) { return true; }
@@ -22,6 +24,11 @@ public final class SkillCastLifecycleTest {
             return true;
         }
         @Override public void useSkillAttack(Player p,Player target,nro.models.mob.Mob mob) {
+            int skillId=p.playerSkill.skillSelect.template.id;
+            if (skillId==Skill.QUA_CAU_KENH_KHI || skillId==Skill.MAKANKOSAPPO) {
+                super.useSkillAttack(p,target,mob);
+                return;
+            }
             if (requirePlayerLock) {
                 acceptedAttacks++;
                 affterUseSkill(p,p.playerSkill.skillSelect.template.id);
@@ -195,6 +202,29 @@ public final class SkillCastLifecycleTest {
                 check(skills.acceptedAttacks==1,"accepted mob cast must execute exactly once");
                 check(!skills.enteredWithoutPlayerLock,"mob skill selection, validation and execution must share a player lock");
             }
+        } else if (args[0].equals("mob-cast-self-destruct-prepare")) {
+            p.nPoint.stamina=100; p.zone=zone(); p.location.x=100; p.location.y=100;
+            Skill bomb=skill(Skill.TU_SAT,7); bomb.template.type=3;
+            p.playerSkill.skills.add(bomb); p.playerSkill.skillSelect=bomb;
+            nro.models.mob.Mob target=new nro.models.mob.Mob(); target.zone=p.zone;
+            target.point.hp=target.point.maxHp=1000; target.location.x=100; target.location.y=100;
+            check(skills.useSkillForMob(p,target,Skill.TU_SAT)==SkillService.MobCastResult.PREPARING,
+                    "offensive type-3 self-destruct must enter preparation instead of being rejected");
+            check(p.playerSkill.prepareTuSat,"accepted self-destruct prepare must be retained on the server");
+            check(skills.useSelfSkillForMob(p,7,Skill.TU_SAT)==SkillService.MobCastResult.PREPARING,
+                    "confirmed self-centered cast must preserve its preparation result");
+        } else if (args[0].equals("mob-cast-charge-prepare")) {
+            p.nPoint.stamina=100; p.zone=zone(); p.location.x=100; p.location.y=100;
+            Skill ball=skill(Skill.QUA_CAU_KENH_KHI,7); ball.template.type=1;
+            p.playerSkill.skills.add(ball); p.playerSkill.skillSelect=ball;
+            nro.models.mob.Mob target=new nro.models.mob.Mob(); target.zone=p.zone;
+            target.point.hp=target.point.maxHp=1000; target.location.x=100; target.location.y=100;
+            check(skills.useSkillForMob(p,target,Skill.QUA_CAU_KENH_KHI)==SkillService.MobCastResult.PREPARING,
+                    "charged mob skill must report preparation rather than a completed attack");
+            check(p.playerSkill.prepareQCKK,"server must retain charged skill preparation");
+            check(skills.useSkillForMob(p,target,Skill.QUA_CAU_KENH_KHI)==SkillService.MobCastResult.PREPARING,
+                    "early duplicate during charge must remain retryable preparation");
+            check(skills.acceptedAttacks==0,"charge start must not be counted as a completed hit");
         } else if (args[0].equals("mob-retry-expired")) {
             Skill selected=skill(Skill.GALICK,1);
             selected.coolDown=500;

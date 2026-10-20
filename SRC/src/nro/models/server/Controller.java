@@ -521,6 +521,17 @@ public class Controller implements IMessageHandler {
                             return;
                         }
                         byte status = _msg.reader().readByte();
+                        if (status == 7 && _msg.reader().available() >= 6) {
+                            _msg.reader().mark(6);
+                            int marker = _msg.reader().readUnsignedByte();
+                            if (marker == 0xA7) {
+                                int sequence = _msg.reader().readInt();
+                                int skillTemplateId = _msg.reader().readUnsignedByte();
+                                Service.gI().attackMobSelfConfirmed(player, status, sequence, skillTemplateId);
+                                break;
+                            }
+                            _msg.reader().reset();
+                        }
                         SkillService.gI().useSkill(player, null, null, status, _msg);
                     }
                     break;
