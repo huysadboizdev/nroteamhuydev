@@ -64,6 +64,10 @@ public class ShopService {
     }
 
     private void openCatalogShop(Player player, String tagName, boolean allGender) {
+        if ("SHOP_CLAN".equals(tagName)) {
+            Service.gI().sendThongBao(player, "Cửa hàng bang hội đã đóng. Hãy đến Santa để mua Pet và Ván Bay.");
+            return;
+        }
         if (tagName.equals("ITEMS_LUCKY_ROUND")) {
             openShopType4(player, tagName, player.inventory.itemsBoxCrackBall);
             return;
@@ -716,6 +720,11 @@ public class ShopService {
         synchronized(player) {
         Shop shop = player.idMark.getShopOpen();
         if (shop == null) return;
+        if ("SHOP_CLAN".equals(shop.tagName)
+                || "SHOP_CLAN".equals(player.idMark.getTagNameShop())) {
+            Service.gI().sendThongBao(player, "Cửa hàng bang hội đã đóng. Hãy đến Santa để mua Pet và Ván Bay.");
+            return;
+        }
         if ("BILL".equals(shop.tagName) || "BILL".equals(player.idMark.getTagNameShop())) {
             BeerusDestroyerTrade.purchase(player, itemTempId);
             return;
@@ -989,8 +998,10 @@ public class ShopService {
                 && itemTempId != 1710 && itemTempId != 1869 && itemTempId != 1775
                 && itemTempId != 2042 && itemTempId != 2043
                 && itemTempId != 880 && itemTempId != 881 && itemTempId != 882
+                && !isClanPetMountRubyItem(itemTempId)
                 && !nro.models.item.AnimeEquipment.contains(itemTempId)
                 && nro.models.shop_ky_gui.ConsignTransactions.rubyMaterialPrice(itemTempId)==0)) return;
+        if (isClanPetMountRubyItem(itemTempId) && row.cost != 50) return;
         if (itemTempId == 2042 && row.cost != 100) return;
         if (itemTempId == 2043 && row.cost != 2000) return;
         if ((itemTempId >= 880 && itemTempId <= 882) && row.cost != 5) return;
@@ -1057,6 +1068,15 @@ public class ShopService {
         InventoryService.gI().sendItemBags(player);
         Service.gI().sendMoney(player);
         Service.gI().sendThongBao(player, "Mua thành công " + row.temp.name + " bằng hồng ngọc.");
+    }
+
+    private boolean isClanPetMountRubyItem(int itemTempId) {
+        return switch (itemTempId) {
+            case 1620, 1748, 1750, 1729, 1727, 1714, 1682, 1683, 1668,
+                    1629, 1630, 1631, 1573, 1550, 1551,
+                    1541, 1563, 1724, 1733, 1734, 1749 -> true;
+            default -> false;
+        };
     }
 
     private boolean ownsSantaPredecessor(Player player, int templateId) {
