@@ -4,6 +4,10 @@ import nro.models.boss.BossID;
 /** Explicit user exclusions and loot exceptions shared by the board and ticker. */
 public final class BossAnnouncementPolicy {
  private BossAnnouncementPolicy(){}
+ private static final java.util.Set<Integer> TIMED_MABU_NOTICE_IDS=java.util.Set.of(
+      BossID.DRABURA,BossID.DRABURA_2,BossID.DRABURA_3,BossID.BUI_BUI,BossID.BUI_BUI_2,
+      BossID.YA_CON,BossID.MABU_12H,BossID.GOKU,BossID.CADIC,BossID.MABU,BossID.SUPERBU);
+ public static boolean hiddenTimedMabuNoticeId(int id){return TIMED_MABU_NOTICE_IDS.contains(id);}
  private static final java.util.Set<Integer> SUPPRESSED_NOTICE_IDS=java.util.Set.of(
       BossID.DRABURA,BossID.BUI_BUI,BossID.YA_CON,BossID.MABU_12H,BossID.DRABURA_2,
       BossID.BUI_BUI_2,BossID.DRABURA_3,BossID.GOKU,BossID.CADIC,BossID.AN_TROM,
@@ -24,7 +28,7 @@ public final class BossAnnouncementPolicy {
     ||b instanceof nro.models.boss.Boss_mini.MatTroi||b instanceof nro.models.boss.Boss_mini.SoiHecQuyn;
  }
  public static boolean suppressedNoticeId(int id,int mapType){
-  return SUPPRESSED_NOTICE_IDS.contains(id)
+  return hiddenTimedMabuNoticeId(id)||SUPPRESSED_NOTICE_IDS.contains(id)
     ||((id==BossID.MABU||id==BossID.SUPERBU)&&mapType==nro.models.consts.ConstMap.MAP_MABU_14H);
  }
  public static int lookupSemanticId(Boss b){

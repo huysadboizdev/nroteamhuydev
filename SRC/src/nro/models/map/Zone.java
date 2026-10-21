@@ -514,6 +514,10 @@ public class Zone {
                             }
                         }
                     }
+                    if (player instanceof Pet pet && pet.master != null
+                            && pet.master.zone == this && pet.master.getSession() != null) {
+                        infoPlayer(pet.master, pet);
+                    }
                 } else {
                     for (int i = currentPlayers.size() - 1; i >= 0; i--) {
                         Player pl = currentPlayers.get(i);
@@ -539,7 +543,8 @@ public class Zone {
                 for (int i = this.humanoids.size() - 1; i >= 0; i--) {
                     Player pl = this.humanoids.get(i);
                     if (pl != null && (pl instanceof NonInteractiveNPC
-                            || pl instanceof TrainingBoss && ((TrainingBoss) pl).playerAtt.equals(player))) {
+                            || pl instanceof TrainingBoss && ((TrainingBoss) pl).playerAtt.equals(player)
+                            || pl instanceof Pet pet && pet.master == player)) {
                         infoPlayer(player, pl);
                     }
                 }

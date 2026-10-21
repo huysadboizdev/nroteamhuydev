@@ -94,7 +94,10 @@ public class Pet extends Player {
             this.location.x = master.location.x + Util.nextInt(-10, 10);
             this.location.y = master.location.y;
             if (MapService.gI().isMapOffline(this.master.zone.map.mapId) || this.master.zone.map.mapId == 113) {
-                ChangeMapService.gI().goToMap(this, MapService.gI().getMapCanJoin(this, master.gender + 21, -1));
+                if (ChangeMapService.gI().goToMap(this, MapService.gI().getMapCanJoin(this, master.gender + 21, -1))
+                        && this.zone != null && MapService.gI().isMapOffline(this.zone.map.mapId)) {
+                    this.zone.load_Me_To_Another(this);
+                }
                 return;
             }
             ChangeMapService.gI().goToMap(this, master.zone);

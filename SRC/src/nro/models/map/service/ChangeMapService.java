@@ -957,6 +957,21 @@ public class ChangeMapService {
                         msg.cleanup();
                     }
                 }
+            } else if (player instanceof nro.models.player.Pet pet
+                    && pet.master != null && pet.master.zone == player.zone
+                    && pet.master.getSession() != null) {
+                Message msg = null;
+                try {
+                    msg = new Message(-6);
+                    msg.writer().writeInt((int) player.id);
+                    Service.gI().sendMessAnotherNotMeInMap(player, msg);
+                } catch (Exception e) {
+                    Logger.logException(MapService.class, e);
+                } finally {
+                    if (msg != null) {
+                        msg.cleanup();
+                    }
+                }
             }
         }
     }

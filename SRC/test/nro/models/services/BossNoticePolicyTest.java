@@ -42,7 +42,7 @@ public final class BossNoticePolicyTest {
         }
         check(BossAnnouncementPolicy.suppressedNoticeId(BossID.MABU,ConstMap.MAP_MABU_14H),"Mabu 14h identity and map type suppressed");
         check(BossAnnouncementPolicy.suppressedNoticeId(BossID.SUPERBU,ConstMap.MAP_MABU_14H),"SuperBu 14h identity and map type suppressed");
-        check(!BossAnnouncementPolicy.suppressedNoticeId(BossID.MABU,ConstMap.MAP_NORMAL),"Mabu outside 14h map remains allowed");
+        check(BossAnnouncementPolicy.suppressedNoticeId(BossID.MABU,ConstMap.MAP_NORMAL),"14h Mabu identity remains suppressed after leaving its map");
         check(!BossAnnouncementPolicy.suppressedNoticeId(BossID.KUKU,ConstMap.MAP_NORMAL),"ordinary boss remains allowed");
         int[] specials=new int[]{BossID.AN_TROM,BossID.O_DO,BossID.O_DO1,BossID.SOI_HEC_QUYN1,BossID.MAT_TROI};
         String[] names=new String[]{"Ăn trộm","Ở dơ","Ở dơ","Sói hẹc quyn","Mặt Trời 12"};

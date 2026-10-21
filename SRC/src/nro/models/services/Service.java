@@ -550,6 +550,9 @@ public class Service {
                         pl.sendMessage(msg);
                     }
                 }
+            } else if (player instanceof Pet pet && pet.master != null
+                    && pet.master.zone == player.zone && pet.master.getSession() != null) {
+                pet.master.sendMessage(msg);
             } else {
                 player.sendMessage(msg);
             }
@@ -587,6 +590,9 @@ public class Service {
                         pl.sendMessage(msg);
                     }
                 }
+            } else if (player instanceof Pet pet && pet.master != null
+                    && pet.master.zone == player.zone && pet.master.getSession() != null) {
+                pet.master.sendMessage(msg);
             }
         } else {
             List<Player> players = player.zone.getPlayers();

@@ -26,7 +26,10 @@ public final class BossNoticeWireTest {
         check(service.rows(0).size()==3&&service.rows(1).size()==3,"screen-hidden special stays in board and history");
         tracker.appear(dead,-20,0,"Dead","Map",nro.models.boss.BossID.KUKU,false,8);tracker.defeat(dead,"admin");
         Capture player=PinkFixture.blank(Capture.class);player.session=PinkFixture.blank(nro.models.shop_ky_gui.ConsignRegressionTest.Connected.class);player.session.player=player;player.session.bossNoticeBoard=true;player.session.bossNoticeCategories=true;
+        service.requestV2(player.session,0,1,0,0);
+        check(player.sent==0,"login/bootstrap must not load boss rows");
         service.requestV2(player.session,5,1,0,0);
+        check(!player.session.bossNoticeSubscribed,"explicit request must not subscribe to live pushes");
         var r=new DataInputStream(new ByteArrayInputStream(player.packet));
         check(r.readInt()==-2&&r.readInt()==5&&r.readUnsignedByte()==1&&r.readUnsignedByte()==0&&r.readUnsignedShort()==0&&r.readUnsignedShort()==1,"V2 request/category/view/page echo");r.readLong();r.readUTF();check(r.readUnsignedShort()==1,"category and alive filtered before count");
         for(int i=0;i<5;i++)r.readUTF();for(int i=0;i<3;i++)r.readLong();r.readUTF();

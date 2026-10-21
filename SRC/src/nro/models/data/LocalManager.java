@@ -47,7 +47,13 @@ public class LocalManager {
         long start=System.nanoTime();
         Connection connection=LocalManager.ds.getConnection();
         long elapsed=(System.nanoTime()-start)/1_000_000;
-        if(elapsed>1000)System.err.println("[SQL] Connection wait "+elapsed+"ms; active="+ds.getHikariPoolMXBean().getActiveConnections()+", pending="+ds.getHikariPoolMXBean().getThreadsAwaitingConnection());
+        if (elapsed > 1000) {
+            var pool = ds.getHikariPoolMXBean();
+            System.err.println("[SQL] Connection wait " + elapsed + "ms; active=" + pool.getActiveConnections()
+                    + ", pending=" + pool.getThreadsAwaitingConnection()
+                    + ", idle=" + pool.getIdleConnections() + ", total=" + pool.getTotalConnections()
+                    + ", max=" + ds.getMaximumPoolSize() + ", thread=" + Thread.currentThread().getName());
+        }
         return connection;
     }
     

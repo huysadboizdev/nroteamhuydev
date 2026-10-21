@@ -54,7 +54,8 @@ public final class HuntingTrioService {
                 int width=zone.map.mapWidth;
                 int center=width>240?Util.nextInt(100,width-100):width/2;
                 for(int i=0;i<3;i++)members[i].prepare(zone,center+(i-1)*40);
-                ServerNotify.gI().notify((kind==0?"Bộ ba Sói":"Tiểu đội Pi Láp")+" đã xuất hiện tại "+zone.map.mapName);
+                for(HuntingTrioBoss member:members)
+                    ServerNotify.gI().notify("BOSS "+member.data[0].getName()+" vừa xuất hiện tại "+zone.map.mapName);
                 return true;
             } catch(Exception failure) {
                 try {removeAll();} catch(RuntimeException cleanup) {failure.addSuppressed(cleanup);}

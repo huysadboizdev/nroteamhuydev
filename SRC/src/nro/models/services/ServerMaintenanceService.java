@@ -23,13 +23,22 @@ public final class ServerMaintenanceService {
     }
     private final Store store;
     private final Drain drain;
+    private final Duration drainTimeout;
     private final String run = UUID.randomUUID().toString();
     private ScheduledExecutorService worker;
     private ScheduledExecutorService heartbeatWorker;
     private volatile State state;
     private volatile long lastError;
 
-    public ServerMaintenanceService(Store store, Drain drain) { this.store = store; this.drain = drain; }
+    public ServerMaintenanceService(Store store, Drain drain) {
+        this(store, drain, Duration.ofSeconds(30));
+    }
+    ServerMaintenanceService(Store store, Drain drain, Duration drainTimeout) {
+        if (drainTimeout == null || drainTimeout.toMillis() <= 0) throw new IllegalArgumentException("Positive drain timeout required");
+        this.store = store;
+        this.drain = drain;
+        this.drainTimeout = drainTimeout;
+    }
     public static ServerMaintenanceService gI() { return Holder.INSTANCE; }
     public static boolean gameplayPaused() { return ServerMaintenanceGate.paused(); }
     public State state() { return state; }
@@ -68,7 +77,17 @@ public final class ServerMaintenanceService {
     }
     private void drainCurrent() throws Exception {
         State draining = state;
-        try (var barrier = ServerMaintenanceGate.freeze(Duration.ofSeconds(30))) {
+        ServerMaintenanceGate.Freeze barrier;
+        try {
+            barrier = ServerMaintenanceGate.freeze(drainTimeout);
+        } catch (ServerMaintenanceGate.DrainTimeoutException waiting) {
+            // Nothing has been saved/disconnected yet. Keep the durable intent and
+            // admission closed; the next coordinator tick retries this command.
+            System.err.println("[Maintenance] Waiting for gameplay: phase=DRAINING, commandId="
+                    + draining.commandId() + ", cause=" + waiting.getMessage());
+            return;
+        }
+        try (barrier) {
             drain.run();
             publish(store.finish(draining, "MAINTENANCE", "Đã lưu dữ liệu và ngắt toàn bộ người chơi", run));
         } catch (Exception failure) {

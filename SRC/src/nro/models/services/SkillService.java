@@ -323,7 +323,9 @@ public class SkillService {
             if (dx == null || dy == null || x == null || y == null) return false;
             switch (skillId) {
                 case Skill.SUPER_KAME, Skill.LIEN_HOAN_CHUONG, Skill.MA_PHONG_BA -> {
-                    if (player.newSkill == null || player.newSkill.skillSelect == null) return false;
+                    // The first cast has no cached special selection yet; setSkillSpecial
+                    // initializes it from the already validated playerSkill selection.
+                    if (player.newSkill == null) return false;
                     player.newSkill.setSkillSpecial(dir, dx, dy, x, y);
                     if (!player.newSkill.isStartSkillSpecial) return false;
                     newSkillNotFocus(player, status);
