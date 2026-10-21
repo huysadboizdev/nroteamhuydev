@@ -74,10 +74,19 @@ public class Controller implements IMessageHandler {
 
     @Override
     public void onMessage(ISession s, Message _msg) {
+        if (isMaintenanceExemptCommand(_msg.command)) {
+            dispatchMessage(s, _msg);
+            return;
+        }
         try(var permit=nro.models.services.ServerMaintenanceGate.enter()) {
             if(!permit.allowed()) { _msg.cleanup(); return; }
             onAdmittedMessage(s,_msg);
         }
+    }
+
+    static boolean isMaintenanceExemptCommand(byte command) {
+        // -74 serves static client resources; large downloads must not hold the gameplay drain lock.
+        return command == -74;
     }
 
     private void onAdmittedMessage(ISession s, Message _msg) {

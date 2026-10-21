@@ -1,5 +1,9 @@
 package nro.models.services;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
 import static nro.models.services.ServerMaintenanceService.*;
 
 /** Deterministic coordinator tests; no server/SQL side effects. */
@@ -54,6 +58,23 @@ public final class ServerMaintenanceTest {
         check(ServerMaintenanceGate.paused(),"restart preserves maintenance");
         service.heartbeatSafely();
         check(store.heartbeats==1,"independent heartbeat persists while coordinator is busy");
+        MemoryStore diagnosticStore=new MemoryStore();
+        diagnosticStore.state=new State("DRAINING",20,121,"");
+        ServerMaintenanceService diagnosticService=new ServerMaintenanceService(diagnosticStore,()->{
+            throw new IllegalStateException("diagnostic fixture cause");
+        });
+        diagnosticService.initialize();
+        ByteArrayOutputStream diagnosticBytes=new ByteArrayOutputStream();
+        PrintStream originalErr=System.err;
+        try {
+            System.setErr(new PrintStream(diagnosticBytes,true,StandardCharsets.UTF_8));
+            Method tickSafely=ServerMaintenanceService.class.getDeclaredMethod("tickSafely");
+            tickSafely.setAccessible(true);
+            tickSafely.invoke(diagnosticService);
+        } finally { System.setErr(originalErr); }
+        String diagnosticLog=diagnosticBytes.toString(StandardCharsets.UTF_8);
+        check(diagnosticLog.contains("diagnostic fixture cause")&&diagnosticLog.contains("IllegalStateException"),
+                "maintenance log contains exception cause and stack trace");
         ServerMaintenanceGate.resume();
         System.out.println("PASS coordinator ordering, lost commits, save failure, replay, restart, reopen");
     }

@@ -23,6 +23,7 @@ SRC/nbproject/private/
 SRC/sql/nro1.sql
 SRC/sql/team2026-full-*.sql
 SRC/sql/team2026-full-*.metadata.json
+SRC/sql/team2026_full_with_maintenance_*.sql
 .env
 .env.*
 !.env.example

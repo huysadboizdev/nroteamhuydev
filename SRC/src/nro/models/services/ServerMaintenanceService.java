@@ -84,7 +84,12 @@ public final class ServerMaintenanceService {
             long now = System.currentTimeMillis();
             if (now - lastError > 10000) {
                 lastError = now;
-                System.err.println("[Maintenance] Control unavailable: " + failure.getClass().getSimpleName());
+                State current = state;
+                String phase = current == null ? "UNKNOWN" : current.phase();
+                long commandId = current == null ? 0 : current.commandId();
+                System.err.println("[Maintenance] Control unavailable: phase=" + phase
+                        + ", commandId=" + commandId + ", cause=" + failure);
+                failure.printStackTrace(System.err);
             }
         }
     }
@@ -94,7 +99,8 @@ public final class ServerMaintenanceService {
             long now = System.currentTimeMillis();
             if (now - lastError > 10000) {
                 lastError = now;
-                System.err.println("[Maintenance] Heartbeat unavailable: " + failure.getClass().getSimpleName());
+                System.err.println("[Maintenance] Heartbeat unavailable: " + failure);
+                failure.printStackTrace(System.err);
             }
         }
     }
