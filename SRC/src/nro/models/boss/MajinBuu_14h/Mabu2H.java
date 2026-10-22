@@ -134,13 +134,24 @@ public class Mabu2H extends Boss {
             if (plAtt.isPl() && Util.isTrue(1, 5)) {
                 plAtt.fightMabu.changePercentPoint((byte) 1);
             }
-            if (this.currentLevel == this.data.length - 1) {
-                if (plAtt.playerSkill.skillSelect.template.id != Skill.QUA_CAU_KENH_KHI) {
+            Integer attackSkillId = nro.models.services.BossNoticeService.damageSkillFor(this);
+            if (attackSkillId == null && plAtt != null && plAtt.playerSkill != null
+                    && plAtt.playerSkill.skillSelect != null && plAtt.playerSkill.skillSelect.template != null) {
+                attackSkillId = plAtt.playerSkill.skillSelect.template.id;
+            }
+            boolean finalKidBu = this.currentLevel == this.data.length - 1;
+            boolean isQckk = attackSkillId != null && attackSkillId == Skill.QUA_CAU_KENH_KHI;
+            if (finalKidBu) {
+                if (!isQckk) {
                     damage = damage >= this.nPoint.hp ? 0 : damage;
+                } else {
+                    // Kid Buu must be finishable by QCKK; cap the hit at remaining HP to keep
+                    // the reported damage within int range while allowing a lethal hit.
+                    damage = Math.min(damage, this.nPoint.hp);
                 }
             }
 
-            if (damage >= 30000000) {
+            if (damage >= 30000000 && !(finalKidBu && isQckk)) {
                 damage = 30000000 + Util.nextInt(-10000, 10000);
             }
 
