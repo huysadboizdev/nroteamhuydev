@@ -35,6 +35,7 @@ public class MySession extends Session {
     public boolean isAdmin;
     public int userId;
     private boolean logoutStarted;
+    public synchronized boolean isLogoutStarted() { return logoutStarted; }
     public synchronized boolean claimLogout() {
         if(logoutStarted)return false;
         logoutStarted=true;return true;

@@ -9,6 +9,7 @@ import nro.models.network.SessionManager;
 import nro.models.interfaces.ISession;
 import nro.models.network.MySession;
 import nro.models.services.Service;
+import nro.models.services.ServerMaintenanceGate;
 import nro.models.map.service.ChangeMapService;
 import nro.models.services.shenron.SummonDragon;
 import nro.models.services_func.TransactionService;
@@ -40,6 +41,8 @@ public class Client implements Runnable {
     private final List<Player> players = new java.util.concurrent.CopyOnWriteArrayList<>();
 
     private static final Map<MySession, LogoutRecord> UNSAVED_LOGOUTS = new java.util.concurrent.ConcurrentHashMap<>();
+    private static final java.util.Set<MySession> DEFERRED_MAINTENANCE_LOGOUTS = java.util.concurrent.ConcurrentHashMap.newKeySet();
+    private static final java.util.Set<MySession> MAINTENANCE_TRANSPORTS_CLOSED = java.util.concurrent.ConcurrentHashMap.newKeySet();
     private final LogoutActions logoutActions;
 
     interface LogoutActions {
@@ -48,6 +51,7 @@ public class Client implements Runnable {
         boolean saveAccount(int account, Timestamp logoutTime) throws Exception;
         void dispose(Player player);
         void disconnect(MySession session);
+        void disconnectTransport(MySession session);
     }
 
     private static final LogoutActions DEFAULT_LOGOUT_ACTIONS = new LogoutActions() {
@@ -61,6 +65,7 @@ public class Client implements Runnable {
             try { ServerManager.gI().disconnect(session); }
             finally { session.disconnect(); }
         }
+        public void disconnectTransport(MySession session) { session.disconnect(); }
     };
 
     private static final class LogoutRecord {
@@ -189,6 +194,42 @@ public class Client implements Runnable {
         }
     }
 
+    /** Close the network path without touching player state or snapshot persistence. */
+    public void disconnectSessionsForWebMaintenance() {
+        java.util.Set<MySession> sessions = new java.util.LinkedHashSet<>();
+        for (Player player : new ArrayList<>(players)) {
+            MySession session = player.getSession();
+            if (session != null) sessions.add(session);
+        }
+        for (ISession session : new ArrayList<>(SessionManager.gI().getSessions()))
+            if (session instanceof MySession) sessions.add((MySession) session);
+        for (MySession session : sessions) {
+            if (!MAINTENANCE_TRANSPORTS_CLOSED.add(session)) continue;
+            try { logoutActions.disconnectTransport(session); }
+            catch (RuntimeException failure) {
+                MAINTENANCE_TRANSPORTS_CLOSED.remove(session);
+                throw failure;
+            }
+        }
+    }
+
+    /** Collector callbacks must not mutate a live player while maintenance is draining gameplay. */
+    public void handleSessionDisconnect(MySession session) {
+        if (session == null) return;
+        try (ServerMaintenanceGate.Lease permit = ServerMaintenanceGate.enter()) {
+            if (permit.allowed()) {
+                kickSession(session);
+                return;
+            }
+        }
+        if (ServerMaintenanceGate.paused()
+                || (!session.isLogoutStarted() && (session.player != null || session.joinedGame))) {
+            DEFERRED_MAINTENANCE_LOGOUTS.add(session);
+            return;
+        }
+        kickSession(session);
+    }
+
     private void completeLogout(LogoutRecord record) throws Exception {
         synchronized (record) {
             if (!record.cleanupComplete || UNSAVED_LOGOUTS.get(record.session) != record) return;
@@ -233,13 +274,20 @@ public class Client implements Runnable {
 
     /** Admission/mutation must already be closed by the maintenance coordinator. */
     public void drainForWebMaintenance() {
+        java.util.Set<MySession> sessions = new java.util.LinkedHashSet<>();
+        sessions.addAll(DEFERRED_MAINTENANCE_LOGOUTS);
         for (Player player : new ArrayList<>(players)) {
             MySession session = player.getSession();
             if (session == null) throw new IllegalStateException("Registered player has no session");
-            kickSession(session);
+            sessions.add(session);
         }
         for (ISession session : new ArrayList<>(SessionManager.gI().getSessions()))
-            if (session instanceof MySession) kickSession((MySession) session);
+            if (session instanceof MySession) sessions.add((MySession) session);
+        for (MySession session : sessions) {
+            DEFERRED_MAINTENANCE_LOGOUTS.remove(session);
+            try { kickSession(session); }
+            finally { MAINTENANCE_TRANSPORTS_CLOSED.remove(session); }
+        }
         retryUnsavedLogouts();
         if (!players.isEmpty() || hasUnsavedLogouts())
             throw new IllegalStateException("Logout saves/metadata remain incomplete: " + getUnsavedLogoutCount());

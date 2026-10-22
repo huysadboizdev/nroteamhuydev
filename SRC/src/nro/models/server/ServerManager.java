@@ -243,7 +243,7 @@ public class ServerManager {
 
                 @Override
                 public void sessionDisconnect(ISession session) {
-                    Client.gI().kickSession((MySession) session);
+                    Client.gI().handleSessionDisconnect((MySession) session);
                     disconnect((MySession) session);
                 }
             }).setTypeSessioClone(MySession.class)

@@ -5,6 +5,9 @@ import nro.models.server.Client;
 /** Runs under the gameplay write barrier, never from the SQL queue worker. */
 final class ServerMaintenanceRuntime {
     private ServerMaintenanceRuntime() {}
+    static void disconnectSessions() {
+        Client.gI().disconnectSessionsForWebMaintenance();
+    }
     static void drain() throws Exception {
         LiveSyncService.gI().drainForMaintenance();
         if (!AchievementService.gI().drainPending()) throw new IllegalStateException("Achievement claims pending");

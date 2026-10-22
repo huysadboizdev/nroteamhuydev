@@ -16,12 +16,15 @@ public final class ServerMaintenanceService {
         State finish(State expected, String phase, String message, String run) throws Exception;
     }
     @FunctionalInterface public interface Drain { void run() throws Exception; }
+    @FunctionalInterface public interface Prepare { void run() throws Exception; }
     private static final class Holder {
         static final ServerMaintenanceService INSTANCE = new ServerMaintenanceService(
                 new ServerMaintenanceDAO(nro.models.data.LocalManager::getConnection),
+                ServerMaintenanceRuntime::disconnectSessions,
                 ServerMaintenanceRuntime::drain);
     }
     private final Store store;
+    private final Prepare prepare;
     private final Drain drain;
     private final Duration drainTimeout;
     private final String run = UUID.randomUUID().toString();
@@ -31,11 +34,18 @@ public final class ServerMaintenanceService {
     private volatile long lastError;
 
     public ServerMaintenanceService(Store store, Drain drain) {
-        this(store, drain, Duration.ofSeconds(30));
+        this(store, () -> {}, drain, Duration.ofSeconds(30));
     }
     ServerMaintenanceService(Store store, Drain drain, Duration drainTimeout) {
+        this(store, () -> {}, drain, drainTimeout);
+    }
+    public ServerMaintenanceService(Store store, Prepare prepare, Drain drain) {
+        this(store, prepare, drain, Duration.ofSeconds(30));
+    }
+    ServerMaintenanceService(Store store, Prepare prepare, Drain drain, Duration drainTimeout) {
         if (drainTimeout == null || drainTimeout.toMillis() <= 0) throw new IllegalArgumentException("Positive drain timeout required");
         this.store = store;
+        this.prepare = prepare;
         this.drain = drain;
         this.drainTimeout = drainTimeout;
     }
@@ -77,12 +87,15 @@ public final class ServerMaintenanceService {
     }
     private void drainCurrent() throws Exception {
         State draining = state;
+        // Close client transports before waiting for already admitted gameplay to drain.
+        // The prepare action must be safe to retry when the barrier is busy.
+        prepare.run();
         ServerMaintenanceGate.Freeze barrier;
         try {
             barrier = ServerMaintenanceGate.freeze(drainTimeout);
         } catch (ServerMaintenanceGate.DrainTimeoutException waiting) {
-            // Nothing has been saved/disconnected yet. Keep the durable intent and
-            // admission closed; the next coordinator tick retries this command.
+            // Player state is still untouched. Keep the durable intent and admission
+            // closed; the next coordinator tick retries after clients were disconnected.
             System.err.println("[Maintenance] Waiting for gameplay: phase=DRAINING, commandId="
                     + draining.commandId() + ", cause=" + waiting.getMessage());
             return;
