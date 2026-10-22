@@ -62,11 +62,14 @@ import nro.models.utils.SkillUtil;
 import nro.models.utils.Util;
 import nro.models.interfaces.IBoss;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class Boss extends Player implements IBoss {
+    private final Set<Player> oshinTaskDamageContributors = new HashSet<>();
     public long adminLife, adminAppliedRevision = -1;
     public int adminDefaultHp, adminDefaultDamage, adminDefaultDef, adminDefaultCrit;
     public boolean adminAliveMode;
@@ -384,6 +387,7 @@ public class Boss extends Player implements IBoss {
     private boolean kolDeathCounted;
     private synchronized boolean claimKolDeath() { if(kolDeathCounted)return false;kolDeathCounted=true;return true; }
     protected void resetBase() {
+        synchronized (this) { oshinTaskDamageContributors.clear(); }
         nro.models.services.BossAdminDropService.reset(this);
         synchronized (this) { questSupportCredit = false; questSupportCombat = false; }
         synchronized(this) { kolDeathCounted=false;defeatedWait=false;deathPhaseStarted=0;defeatedSinceSpawn=false;defeatConsumed=false; }
@@ -393,6 +397,25 @@ public class Boss extends Player implements IBoss {
         this.timeChatE = 0;
         this.indexChatS = 0;
         this.indexChatE = 0;
+    }
+
+    public final boolean tracksOshinTaskDamage() {
+        return switch (questBossId()) {
+            case BossID.DRABURA, BossID.BUI_BUI, BossID.BUI_BUI_2, BossID.YA_CON,
+                    BossID.DRABURA_2, BossID.MABU_12H -> true;
+            default -> false;
+        };
+    }
+
+    public final synchronized void recordOshinTaskDamage(Player attacker, long damage) {
+        if (damage <= 0 || attacker == null || attacker.isBot || attacker.isBoss || attacker.isPet) return;
+        if (tracksOshinTaskDamage()) oshinTaskDamageContributors.add(attacker);
+    }
+
+    public final synchronized Set<Player> drainOshinTaskDamageContributors() {
+        Set<Player> contributors = Set.copyOf(oshinTaskDamageContributors);
+        oshinTaskDamageContributors.clear();
+        return contributors;
     }
 
     //.outfit.

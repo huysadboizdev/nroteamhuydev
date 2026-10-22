@@ -25,7 +25,9 @@ import nro.models.network.Message;
 import nro.models.utils.Logger;
 import nro.models.utils.Util;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import nro.models.server.Client;
 import nro.models.task.BadgesTaskService;
 import nro.models.task.ClanTaskTemplate;
@@ -321,7 +323,21 @@ public class TaskService {
             } else {
                 AchievementService.gI().checkDoneTask(player, ConstAchievement.TRUM_KET_LIEU_BOSS);
             }
-            switch (boss.questBossId()) {
+            Set<Player> creditedPlayers = new LinkedHashSet<>();
+            creditedPlayers.add(player);
+            if (boss.tracksOshinTaskDamage()) {
+                creditedPlayers.addAll(boss.drainOshinTaskDamageContributors());
+            }
+            for (Player creditedPlayer : creditedPlayers) {
+                if (creditedPlayer != null && !creditedPlayer.isBot && !creditedPlayer.isBoss && !creditedPlayer.isPet) {
+                    progressBossKillTask(creditedPlayer, boss);
+                }
+            }
+        }
+    }
+
+    private void progressBossKillTask(Player player, Boss boss) {
+        switch (boss.questBossId()) {
                 case BossID.KUKU ->
                     doneTask(player, ConstTask.TASK_19_0);
                 case BossID.MAP_DAU_DINH ->
@@ -379,7 +395,7 @@ public class TaskService {
                 case BossID.XEN_CON_1, BossID.XEN_CON_2, BossID.XEN_CON_3, BossID.XEN_CON_4, BossID.XEN_CON_5, BossID.XEN_CON_6, BossID.XEN_CON_7 ->
                     doneTask(player, ConstTask.TASK_27_3);
                 case BossID.DRABURA -> doneTask(player,ConstTask.TASK_28_1);
-                case BossID.DRABURA_2, BossID.DRABURA_3 -> doneTask(player,ConstTask.TASK_28_5);
+                case BossID.DRABURA_2 -> doneTask(player,ConstTask.TASK_28_5);
                 case BossID.BUI_BUI -> doneTask(player,ConstTask.TASK_28_2);
                 case BossID.BUI_BUI_2 -> doneTask(player,ConstTask.TASK_28_3);
                 case BossID.YA_CON ->
@@ -392,7 +408,6 @@ public class TaskService {
                             doneTask(player, ConstTask.TASK_27_4);
                     }
                 }
-            }
         }
     }
 

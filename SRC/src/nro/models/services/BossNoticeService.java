@@ -46,7 +46,16 @@ public final class BossNoticeService {
         }
         if(!(target instanceof Boss b))return target.injured(attacker,damage,piercing,mobAttack);
         Attack previous=ATTACK.get();ATTACK.set(new Attack(b,attacker,skillId));
-        try{return target.injured(attacker,damage,piercing,mobAttack);}finally{try{b.ensureDeathTransition();}finally{if(previous==null)ATTACK.remove();else ATTACK.set(previous);}}
+        if(!b.tracksOshinTaskDamage()){
+            try{return target.injured(attacker,damage,piercing,mobAttack);}finally{try{b.ensureDeathTransition();}finally{if(previous==null)ATTACK.remove();else ATTACK.set(previous);}}
+        }
+        try{
+            synchronized(b){
+                int dealt=target.injured(attacker,damage,piercing,mobAttack);
+                if(dealt>0&&!b.isDie())b.recordOshinTaskDamage(attacker,dealt);
+                return dealt;
+            }
+        }finally{try{b.ensureDeathTransition();}finally{if(previous==null)ATTACK.remove();else ATTACK.set(previous);}}
     }
     private BossNoticeService(){
         worker=Executors.newSingleThreadScheduledExecutor(r->{Thread t=new Thread(r,"Boss notice persistence");t.setDaemon(true);return t;});
