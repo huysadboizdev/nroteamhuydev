@@ -137,7 +137,7 @@ public class Mabu2H extends Boss {
             Integer attackSkillId = nro.models.services.BossNoticeService.damageSkillFor(this);
             if (attackSkillId == null && plAtt != null && plAtt.playerSkill != null
                     && plAtt.playerSkill.skillSelect != null && plAtt.playerSkill.skillSelect.template != null) {
-                attackSkillId = plAtt.playerSkill.skillSelect.template.id;
+                attackSkillId = (int) plAtt.playerSkill.skillSelect.template.id;
             }
             boolean finalKidBu = this.currentLevel == this.data.length - 1;
             boolean isQckk = attackSkillId != null && attackSkillId == Skill.QUA_CAU_KENH_KHI;
