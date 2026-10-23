@@ -23,7 +23,7 @@ public class ConsignDAO {
         try { if(token==null||!UUID.fromString(token).toString().equals(token))throw new IllegalArgumentException(); }
         catch(IllegalArgumentException invalid){throw new SQLException("request UUID invalid",invalid);}
         if(!"post".equals(action)&&!"buy".equals(action)&&!"top".equals(action)&&!"cancel".equals(action)&&!"claim".equals(action)
-                &&!"box1775".equals(action)&&!"shop1775".equals(action)&&!"ruby_material".equals(action)&&!"intrinsic_max".equals(action))throw new SQLException("invalid inventory action");
+                &&!"box1775".equals(action)&&!"box1538".equals(action)&&!"shop1775".equals(action)&&!"ruby_material".equals(action)&&!"intrinsic_max".equals(action)&&!"skh_vip".equals(action)&&!"skh_claim".equals(action))throw new SQLException("invalid inventory action");
     }
     private String lockPlayer(Connection c,Snapshot p)throws SQLException {
         try(PreparedStatement q=c.prepareStatement("SELECT account_id,data_inventory FROM player WHERE id=? FOR UPDATE")) {
@@ -80,8 +80,8 @@ public class ConsignDAO {
         try {JsonArray old=new Gson().fromJson(stored,JsonArray.class),next=new Gson().fromJson(p.inventory(),JsonArray.class);if(old.size()<3||next.size()!=5)throw new SQLException("inventory shape");for(int n=0;n<5;n++){JsonElement value=next.get(n);if(n<old.size())old.set(n,value);else old.add(value);}inventory=old.toString();}
         catch(RuntimeException invalid){throw new SQLException("invalid inventory JSON",invalid);}
         StringBuilder sql=new StringBuilder("UPDATE player SET data_inventory=?,items_bag=?");
-        if(p.body()!=null)sql.append(",items_body=?");if(p.box()!=null)sql.append(",items_box=?");if(p.luckyBox()!=null)sql.append(",items_box_lucky_round=?");if(p.soldItems()!=null)sql.append(",items_daban=?");if(intrinsic!=null)sql.append(",data_intrinsic=?");sql.append(" WHERE id=? AND account_id=?");
-        try(PreparedStatement q=c.prepareStatement(sql.toString())){q.setString(1,inventory);q.setString(2,p.bag());int n=3;if(p.body()!=null)q.setString(n++,p.body());if(p.box()!=null)q.setString(n++,p.box());if(p.luckyBox()!=null)q.setString(n++,p.luckyBox());if(p.soldItems()!=null)q.setString(n++,p.soldItems());if(intrinsic!=null)q.setString(n++,intrinsic);q.setLong(n++,p.id());q.setInt(n,p.account());if(q.executeUpdate()!=1)throw new SQLException("player update missing");}
+        if(p.body()!=null)sql.append(",items_body=?");if(p.box()!=null)sql.append(",items_box=?");if(p.luckyBox()!=null)sql.append(",items_box_lucky_round=?");if(p.soldItems()!=null)sql.append(",items_daban=?");if(intrinsic!=null)sql.append(",data_intrinsic=?");if(p.vip()!=null)sql.append(",data_vip=?");sql.append(" WHERE id=? AND account_id=?");
+        try(PreparedStatement q=c.prepareStatement(sql.toString())){q.setString(1,inventory);q.setString(2,p.bag());int n=3;if(p.body()!=null)q.setString(n++,p.body());if(p.box()!=null)q.setString(n++,p.box());if(p.luckyBox()!=null)q.setString(n++,p.luckyBox());if(p.soldItems()!=null)q.setString(n++,p.soldItems());if(intrinsic!=null)q.setString(n++,intrinsic);if(p.vip()!=null)q.setString(n++,p.vip());q.setLong(n++,p.id());q.setInt(n,p.account());if(q.executeUpdate()!=1)throw new SQLException("player update missing");}
     }
     public int transact(String token,String action,ConsignItem before,ConsignItem after,Snapshot player)throws SQLException {
         return transact(token,action,before,after,player,null);
@@ -98,7 +98,7 @@ public class ConsignDAO {
         try(Connection c=connections.open()) {
             c.setAutoCommit(false);try {
                 String inventory=lockPlayer(c,player);Integer prior=existing(c,token,action,player);if(prior!=null){c.rollback();if(before==null&&after!=null)after.id=prior;return prior;}
-                boolean inventoryOnly="box1775".equals(action)||"shop1775".equals(action)||"ruby_material".equals(action)||"intrinsic_max".equals(action);
+                boolean inventoryOnly="box1775".equals(action)||"box1538".equals(action)||"shop1775".equals(action)||"ruby_material".equals(action)||"intrinsic_max".equals(action)||"skh_vip".equals(action)||"skh_claim".equals(action);
                 if(inventoryOnly) {if(before!=null||after!=null)throw new SQLException("inventory receipt cannot change listing");}
                 else if("post".equals(action)) {if(before!=null||after==null||after.id!=0||after.player_sell!=player.id()||!"ruby".equals(after.currency)||after.isBuy||after.goldSell!=-1||after.gemSell<=0||after.gemSell>1000000||after.quantity<=0)throw new SQLException("invalid ruby listing");}
                 else {

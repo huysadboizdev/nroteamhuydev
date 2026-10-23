@@ -5,6 +5,10 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.function.Predicate;
+import java.util.function.IntUnaryOperator;
+import nro.models.combine.NangSKHVip;
+import nro.models.combine.NangSKHVipTichLuy;
+import nro.models.consts.ConstNpc;
 import nro.models.database.ConsignDAO;
 import nro.models.database.RubyGiftDAO.Snapshot;
 import nro.models.item.Item;
@@ -31,6 +35,11 @@ public final class ConsignTransactions {
         final ConsignItem before,after;final List<Item> bag;final int ruby;final Snapshot snapshot;
         boolean resolved,committed,published,logoutSaved;int id;
         nro.models.intrinsic.Intrinsic intrinsic;
+        NangSKHVipTichLuy.Progress vip;
+        long gold;
+        String recoveryMessage;
+        Integer vipSuccesses;
+        boolean outcomeSent;
         Pending(ConsignTransactions owner,Player player,String token,String action,ConsignItem before,
                 ConsignItem after,List<Item> bag,int ruby,Snapshot snapshot) {
             this.owner=owner;this.player=player;this.token=token;this.action=action;this.before=before;
@@ -182,6 +191,83 @@ public final class ConsignTransactions {
             return commit(p,"box1775",null,null,bag,p.inventory.ruby,"Đã nhận đủ 5 món Thần Linh, chỉ số gốc 0%, không giao dịch/ký gửi.");
         }}
     }
+    public Result redeemActivationBox(Player p,Item selected,int mode) {
+        if(p==null)return fail("Không tìm thấy nhân vật.");
+        synchronized(p) {synchronized(ConsignShopManager.gI()) {
+            String invalid=validate(p,false);
+            if(invalid!=null)return fail("Chưa thể mở hộp. Hãy kết thúc giao dịch và chờ dữ liệu được lưu.");
+            int slot=selected==null?-1:p.inventory.itemsBag.indexOf(selected);
+            if(mode<0||mode>2||slot<0||selected.template==null||selected.template.id!=ActivationGiftBoxService.ITEM_ID
+                    ||selected.quantity<1||selected.quantityGD!=0||Collections.frequency(p.inventory.itemsBag,selected)!=1)
+                return fail("Hộp hoặc lựa chọn không còn hợp lệ. Hãy sử dụng lại hộp.");
+            if(p.inventory.itemsBag.stream().noneMatch(item->item!=null&&!item.isNotNullItem()))
+                return fail("Cần 1 ô trống trong hành trang để mở hộp. Hộp chưa bị sử dụng.");
+            Item reward;
+            try {reward=ActivationGiftBoxService.createReward(mode);}
+            catch(RuntimeException failure) {
+                nro.models.utils.Logger.logException(ActivationGiftBoxService.class,failure,"Activation reward data unavailable");
+                return fail("Thiếu dữ liệu trang bị kích hoạt. Hộp chưa bị sử dụng.");
+            }
+            List<Item> bag=copyBag(p.inventory.itemsBag);
+            if(bag.get(slot).quantity==1)bag.set(slot,new Item());else bag.get(slot).quantity--;
+            String rewardName=reward.template.name;
+            if(!InventoryService.gI().addItemList(bag,reward))return fail("Hành trang không đủ chỗ. Hộp chưa bị sử dụng.");
+            Result result=commit(p,"box1538",null,null,bag,p.inventory.ruby,
+                    "Bạn nhận được "+rewardName+", 5 ô sao pha lê chưa ép, không giao dịch.");
+            if(result.success())return result;
+            if(hasPending(p))return fail("Mở hộp đang chờ đối soát dữ liệu. Hệ thống sẽ tự kiểm tra, vui lòng chờ.");
+            return fail("Không lưu được mở hộp. Hộp và đồ chưa bị thay đổi, hãy thử lại.");
+        }}
+    }
+    public Result upgradeSkhVip(Player p,IntUnaryOperator random) {
+        if(p==null)return fail("Không tìm thấy nhân vật.");
+        synchronized(p) {synchronized(ConsignShopManager.gI()) {
+            String invalid=validate(p,false);if(invalid!=null)return fail(invalid);
+            NangSKHVip.Prepared staged;
+            try {staged=NangSKHVip.prepare(p,random);}
+            catch(IllegalArgumentException | IllegalStateException failure){return fail(failure.getMessage());}
+            String message="Nâng SKH VIP: thành công "+staged.successes()+"/"+staged.pairs()+" cặp."
+                    +bonusMessage(staged.bonusNames());
+            Snapshot snapshot=snapshot(p,staged.bag(),p.inventory.ruby,staged.gold(),
+                    NangSKHVipTichLuy.encodeVip(p,staged.progress()));
+            // Consumed once accepted for persistence, including an uncertain acknowledgement.
+            p.combineNew.clearItemCombine();p.combineNew.clearParamCombine();
+            long now=System.currentTimeMillis();p.combineNew.lastTimeCombine=now;
+            p.idMark.setLastTimeCombine(now);p.idMark.setIndexMenu(ConstNpc.IGNORE_MENU);
+            return commitVip(p,"skh_vip",staged.bag(),staged.gold(),staged.progress(),snapshot,message,staged.successes());
+        }}
+    }
+    public Result claimSkhVip(Player p) {
+        if(p==null)return fail("Không tìm thấy nhân vật.");
+        synchronized(p) {synchronized(ConsignShopManager.gI()) {
+            String invalid=validate(p,false);if(invalid!=null)return fail(invalid);
+            NangSKHVipTichLuy.PreparedRewards staged;
+            try {staged=NangSKHVipTichLuy.prepareClaim(p,b->ThreadLocalRandom.current().nextInt(b));}
+            catch(IllegalArgumentException | IllegalStateException failure){return fail(failure.getMessage());}
+            String vip=NangSKHVipTichLuy.encodeVip(p,staged.progress());
+            // A full bag may still require persisting conversion of a legacy paid milestone.
+            if(staged.bonusNames().isEmpty()&&staged.progress().divine()==p.skhVipDivineProgress
+                    &&staged.progress().destroyer()==p.skhVipDestroyerProgress
+                    &&staged.progress().rewards().equals(p.skhVipRewardPlanets==null?List.of():p.skhVipRewardPlanets))
+                return fail("Chưa có phần thưởng có thể nhận. Hãy chừa ô trống trong hành trang nếu còn thưởng đang chờ.");
+            Snapshot snapshot=snapshot(p,staged.bag(),p.inventory.ruby,p.inventory.gold,vip);
+            return commitVip(p,"skh_claim",staged.bag(),p.inventory.gold,staged.progress(),snapshot,
+                    staged.bonusNames().isEmpty()?"Phần thưởng được giữ lại, hãy chừa ô trống trong hành trang.":bonusMessage(staged.bonusNames()).strip(),null);
+        }}
+    }
+    private static String bonusMessage(List<String> names) {
+        StringBuilder message=new StringBuilder();
+        for(String name:names)message.append("\nBà Hạt Mít ban thưởng cho sự kiên trì của con: ")
+                .append(name).append(" Thần Linh kích hoạt!");
+        return message.toString();
+    }
+    private Result commitVip(Player p,String action,List<Item> bag,long gold,NangSKHVipTichLuy.Progress progress,
+            Snapshot snapshot,String message,Integer successes) {
+        Result result=commit(p,action,null,null,bag,p.inventory.ruby,message,null,snapshot,progress,gold,successes);
+        if(result.success())return result;
+        return fail(hasPending(p)?"SKH VIP đang chờ đối soát dữ liệu. Hệ thống sẽ tự kiểm tra, vui lòng chờ."
+                :"Không lưu được SKH VIP; vàng, đồ và tiến độ chưa thay đổi. Hãy chọn lại nguyên liệu.");
+    }
     public Result post(Player p,int slot,int price,byte currency,int quantity) {
         if(p==null)return fail("Không tìm thấy nhân vật.");
         synchronized(p) {
@@ -264,21 +350,27 @@ public final class ConsignTransactions {
         return commit(p,action,before,after,bag,ruby,success,null);
     }
     private Result commit(Player p,String action,ConsignItem before,ConsignItem after,List<Item> bag,int ruby,String success,nro.models.intrinsic.Intrinsic intrinsic) {
-        String token=UUID.randomUUID().toString();Snapshot snapshot=snapshot(p,bag,ruby);
+        return commit(p,action,before,after,bag,ruby,success,intrinsic,snapshot(p,bag,ruby),null,p.inventory.gold,null);
+    }
+    private Result commit(Player p,String action,ConsignItem before,ConsignItem after,List<Item> bag,int ruby,String success,
+            nro.models.intrinsic.Intrinsic intrinsic,Snapshot snapshot,NangSKHVipTichLuy.Progress vip,long gold,Integer vipSuccesses) {
+        String token=UUID.randomUUID().toString();
         Pending op=new Pending(this,p,token,action,before,after,bag,ruby,snapshot);
         op.intrinsic=intrinsic;
+        op.vip=vip;op.gold=gold;op.recoveryMessage=vip==null?null:success;op.vipSuccesses=vipSuccesses;
         PENDING.put(p,op);
         try {
             int id=intrinsic==null?dao.transact(token,action,before,after,snapshot):dao.transactIntrinsic(token,snapshot,intrinsicData(p,intrinsic));
             op.id=id;op.resolved=true;op.committed=true;
             if(!finishPending(op)){schedule(op);return fail(intrinsic==null?"Ký gửi đã lưu, đang chờ lưu dữ liệu đăng xuất.":"Nội tại đã lưu, đang chờ lưu dữ liệu đăng xuất.");}
-            return new Result(true,success);
         } catch(ConsignDAO.CommitUncertain uncertain) {
             schedule(op);return fail(intrinsic==null?"Ký gửi đang chờ đối soát; chưa thể thao tác tiếp. Hệ thống sẽ tự kiểm tra lại.":"Mở nội tại đang chờ đối soát. Hệ thống sẽ tự kiểm tra; vui lòng chờ.");
         } catch(SQLException | RuntimeException failure) {
             PENDING.remove(p,op);nro.models.utils.Logger.logException(ConsignTransactions.class,failure,"Consignment transaction rolled back");
             return fail(intrinsic==null?"Không lưu được ký gửi; tiền và đồ chưa bị thay đổi. Vui lòng thử lại.":"Không lưu được nội tại; hồng ngọc và nội tại cũ chưa thay đổi. Vui lòng thử lại.");
         }
+        sendVipOutcome(op,false);
+        return new Result(true,success);
     }
     private static void publish(Pending op,int id) {
         List<ConsignItem> items=ConsignShopManager.gI().listItem;
@@ -286,6 +378,13 @@ public final class ConsignTransactions {
         if(op.after!=null){op.after.id=id;items.add(op.after);}
         op.player.inventory.itemsBag=op.bag;op.player.inventory.ruby=op.ruby;
         if(op.intrinsic!=null)op.player.playerIntrinsic.intrinsic=op.intrinsic;
+        if(op.vip!=null){
+            String previous=op.player.skhVipDivineProgress+"/"+op.player.skhVipDestroyerProgress
+                    +" queued="+op.player.skhVipRewardPlanets;
+            op.player.inventory.gold=op.gold;NangSKHVipTichLuy.apply(op.player,op.vip);
+            nro.models.utils.Logger.logln("[SKH VIP] receipt="+op.token+" player="+op.player.id+" action="+op.action
+                    +" before="+previous+" after="+op.vip+" outcome="+op.recoveryMessage);
+        }
     }
     private static boolean finishPending(Pending op) {
         if(op.committed && !op.published){publish(op,op.id);op.published=true;}
@@ -312,6 +411,7 @@ public final class ConsignTransactions {
     }
     public static boolean reconcilePending(Player p) {
         Pending op=PENDING.get(p);if(op==null)return true;
+        boolean finished;
         synchronized(p) {synchronized(ConsignShopManager.gI()) {
             if(PENDING.get(p)!=op)return !hasPending(p);
             try {
@@ -319,9 +419,27 @@ public final class ConsignTransactions {
                     Integer id=op.owner.dao.reconcile(op.token,op.action,op.snapshot);
                     op.committed=id!=null;op.id=id==null?0:id;op.resolved=true;
                 }
-                return finishPending(op);
+                finished=finishPending(op);
             }catch(SQLException failure){return false;}
         }}
+        if(finished)sendVipOutcome(op,true);
+        return finished;
+    }
+    /** Packet failures never change the known receipt outcome or replay inventory publication. */
+    private static void sendVipOutcome(Pending op,boolean recovered) {
+        synchronized(op.player) {
+            if(!op.committed||op.vip==null||op.outcomeSent||op.player.beforeDispose)return;
+            op.outcomeSent=true;
+        }
+        try {
+            if(op.vipSuccesses!=null) {
+                if(op.vipSuccesses>0)nro.models.combine.CombineService.gI().sendEffectSuccessCombine(op.player);
+                else nro.models.combine.CombineService.gI().sendEffectFailCombine(op.player);
+            }
+            if(recovered&&op.recoveryMessage!=null)Service.gI().sendThongBao(op.player,op.recoveryMessage);
+        } catch(RuntimeException failure) {
+            nro.models.utils.Logger.logException(ConsignTransactions.class,failure,"SKH VIP committed outcome refresh");
+        }
     }
     private static String intrinsicData(Player p,nro.models.intrinsic.Intrinsic intrinsic) {
         JsonArray data=new JsonArray();data.add(intrinsic.id);data.add(intrinsic.param1);data.add(intrinsic.param2);
@@ -340,10 +458,13 @@ public final class ConsignTransactions {
         }return result.toString();
     }
     private static Snapshot snapshot(Player p,List<Item> bag,int ruby) {
-        JsonArray inventory=new JsonArray();inventory.add(p.inventory.gold);inventory.add(p.inventory.gem);
+        return snapshot(p,bag,ruby,p.inventory.gold,null);
+    }
+    private static Snapshot snapshot(Player p,List<Item> bag,int ruby,long gold,String vip) {
+        JsonArray inventory=new JsonArray();inventory.add(gold);inventory.add(p.inventory.gem);
         inventory.add(ruby);inventory.add(p.inventory.coupon);inventory.add(p.inventory.event);
         return new Snapshot(p.id,p.session.userId,inventory.toString(),serialized(bag),
                 serialized(p.inventory.itemsBody),serialized(p.inventory.itemsBox),
-                serialized(p.inventory.itemsBoxCrackBall),serialized(p.inventory.itemsDaBan));
+                serialized(p.inventory.itemsBoxCrackBall),serialized(p.inventory.itemsDaBan),vip);
     }
 }

@@ -35,7 +35,7 @@ public final class ConsignDbTest {
     static String token(){return UUID.randomUUID().toString();}
     static int count(String table)throws Exception {try(Connection c=open();Statement q=c.createStatement();ResultSet r=q.executeQuery("SELECT COUNT(*) FROM "+table)){r.next();return r.getInt(1);}}
     static String stored(String column)throws Exception {try(Connection c=open();Statement q=c.createStatement();ResultSet r=q.executeQuery("SELECT "+column+" FROM player WHERE id=1")){r.next();return r.getString(1);}}
-    static void reset()throws Exception {try(Connection c=open();Statement q=c.createStatement()){q.executeUpdate("DELETE FROM consign_receipt");q.executeUpdate("DELETE FROM shop_ky_gui");q.executeUpdate("DELETE FROM player");q.executeUpdate("INSERT INTO player VALUES(1,1,'[9,8,1000,7,6,12345]','[]','[]','[]','[]','[]'),(2,2,'[9,8,1000,7,6,99]','[]','[]','[]','[]','[]')");}}
+    static void reset()throws Exception {try(Connection c=open();Statement q=c.createStatement()){q.executeUpdate("DELETE FROM consign_receipt");q.executeUpdate("DELETE FROM shop_ky_gui");q.executeUpdate("DELETE FROM player");q.executeUpdate("INSERT INTO player(id,account_id,data_inventory,items_bag,items_body,items_box,items_box_lucky_round,items_daban) VALUES(1,1,'[9,8,1000,7,6,12345]','[]','[]','[]','[]','[]'),(2,2,'[9,8,1000,7,6,99]','[]','[]','[]','[]','[]')");}}
     static Object fault(int write,boolean committed,boolean[] unavailable)throws Exception {
         return dao(()->{if(unavailable[0])throw new SQLException("outage");Connection c=open();int[] writes={0};return (Connection)Proxy.newProxyInstance(Connection.class.getClassLoader(),new Class[]{Connection.class},(p,m,a)->{try{
             if(m.getName().equals("commit")&&committed){c.commit();unavailable[0]=true;throw new SQLException("lost commit acknowledgement");}
@@ -66,7 +66,7 @@ public final class ConsignDbTest {
         check(count("shop_ky_gui")==1&&count("consign_receipt")==1,"ownership rejection has no writes");
     }
     static void concurrency()throws Exception {
-        reset();try(Connection c=open();Statement q=c.createStatement()){q.execute("INSERT INTO player VALUES(3,3,'[9,8,1000,7,6]','[]','[]','[]','[]','[]')");}
+        reset();try(Connection c=open();Statement q=c.createStatement()){q.execute("INSERT INTO player(id,account_id,data_inventory,items_bag,items_body,items_box,items_box_lucky_round,items_daban) VALUES(3,3,'[9,8,1000,7,6]','[]','[]','[]','[]','[]')");}
         Object dao=dao(ConsignDbTest::open);ConsignItem before=listing(1);transact(dao,token(),"post",null,before,snapshot(1,990));
         ConsignItem sold=listing(1);sold.id=before.id;sold.isBuy=true;CountDownLatch start=new CountDownLatch(1);ExecutorService pool=Executors.newFixedThreadPool(2);
         try {List<Future<Boolean>> calls=new ArrayList<>();for(int p:new int[]{2,3})calls.add(pool.submit(()->{start.await();try{transact(dao,token(),"buy",before,sold,snapshot(p,900));return true;}catch(SQLException conflict){return false;}}));start.countDown();check(calls.get(0).get(10,TimeUnit.SECONDS)!=calls.get(1).get(10,TimeUnit.SECONDS),"one buyer wins CAS");check(count("consign_receipt")==2,"losing buyer leaves no receipt");}
@@ -83,20 +83,56 @@ public final class ConsignDbTest {
         check(id>=32768&&item.id==id&&count("shop_ky_gui")==1&&count("consign_receipt")==1&&stored("data_inventory").contains("990"),"database ids remain usable beyond wire signed-short capacity");
         check((Integer)invoke(dao,"reconcile",new Class[]{String.class,String.class,RubyGiftDAO.Snapshot.class},request,"post",snapshot(1,0))==id,"receipt retains full database id");
     }
+    static RubyGiftDAO.Snapshot vipSnapshot(String vip) {
+        return new RubyGiftDAO.Snapshot(1,1,"[4000000000,8,1000,7,6]","[\"reward\"]","[2]","[3]","[4]","[5]",vip);
+    }
+    static void skhVip()throws Exception {
+        for(String action:List.of("skh_vip","skh_claim")) {
+            reset();Object dao=dao(ConsignDbTest::open);String request=token();
+            String vip="[0,0,false,false,false,0,0,0,1,1,1,[2]]";
+            check(transact(dao,request,action,null,null,vipSnapshot(vip))==0,"VIP receipt has no listing: "+action);
+            check(stored("data_inventory").equals("[4000000000,8,1000,7,6,12345]")
+                    &&stored("data_vip").equals(vip)&&stored("items_bag").equals("[\"reward\"]")
+                    &&count("consign_receipt")==1&&count("shop_ky_gui")==0,"VIP gold, bag, progress and receipt commit together: "+action);
+            transact(dao,request,action,null,null,vipSnapshot("[99]"));
+            check(stored("data_vip").equals(vip)&&count("consign_receipt")==1,"VIP replay cannot rewrite progress: "+action);
+            transact(dao,token(),"box1538",null,null,snapshot(1,1000));
+            check(stored("data_vip").equals(vip),"legacy null-VIP snapshot preserves progress");
+            for(int write=1;write<=2;write++) {
+                reset();try {transact(fault(write,false,new boolean[]{false}),token(),action,null,null,vipSnapshot(vip));
+                    throw new AssertionError("VIP write must rollback");}catch(SQLException expected){}
+                check(stored("data_vip").equals("[]")&&stored("items_bag").equals("[]")
+                        &&stored("data_inventory").contains("1000")&&count("consign_receipt")==0,"VIP rollback is atomic: "+action+" write "+write);
+            }
+            reset();boolean[] outage={false};Object uncertain=fault(0,true,outage);String uncertainToken=token();
+            try {transact(uncertain,uncertainToken,action,null,null,vipSnapshot(vip));throw new AssertionError("VIP uncertain outcome must gate");}
+            catch(SQLException expected){check(expected instanceof ConsignDAO.CommitUncertain,"VIP typed uncertainty");}
+            outage[0]=false;check((Integer)invoke(uncertain,"reconcile",new Class[]{String.class,String.class,RubyGiftDAO.Snapshot.class},
+                    uncertainToken,action,vipSnapshot(vip))==0,"VIP uncertain receipt reconciles");
+            transact(uncertain,uncertainToken,action,null,null,vipSnapshot("[99]"));
+            check(stored("data_vip").equals(vip)&&stored("items_bag").equals("[\"reward\"]")
+                    &&count("consign_receipt")==1,"VIP commit acknowledgement loss cannot replay reward");
+        }
+    }
     public static void main(String[] args)throws Exception {
         try{daoType=Class.forName("nro.models.database.ConsignDAO");}catch(ClassNotFoundException missing){throw new AssertionError("durable consignment DAO missing",missing);}
         schema=args[0];if(!schema.matches("consign_verify_[0-9_]+"))throw new IllegalArgumentException("isolated schema only");
         try(var in=Files.newInputStream(Path.of("Config.properties"))){config.load(in);}Class.forName(config.getProperty("database.driver"));
         try(Connection c=DriverManager.getConnection("jdbc:mysql://"+config.getProperty("database.host")+":"+config.getProperty("database.port")+"/",config.getProperty("database.user"),config.getProperty("database.pass"));Statement q=c.createStatement()){q.execute("CREATE DATABASE `"+schema+"`");}
         try(Connection c=open();Statement q=c.createStatement()){
-            q.execute("CREATE TABLE player(id BIGINT PRIMARY KEY,account_id INT,data_inventory LONGTEXT,items_bag LONGTEXT,items_body LONGTEXT,items_box LONGTEXT,items_box_lucky_round LONGTEXT,items_daban LONGTEXT) ENGINE=InnoDB");
+            q.execute("CREATE TABLE player(id BIGINT PRIMARY KEY,account_id INT,data_inventory LONGTEXT,items_bag LONGTEXT,items_body LONGTEXT,items_box LONGTEXT,items_box_lucky_round LONGTEXT,items_daban LONGTEXT,data_vip LONGTEXT DEFAULT '[]') ENGINE=InnoDB");
             q.execute("CREATE TABLE shop_ky_gui(id INT PRIMARY KEY,player_id INT,tab INT,item_id INT,gold INT,gem INT,quantity INT,itemOption TEXT,isUpTop INT,isBuy INT) ENGINE=InnoDB");
             q.execute("INSERT INTO shop_ky_gui VALUES(8,1,1,17,9,-1,1,'[]',0,0)");
             String migration=Files.readString(Path.of("sql/migrations/20261005_consignment_ruby.sql")).replaceAll("(?m)^--.*$","");
             for(int run=0;run<2;run++)for(String sql:migration.split(";"))if(!sql.isBlank())q.execute(sql);
             try(ResultSet r=q.executeQuery("SELECT id,currency FROM shop_ky_gui")){r.next();check(r.getInt(1)==8&&r.getString(2).equals("legacy"),"migration retains legacy listings without currency conversion");}
         }
-        success();rollback();ambiguous();ownership();concurrency();absentCommit();idCap();
+        success();rollback();ambiguous();ownership();concurrency();absentCommit();idCap();skhVip();
+        reset();Object activationDao=dao(ConsignDbTest::open);String activationToken=token();
+        check(transact(activationDao,activationToken,"box1538",null,null,snapshot(1,1000))==0,"activation box inventory-only receipt");
+        check(count("shop_ky_gui")==0&&count("consign_receipt")==1&&stored("items_bag").equals("[1]"),"activation reward inventory saved without a listing");
+        transact(activationDao,activationToken,"box1538",null,null,snapshot(1,1));
+        check(stored("data_inventory").contains("1000")&&count("consign_receipt")==1,"activation box receipt replay cannot rewrite inventory");
         reset();Object inventoryDao=dao(ConsignDbTest::open);String purchaseToken=token();
         check(transact(inventoryDao,purchaseToken,"shop1775",null,null,snapshot(1,900))==0,"inventory-only receipt id");
         check(count("shop_ky_gui")==0&&count("consign_receipt")==1&&stored("data_inventory").contains("900"),"shop receipt must update only player");

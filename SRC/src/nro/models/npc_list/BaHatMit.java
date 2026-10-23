@@ -13,6 +13,7 @@ import nro.models.services.Service;
 import nro.models.map.service.ChangeMapService;
 import nro.models.combine.CombineService;
 import nro.models.combine.NangSKHVip;
+import nro.models.combine.NangSKHVipTichLuy;
 import nro.models.combine.NangSKHThuong;
 import nro.models.combine.CheTaoCuonSachCu;
 import nro.models.combine.DoiSachTuyetKy;
@@ -160,8 +161,11 @@ public class BaHatMit extends Npc {
                         }
                     } else if (player.idMark.getIndexMenu() == ConstNpc.MENU_NANG_SKH) {
                         if (select == 0) CombineService.gI().openTabCombine(player, CombineService.NANG_SKH_THUONG);
-                        else if (select == 1) CombineService.gI().openTabCombine(player, CombineService.NANG_SKH_VIP);
+                        else if (select == 1) NangSKHVipTichLuy.open(player);
                         else player.idMark.setIndexMenu(ConstNpc.IGNORE_MENU);
+                    } else if (player.idMark.getIndexMenu() == ConstNpc.MENU_NANG_SKH_VIP) {
+                        player.combineNew.clearItemCombine();
+                        player.idMark.setIndexMenu(ConstNpc.IGNORE_MENU);
                     } else if (player.idMark.getIndexMenu() == 3) {
                         switch (select) {
                             case 0:
@@ -196,6 +200,11 @@ public class BaHatMit extends Npc {
                             else NangSKHVip.cancel(player);
                             return;
                         }
+                        if (player.combineNew.typeCombine == CombineService.NANG_SKH_VIP_TICH_LUY) {
+                            player.combineNew.clearItemCombine();
+                            player.idMark.setIndexMenu(ConstNpc.IGNORE_MENU);
+                            return;
+                        }
                         switch (player.combineNew.typeCombine) {
                             case CombineService.EP_SAO_TRANG_BI, CombineService.PHA_LE_HOA_TRANG_BI, CombineService.CHUYEN_HOA_TRANG_BI_VANG, CombineService.CHUYEN_HOA_TRANG_BI_NGOC, CombineService.PHAN_RA_TRANG_BI_KH, CombineService.TAI_TAO_CAPSULE_KH, CombineService.NANG_CAP_SAO_PHA_LE, CombineService.DANH_BONG_SAO_PHA_LE, CombineService.CUONG_HOA_LO_SAO_PHA_LE, CombineService.TAO_DA_HEMATITE -> {
                                 switch (select) {
@@ -210,6 +219,9 @@ public class BaHatMit extends Npc {
                                 }
                             }
                         }
+                    } else if (player.idMark.getIndexMenu() == ConstNpc.MENU_NANG_SKH_VIP_CRAFT) {
+                        player.combineNew.clearItemCombine();
+                        player.idMark.setIndexMenu(ConstNpc.IGNORE_MENU);
                     }
                 }
                 case 112 -> {

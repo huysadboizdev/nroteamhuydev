@@ -1059,16 +1059,8 @@ public class PlayerDAO {
                 String dataKol = gson.toJson(kolData);
                 dataArray.clear();
 
-                // data vip
-                dataArray.add(player.timesPerDayCuuSat);
-                dataArray.add(player.lastTimeCuuSat);
-                dataArray.add(player.nhanDeTuNangVIP);
-                dataArray.add(player.nhanVangNangVIP);
-                dataArray.add(player.nhanSKHVIP);
-                dataArray.add(player.vip);
-                dataArray.add(player.timevip);
-                dataArray.add(player.vipPurchaseCount);
-                String dataVip = dataArray.toJSONString();
+                String dataVip = nro.models.combine.NangSKHVipTichLuy.encodeVip(player,
+                        nro.models.combine.NangSKHVipTichLuy.current(player));
                 dataArray.clear();
 
                 dataArray.add(player.LearnSkill.Time);

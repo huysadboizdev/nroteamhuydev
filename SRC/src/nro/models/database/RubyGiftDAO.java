@@ -28,10 +28,14 @@ public class RubyGiftDAO {
         }
     }
     public record Snapshot(long id,int account,String inventory,String bag,
-            String body,String box,String luckyBox,String soldItems) {
+            String body,String box,String luckyBox,String soldItems,String vip) {
+        public Snapshot(long id,int account,String inventory,String bag,
+                String body,String box,String luckyBox,String soldItems) {
+            this(id,account,inventory,bag,body,box,luckyBox,soldItems,null);
+        }
         /** Legacy callers can omit containers, which the UPDATE then leaves unchanged. */
         public Snapshot(long id,int account,String inventory,String bag) {
-            this(id,account,inventory,bag,null,null,null,null);
+            this(id,account,inventory,bag,null,null,null,null,null);
         }
     }
     public record Receipt(long sender,long receiver,int senderAccount,int receiverAccount,int amount,int fee,int net) {

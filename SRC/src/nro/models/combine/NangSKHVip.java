@@ -34,6 +34,11 @@ public final class NangSKHVip {
         public long fee() { return totalFee(pairs.size()); }
     }
 
+    public record Prepared(List<Item> bag, long gold, NangSKHVipTichLuy.Progress progress,
+            int pairs, int successes, List<String> bonusNames) {
+        public Prepared { bonusNames = List.copyOf(bonusNames); }
+    }
+
     public static long totalFee(int count) {
         if (count < 1 || count > 5) throw invalid("Chỉ nhận từ 1 đến 5 cặp");
         return FEE_PER_PAIR * count;
@@ -160,6 +165,7 @@ public final class NangSKHVip {
                         .append("Cấp 9–12 chiếm tổng 5% trong các món thành công.\n")
                         .append("Thành công đổi cả hai lấy đồ mới; xịt chỉ mất thần, giữ hủy diệt.\n")
                         .append("Rada lấy set theo hành tinh người chơi.\n")
+                        .append("Càng kiên trì, con càng có cơ duyên nhận bảo vật.\n")
                         .append("Phí: ").append(Util.numberToMoney(selection.fee())).append(" vàng, không hoàn khi xịt.");
                 if (player.inventory.gold < selection.fee()) throw invalid("Không đủ " + Util.numberToMoney(selection.fee()) + " vàng");
                 CombineService.gI().baHatMit.createOtherMenu(player, ConstNpc.MENU_START_COMBINE,
@@ -171,8 +177,8 @@ public final class NangSKHVip {
         }
     }
 
-    /** Returns the number of successful pairs; no packet is sent inside the commit. */
-    static int execute(Player player, IntUnaryOperator random) {
+    /** Build a complete transaction snapshot. Never charge or publish live inventory here. */
+    public static Prepared prepare(Player player, IntUnaryOperator random) {
         synchronized (player) {
             if (player.combineNew == null || player.combineNew.typeCombine != CombineService.NANG_SKH_VIP
                     || player.combineNew.skhVipSelection == null) throw invalid("Hãy chọn lại nguyên liệu SKH VIP");
@@ -200,6 +206,7 @@ public final class NangSKHVip {
                 }
                 if (player.inventory.gold < current.fee()) throw invalid("Không đủ vàng để nâng SKH VIP");
                 List<Item> outputs = new ArrayList<>();
+                NangSKHVipTichLuy.Progress progress = NangSKHVipTichLuy.current(player);
                 int successes = 0;
                 for (Pair pair : current.pairs()) {
                     Item output = null;
@@ -212,33 +219,27 @@ public final class NangSKHVip {
                         successes++;
                     }
                     outputs.add(output);
+                    progress = NangSKHVipTichLuy.advance(progress, pair.planet());
                 }
-                // Allocate replacements first; write only the selected slots. Other
-                // reward/pickup paths can fill unrelated slots without this lock.
+                List<Item> bag = new ArrayList<>(current.bag());
                 Item[] emptyFodders = new Item[current.pairs().size()];
                 for (int i = 0; i < emptyFodders.length; i++) emptyFodders[i] = new Item();
                 for (int i = 0; i < current.pairs().size(); i++) {
                     Pair pair = current.pairs().get(i);
-                    if (outputs.get(i) != null) current.bag().set(pair.mainSlot(), outputs.get(i));
-                    current.bag().set(pair.fodderSlot(), emptyFodders[i]);
+                    if (outputs.get(i) != null) bag.set(pair.mainSlot(), outputs.get(i));
+                    bag.set(pair.fodderSlot(), emptyFodders[i]);
                 }
-                player.inventory.gold -= current.fee();
-                player.combineNew.clearItemCombine();
-                player.combineNew.clearParamCombine();
-                long now = System.currentTimeMillis();
-                player.idMark.setLastTimeCombine(now);
-                player.idMark.setIndexMenu(ConstNpc.IGNORE_MENU);
-                player.combineNew.lastTimeCombine = now;
-                return successes;
+                var rewards = NangSKHVipTichLuy.prepareRewards(bag, progress, random);
+                return new Prepared(rewards.bag(), player.inventory.gold - current.fee(), rewards.progress(),
+                        current.pairs().size(), successes, rewards.bonusNames());
             }
         }
     }
 
     public static void upgrade(Player player) {
         synchronized (player) {
-            int count = player.combineNew.skhVipSelection == null ? 0 : player.combineNew.skhVipSelection.pairs().size();
-            int successes;
-            try { successes = execute(player, Util::nextInt); }
+            nro.models.shop_ky_gui.ConsignTransactions.Result result;
+            try { result = new nro.models.shop_ky_gui.ConsignTransactions().upgradeSkhVip(player, Util::nextInt); }
             catch (IllegalArgumentException | IllegalStateException ex) {
                 synchronized (player) { player.combineNew.clearItemCombine(); }
                 Service.gI().sendThongBao(player, ex.getMessage());
@@ -246,12 +247,8 @@ public final class NangSKHVip {
             }
             InventoryService.gI().sendItemBags(player);
             Service.gI().sendMoney(player);
-            if (successes > 0) CombineService.gI().sendEffectSuccessCombine(player);
-            else CombineService.gI().sendEffectFailCombine(player);
             CombineService.gI().reOpenItemCombine(player);
-            Service.gI().sendThongBao(player, "Nâng SKH VIP: " + successes + " món thành công, "
-                    + (count - successes) + " món xịt. Đã dùng " + count + " phôi thần và "
-                    + Util.numberToMoney(totalFee(count)) + " vàng.");
+            Service.gI().sendThongBao(player, result.message());
         }
     }
 

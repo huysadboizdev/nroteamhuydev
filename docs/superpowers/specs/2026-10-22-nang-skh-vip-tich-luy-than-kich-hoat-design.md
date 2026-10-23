@@ -1,6 +1,6 @@
 # Thiết kế: Tích lũy nguyên liệu trong Nâng SKH VIP
 
-Ngày 22/10/2026. Trạng thái: bản thiết kế chờ người dùng rà soát.
+Ngày 22/10/2026. Trạng thái: đã triển khai trong workspace; chưa build hoặc chạy kiểm thử theo quy tắc workspace.
 
 ## Mục tiêu
 

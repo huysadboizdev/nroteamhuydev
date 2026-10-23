@@ -28,6 +28,12 @@ import nro.models.map.Zone;
  */
 public class ItemService {
 
+    private static final int[][] DIVINE_EQUIPMENT_IDS = {
+        {555, 556, 562, 563, 561},
+        {557, 558, 564, 565, 561},
+        {559, 560, 566, 567, 561}
+    };
+
     private static ItemService i;
 
     public static ItemService gI() {
@@ -256,6 +262,50 @@ public class ItemService {
             item.itemOptions.add(new Item.ItemOption(30, 1));
         }
         return item;
+    }
+
+    /** Creates one Divine item with its canonical base stats and one valid activation set. */
+    public Item createActivatedDivineItem(int templateId, int setId, int planet) {
+        if (planet < 0 || planet >= DIVINE_EQUIPMENT_IDS.length) {
+            throw new IllegalArgumentException("Invalid Divine equipment planet");
+        }
+        int type = -1;
+        for (int slot = 0; slot < DIVINE_EQUIPMENT_IDS[planet].length; slot++) {
+            if (DIVINE_EQUIPMENT_IDS[planet][slot] == templateId) {
+                type = slot;
+                break;
+            }
+        }
+        if (type < 0 || Arrays.stream(SKHCapsuleCatalog.sets(planet)).noneMatch(id -> id == setId)) {
+            throw new IllegalArgumentException("Divine item or activation set does not match planet");
+        }
+        Template.ItemTemplate template = getTemplate(templateId);
+        if (template == null || template.id != templateId || template.type != type
+                || (type == 4 ? template.gender != 3 : template.gender != planet)) {
+            throw new IllegalStateException("Invalid Divine item template");
+        }
+
+        Item item = createItemSetKichHoat(templateId, 1);
+        if (item == null || item.template == null) {
+            throw new IllegalStateException("Missing Divine item template");
+        }
+        RewardService.gI().initChiSoItemBase(item);
+        item.itemOptions.add(requiredActivationOption(setId));
+        for (int effectId : getOptionIdsBySKH(setId)) {
+            item.itemOptions.add(requiredActivationOption(effectId));
+        }
+        item.itemOptions.add(requiredActivationOption(30));
+        item.content = item.getContent();
+        item.info = item.getInfo();
+        return item;
+    }
+
+    private ItemOption requiredActivationOption(int optionId) {
+        ItemOptionTemplate template = getItemOptionTemplate(optionId);
+        if (template == null || template.id != optionId) {
+            throw new IllegalStateException("Missing activation option template " + optionId);
+        }
+        return new ItemOption(template, 1);
     }
 
     /** Creates one validated VIP piece with exact-template village-shop maximum base stats. */

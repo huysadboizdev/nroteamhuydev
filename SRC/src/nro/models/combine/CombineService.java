@@ -38,6 +38,7 @@ public class CombineService {
     public static final int TAI_TAO_CAPSULE_KH = 997;
     public static final int NANG_SKH_VIP = 998;
     public static final int NANG_SKH_THUONG = 999;
+    public static final int NANG_SKH_VIP_TICH_LUY = 1000;
     public static final int NANG_CAP_SAO_PHA_LE = 100;
     public static final int DANH_BONG_SAO_PHA_LE = 101;
     public static final int CUONG_HOA_LO_SAO_PHA_LE = 102;
@@ -106,6 +107,10 @@ public class CombineService {
         }
         if (player.combineNew.typeCombine == NANG_SKH_VIP) {
             NangSKHVip.showInfoCombine(player, index);
+            return;
+        }
+        if (player.combineNew.typeCombine == NANG_SKH_VIP_TICH_LUY) {
+            player.combineNew.clearItemCombine();
             return;
         }
         player.combineNew.clearItemCombine();
@@ -203,6 +208,10 @@ public class CombineService {
         }
         if (player.combineNew.typeCombine == NANG_SKH_VIP) {
             NangSKHVip.upgrade(player);
+            return;
+        }
+        if (player.combineNew.typeCombine == NANG_SKH_VIP_TICH_LUY) {
+            player.combineNew.clearItemCombine();
             return;
         }
         switch (player.combineNew.typeCombine) {
@@ -646,6 +655,8 @@ public class CombineService {
                 return "Nâng SKH Thường\n500 triệu vàng/món\nMỗi món thành công 50%";
             case NANG_SKH_VIP:
                 return "Nâng SKH VIP\n50% thành công mỗi cặp\n1 tỉ vàng/cặp";
+            case NANG_SKH_VIP_TICH_LUY:
+                return "Tích lũy 50 Thần Linh + 50 Hủy Diệt\n1 tỉ vàng mỗi cặp";
             case EP_SAO_TRANG_BI:
                 return "Ta sẽ phù phép\ncho trang bị của ngươi\ntrở lên mạnh mẽ";
             case PHA_LE_HOA_TRANG_BI:
@@ -710,6 +721,8 @@ public class CombineService {
                 return "Nâng cấp từ đồ thần linh, có thể nâng 5 món cùng 1 lúc cho nhanh";
             case NANG_SKH_VIP:
                 return "Nâng cấp từ đồ hủy diệt làm đồ chính, đồ thần làm đồ phôi";
+            case NANG_SKH_VIP_TICH_LUY:
+                return "Nộp dần đồ Thần Linh và Hủy Diệt\nĐủ 50 món mỗi loại sẽ chế tạo 1 món Thần Linh kích hoạt";
             case EP_SAO_TRANG_BI:
                 return "Chọn trang bị\n(Áo, quần, găng, giày hoặc rađa) có ô đặt sao pha lê\nChọn loại sao pha lê\n"
                         + "Sau đó chọn 'Nâng cấp'";

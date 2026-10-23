@@ -184,6 +184,8 @@ public class ConstNpc {
     public static final int MENU_OPTION_SHOP_BUA = 502;
     public static final int MENU_START_COMBINE = 503;
     public static final int MENU_NANG_SKH = 511;
+    public static final int MENU_NANG_SKH_VIP = 512;
+    public static final int MENU_NANG_SKH_VIP_CRAFT = 513;
     public static final int MENU_PHAN_RA_DO_THAN_LINH = 504;
     public static final int MENU_NANG_CAP_DO_TS = 505;
     public static final int MENU_CHE_TAO_CHAN_MENH = 507;

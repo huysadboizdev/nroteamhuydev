@@ -1037,6 +1037,9 @@ public class MrBlue {
                     player.nhanDeTuNangVIP = false;
                     player.nhanVangNangVIP = false;
                     player.nhanSKHVIP = false;
+                    player.skhVipDivineProgress = 0;
+                    player.skhVipDestroyerProgress = 0;
+                    player.skhVipPaidPairs = 0;
                     player.vip = 0;
                     player.timevip = 0L;
                     player.vipPurchaseCount = 0;
@@ -1051,10 +1054,14 @@ public class MrBlue {
                         player.vip = Byte.parseByte(dataArray.get(5).toString());
                         player.timevip = Long.parseLong(String.valueOf(dataArray.get(6)).toString());
                         player.vipPurchaseCount = Integer.parseInt(String.valueOf(dataArray.get(7)));
+                        nro.models.combine.NangSKHVipTichLuy.load(player, dataArray);
                     } else {
                         //   System.err.println("DEBUG: data_vip for player " + player.name + " is old format (size " + dataArray.size() + "), initializing new fields with default values.");
                         player.nhanSKHVIP = false;
                         player.vipPurchaseCount = 0;
+                        player.skhVipDivineProgress = 0;
+                        player.skhVipDestroyerProgress = 0;
+                        player.skhVipPaidPairs = 0;
                     }
                 }
 
@@ -1065,6 +1072,9 @@ public class MrBlue {
                 player.nhanDeTuNangVIP = false;
                 player.nhanVangNangVIP = false;
                 player.nhanSKHVIP = false;
+                player.skhVipDivineProgress = 0;
+                player.skhVipDestroyerProgress = 0;
+                player.skhVipPaidPairs = 0;
                 player.vip = 0;
                 player.timevip = 0L;
                 player.vipPurchaseCount = 0;

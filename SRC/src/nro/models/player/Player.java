@@ -291,6 +291,10 @@ public class Player implements Runnable {
     public boolean nhanVangNangVIP;
     public boolean nhanDeTuNangVIP;
     public boolean nhanSKHVIP;
+    public int skhVipDivineProgress;
+    public int skhVipDestroyerProgress;
+    public int skhVipPaidPairs;
+    public java.util.List<Integer> skhVipRewardPlanets = new java.util.ArrayList<>();
     public Item itemLoa = null;
 
     public long totalDamageTaken;

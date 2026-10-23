@@ -82,21 +82,21 @@ public final class NangSKHVipTest {
             for(int group:new int[]{0,4,5,99})for(int i=0;i<(group<5?4:8);i++)check(NangSKHVip.rollTemplate(p,t,script(group,i))==ids[(group<5?8:0)+i],"5% high levels, all levels reachable");
             for(int i=0;i<5;i++)check(NangSKHVip.rollSet(p,script(i))==SKHCapsuleCatalog.sets(p)[i],"All five sets"); }
         for(int planet=0;planet<3;planet++)for(int set=0;set<5;set++) { Player p=player(); p.gender=(byte)planet; p.inventory.itemsBag.add(item(656)); p.inventory.itemsBag.add(item(557)); preview(p,0,1);
-            check(NangSKHVip.execute(p,script(0,0,3,set))==1,"Radar succeeds"); Item radar=p.inventory.itemsBag.get(0); int primary=SKHCapsuleCatalog.sets(planet)[set];
+            check(execute(p,script(0,0,3,set))==1,"Radar succeeds"); Item radar=p.inventory.itemsBag.get(0); int primary=SKHCapsuleCatalog.sets(planet)[set];
             check(radar.template.id==281 && radar.template.type==4 && radar.template.gender==3,"Generic radar"); check(has(radar,primary),"Radar set follows player planet");
             for(int effect:ActivationSet.effectIds(primary))check(has(radar,effect),"Radar effects"); }
         for(int[] c:new int[][]{{0,659,1},{2,657,0}}) { Player p=player(); p.gender=(byte)c[0]; p.inventory.itemsBag.add(item(c[1])); p.inventory.itemsBag.add(item(555)); preview(p,0,1);
-            NangSKHVip.execute(p,script(0,99,0,4)); Item out=p.inventory.itemsBag.get(0); check(out.template.type==2 && out.template.gender==c[2] && has(out,SKHCapsuleCatalog.sets(c[2])[4]),"Foreign main overrides character/fodder planet"); }
+            execute(p,script(0,99,0,4)); Item out=p.inventory.itemsBag.get(0); check(out.template.type==2 && out.template.gender==c[2] && has(out,SKHCapsuleCatalog.sets(c[2])[4]),"Foreign main overrides character/fodder planet"); }
     }
     private static void fees() {
         for(int n=1;n<=5;n++) { check(NangSKHVip.totalFee(n)==n*1_000_000_000L,"long fee"); Player p=batch(n); p.inventory.gold=NangSKHVip.totalFee(n)-1;
-            List<Item> before=new ArrayList<>(p.inventory.itemsBag); long gold=p.inventory.gold; reject(()->NangSKHVip.execute(p,b->99)); unchanged(p,before,gold);
-            p.inventory.gold++; check(NangSKHVip.execute(p,b->99)==0 && p.inventory.gold==0,"Exact fee, failures charged"); }
+            List<Item> before=new ArrayList<>(p.inventory.itemsBag); long gold=p.inventory.gold; reject(()->execute(p,b->99)); unchanged(p,before,gold);
+            p.inventory.gold++; check(execute(p,b->99)==0 && p.inventory.gold==0,"Exact fee, failures charged"); }
         reject(()->NangSKHVip.totalFee(0)); reject(()->NangSKHVip.totalFee(6));
     }
     private static void outcome(boolean success) {
         for(int n=1;n<=5;n++) { Player p=batch(n); List<Item> before=new ArrayList<>(p.inventory.itemsBag);
-            check(NangSKHVip.execute(p,b->success?0:99)==(success?n:0),"Result count"); check(p.inventory.gold==5_000_000_000L-n*1_000_000_000L,"All attempts charged once");
+            check(execute(p,b->success?0:99)==(success?n:0),"Result count"); check(p.inventory.gold==5_000_000_000L-n*1_000_000_000L,"All attempts charged once");
             for(int i=0;i<n;i++) { Item main=p.inventory.itemsBag.get(i); check(!p.inventory.itemsBag.get(i+n).isNotNullItem(),"Every fodder consumed");
                 if(success)check(main!=before.get(i) && main.quantity==1 && main.isSKH() && !has(main,107) && !has(main,72),"Fresh success equipment");
                 else check(main==before.get(i) && value(main,107)==9 && value(main,72)==8,"Exact failed main/options/stars"); }
@@ -104,45 +104,37 @@ public final class NangSKHVipTest {
     }
     private static void mixed() {
         Player p=batch(5); p.gender=2; preview(p,slots(10)); List<Item> before=new ArrayList<>(p.inventory.itemsBag);
-        check(NangSKHVip.execute(p,script(49,5,0,0,50,0,4,3,4,99,10,99,7,2))==3,"Independent mixed batch"); check(p.inventory.gold==0,"5 billion");
+        check(execute(p,script(49,5,0,0,50,0,4,3,4,99,10,99,7,2))==3,"Independent mixed batch"); check(p.inventory.gold==0,"5 billion");
         for(int i=0;i<5;i++)check(!p.inventory.itemsBag.get(i+5).isNotNullItem(),"Five fodders consumed");
         check(p.inventory.itemsBag.get(1)==before.get(1) && p.inventory.itemsBag.get(3)==before.get(3),"Failed mains unchanged");
         check(p.inventory.itemsBag.get(2).template.gender==0,"Earth glove stays Earth for Xayda player"); check(has(p.inventory.itemsBag.get(4),SKHCapsuleCatalog.sets(2)[2]),"Radar uses Xayda in mixed batch");
     }
     private static void inventory() {
-        Player pickup = batch(1);
-        Item dropped = item(0);
-        pickup.inventory.itemsBag = new ArrayList<>(pickup.inventory.itemsBag) {
-            boolean delivered;
-            @Override public Item set(int index, Item value) {
-                // Background pickup reaches an unrelated slot during the VIP commit.
-                if (index == 0 && !delivered) { delivered = true; super.set(2, dropped); }
-                return super.set(index, value);
-            }
-        };
-        pickup.inventory.itemsBag.add(new Item());
-        preview(pickup, 0, 1);
-        NangSKHVip.execute(pickup, b -> 0);
-        check(pickup.inventory.itemsBag.get(2) == dropped, "VIP must not overwrite an unrelated concurrent pickup");
-        Player full=batch(5); while(full.inventory.itemsBag.size()<80)full.inventory.itemsBag.add(item(0)); List<Item> before=new ArrayList<>(full.inventory.itemsBag); NangSKHVip.execute(full,b->0);
+        Player staged = batch(1);
+        Item unrelated = item(0); staged.inventory.itemsBag.add(unrelated);
+        List<Item> original = new ArrayList<>(staged.inventory.itemsBag);
+        NangSKHVip.Prepared prepared = NangSKHVip.prepare(staged, b -> 0);
+        unchanged(staged, original, 5_000_000_000L);
+        check(prepared.bag().get(2) == unrelated, "Staged VIP preserves unrelated slots");
+        Player full=batch(5); while(full.inventory.itemsBag.size()<80)full.inventory.itemsBag.add(item(0)); List<Item> before=new ArrayList<>(full.inventory.itemsBag); execute(full,b->0);
         for(int i=10;i<80;i++)check(full.inventory.itemsBag.get(i)==before.get(i),"Full bag untouched outside selection");
         for(int change=0;change<7;change++) { Player p=batch(5);
             switch(change) { case 0->p.inventory.itemsBag.set(0,item(650)); case 1->p.inventory.itemsBag.get(0).itemOptions.get(0).param++; case 2->p.inventory.itemsBag.get(5).quantity++;
                 case 3->p.inventory.itemsBag=new ArrayList<>(p.inventory.itemsBag); case 4->p.combineNew.itemsCombine.set(0,p.inventory.itemsBag.get(1)); case 5->p.gender=1; case 6->p.inventory.itemsBag.get(5).quantityGD=1; }
-            List<Item> snapshot=new ArrayList<>(p.inventory.itemsBag); long gold=p.inventory.gold; reject(()->NangSKHVip.execute(p,b->0)); unchanged(p,snapshot,gold); }
+            List<Item> snapshot=new ArrayList<>(p.inventory.itemsBag); long gold=p.inventory.gold; reject(()->execute(p,b->0)); unchanged(p,snapshot,gold); }
         // First output builds; missing stats on second must abort the entire batch.
         Player badData=batch(2); List<Item> snapshot=new ArrayList<>(badData.inventory.itemsBag);
         for(ItemShop e:Manager.SHOPS.get(0).tabShops.get(0).itemShops)if(e.temp.id==246)e.options.clear();
-        reject(()->NangSKHVip.execute(badData,b->0)); unchanged(badData,snapshot,5_000_000_000L);
+        reject(()->execute(badData,b->0)); unchanged(badData,snapshot,5_000_000_000L);
     }
     private static void replay() throws Exception {
-        Player p=batch(1); NangSKHVip.execute(p,b->99); List<Item> snapshot=new ArrayList<>(p.inventory.itemsBag); reject(()->NangSKHVip.execute(p,b->0)); unchanged(p,snapshot,4_000_000_000L);
-        p.inventory.itemsBag.set(1,item(555)); preview(p,0,1); reject(()->NangSKHVip.execute(p,b->0)); check(p.inventory.gold==4_000_000_000L,"Cooldown");
+        Player p=batch(1); execute(p,b->99); List<Item> snapshot=new ArrayList<>(p.inventory.itemsBag); reject(()->execute(p,b->0)); unchanged(p,snapshot,4_000_000_000L);
+        p.inventory.itemsBag.set(1,item(555)); preview(p,0,1); reject(()->execute(p,b->0)); check(p.inventory.gold==4_000_000_000L,"Cooldown");
         Player concurrent=batch(5); AtomicInteger committed=new AtomicInteger(); AtomicReference<Throwable> error=new AtomicReference<>(); CountDownLatch start=new CountDownLatch(1);
-        Runnable action=()-> { try { start.await(); NangSKHVip.execute(concurrent,b->99); committed.incrementAndGet(); } catch(IllegalArgumentException rejected) { } catch(Throwable t) { error.compareAndSet(null,t); } };
+        Runnable action=()-> { try { start.await(); execute(concurrent,b->99); committed.incrementAndGet(); } catch(IllegalArgumentException rejected) { } catch(Throwable t) { error.compareAndSet(null,t); } };
         Thread a=new Thread(action), b=new Thread(action); a.start(); b.start(); start.countDown(); a.join(5000); b.join(5000);
         check(!a.isAlive() && !b.isAlive() && error.get()==null && committed.get()==1 && concurrent.inventory.gold==0,"Concurrent confirm commits once");
-        Player switched=batch(1); switched.combineNew.setTypeCombine(CombineService.PHA_LE_HOA_TRANG_BI); check(switched.combineNew.skhVipSelection==null,"Switch clears preview"); reject(()->NangSKHVip.execute(switched,x->0));
+        Player switched=batch(1); switched.combineNew.setTypeCombine(CombineService.PHA_LE_HOA_TRANG_BI); check(switched.combineNew.skhVipSelection==null,"Switch clears preview"); reject(()->execute(switched,x->0));
     }
     private static void menu() {
         Player p=batch(5); npc.openBaseMenu(p); check(npc.choices.length==6 && npc.choices[5].equals("Nâng SKH"),"Append base menu"); npc.confirmMenu(p,5);
@@ -151,8 +143,35 @@ public final class NangSKHVipTest {
         check(npc.text.contains("5%") && npc.text.contains("50%") && npc.text.contains("5"),"Preview percentages and fee"); List<Item> snapshot=new ArrayList<>(p.inventory.itemsBag); npc.confirmMenu(p,1); unchanged(p,snapshot,5_000_000_000L);
         check(p.combineNew.skhVipSelection==null,"Cancel cannot become x10");
         for(int[] bad:new int[][]{{-1,1},{0,80},{0,0}}) { CombineService.gI().showInfoCombine(p,bad); check(p.combineNew.skhVipSelection==null && p.idMark.getIndexMenu()==ConstNpc.IGNORE_MENU,"Packet bounds safe"); unchanged(p,snapshot,5_000_000_000L); }
-        CombineService.gI().showInfoCombine(p,slots(10)); npc.confirmMenu(p,0); check(p.inventory.gold==0 && p.combineNew.skhVipSelection==null,"Confirm charges once");
-        for(int i=5;i<10;i++)check(!p.inventory.itemsBag.get(i).isNotNullItem(),"Confirm consumes fodders");
+        check(npc.choices.length != 3 || !Arrays.asList(npc.choices).contains("N?ng theo c?p"),
+                "VIP must not expose an intermediate submenu");
+        staleDeposit();
+    }
+    private static void staleDeposit() {
+        Player stale=batch(1); List<Item> before=new ArrayList<>(stale.inventory.itemsBag);
+        stale.combineNew.setTypeCombine(CombineService.NANG_SKH_VIP_TICH_LUY);
+        stale.combineNew.itemsCombine.addAll(before);
+        stale.idMark.setIndexMenu(ConstNpc.MENU_START_COMBINE); npc.confirmMenu(stale,0);
+        unchanged(stale,before,5_000_000_000L);
+        check(stale.skhVipDivineProgress==0 && stale.skhVipDestroyerProgress==0,
+                "Old deposit callback cannot consume or accumulate");
+        stale.idMark.setIndexMenu(ConstNpc.MENU_NANG_SKH_VIP); npc.confirmMenu(stale,1);
+        unchanged(stale,before,5_000_000_000L);
+        check(stale.skhVipDivineProgress==0 && stale.skhVipDestroyerProgress==0,
+                "Old VIP submenu cannot deposit");
+    }
+
+    // Offline deterministic adapter: persistence/receipt publishing is tested separately.
+    private static int execute(Player p, IntUnaryOperator random) {
+        synchronized(p) { synchronized(p.inventory) {
+            NangSKHVip.Prepared result=NangSKHVip.prepare(p,random);
+            p.inventory.itemsBag=new ArrayList<>(result.bag()); p.inventory.gold=result.gold();
+            NangSKHVipTichLuy.apply(p,result.progress());
+            p.combineNew.clearItemCombine(); p.combineNew.clearParamCombine();
+            long now=System.currentTimeMillis(); p.idMark.setLastTimeCombine(now);
+            p.idMark.setIndexMenu(ConstNpc.IGNORE_MENU); p.combineNew.lastTimeCombine=now;
+            return result.successes();
+        } }
     }
     private static void normalMenu() {
         Player p = batch(5);

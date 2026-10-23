@@ -769,6 +769,9 @@ public class UseItem {
                                 PetService.Pet2(pl, 1680, 1681, 1682);
                                 Service.gI().point(pl);
                                 break;
+                            case nro.models.services.ActivationGiftBoxService.ITEM_ID:
+                                nro.models.services.ActivationGiftBoxService.show(pl, item);
+                                break;
                             case 1655: // capule kich hoat
                                 UseItem.gI().CapsuleKichHoat(pl, item);
                                 break;
