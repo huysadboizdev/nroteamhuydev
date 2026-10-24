@@ -31,6 +31,16 @@ public final class ServerMaintenanceGate {
         return new Freeze();
     }
 
+    /** Takes a consistent checkpoint without closing normal admission. */
+    public static Freeze tryCheckpointFreeze(Duration timeout) throws InterruptedException {
+        if (paused || !LOCK.writeLock().tryLock(timeout.toMillis(), TimeUnit.MILLISECONDS)) return null;
+        if (paused) {
+            LOCK.writeLock().unlock();
+            return null;
+        }
+        return new Freeze();
+    }
+
     /** Only failure to acquire the barrier is retryable; save errors remain terminal. */
     public static final class DrainTimeoutException extends IllegalStateException {
         private DrainTimeoutException(String message) { super(message); }

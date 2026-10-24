@@ -1,8 +1,20 @@
 package nro.models.services;
 
 import java.time.Duration;
+import java.net.SocketException;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.*;
+import nro.models.database.PlayerDAO;
+import nro.models.data.LocalManager;
+import nro.models.player.Player;
+import nro.models.server.Client;
 
 /** Independent control worker. Never stops or waits for its own command executor. */
 public final class ServerMaintenanceService {
@@ -30,8 +42,15 @@ public final class ServerMaintenanceService {
     private final String run = UUID.randomUUID().toString();
     private ScheduledExecutorService worker;
     private ScheduledExecutorService heartbeatWorker;
+    private ScheduledExecutorService checkpointWorker;
     private volatile State state;
     private volatile long lastError;
+    private volatile boolean nativeMaintenance;
+    private final Object maintenanceModeLock = new Object();
+    private volatile String lastCheckpointSummary = "no checkpoint yet";
+    private final Map<Long, CheckpointRecord> checkpoints = new ConcurrentHashMap<>();
+
+    private record CheckpointRecord(String name, long savedAt, String issue) {}
 
     public ServerMaintenanceService(Store store, Drain drain) {
         this(store, () -> {}, drain, Duration.ofSeconds(30));
@@ -69,13 +88,23 @@ public final class ServerMaintenanceService {
             Thread t = new Thread(r, "Web maintenance heartbeat"); t.setDaemon(true); return t;
         });
         heartbeatWorker.scheduleWithFixedDelay(this::heartbeatSafely, 0, 5, TimeUnit.SECONDS);
+        checkpointWorker = Executors.newSingleThreadScheduledExecutor(r -> {
+            Thread t = new Thread(r, "Player persistence checkpoint"); t.setDaemon(true); return t;
+        });
+        checkpointWorker.scheduleWithFixedDelay(this::checkpointSafely, 30, 30, TimeUnit.SECONDS);
     }
     private void publish(State value) {
-        state = value;
-        if ("OPEN".equals(value.phase())) ServerMaintenanceGate.resume();
-        else ServerMaintenanceGate.pause();
+        synchronized (maintenanceModeLock) {
+            state = value;
+            if ("OPEN".equals(value.phase()) && !nativeMaintenance) ServerMaintenanceGate.resume();
+            else ServerMaintenanceGate.pause();
+        }
     }
     public synchronized void tick() throws Exception {
+        if (nativeMaintenance) {
+            ServerMaintenanceGate.pause();
+            return;
+        }
         publish(store.load(run));
         if ("DRAINING".equals(state.phase())) { drainCurrent(); return; }
         Intent intent = store.next();
@@ -109,6 +138,167 @@ public final class ServerMaintenanceService {
             catch (Exception statusFailure) { failure.addSuppressed(statusFailure); }
             throw failure;
         }
+    }
+
+    /** Native countdown/CLI maintenance uses the same admission barrier and drain as web maintenance. */
+    public void beginNativeMaintenance() throws Exception {
+        synchronized (maintenanceModeLock) {
+            nativeMaintenance = true;
+            ServerMaintenanceGate.pause();
+        }
+        synchronized (this) {
+            prepare.run();
+        }
+    }
+
+    public void drainForNativeMaintenance() throws Exception {
+        beginNativeMaintenance();
+        try (ServerMaintenanceGate.Freeze ignored = ServerMaintenanceGate.freeze(drainTimeout)) {
+            drain.run();
+        }
+    }
+
+    private boolean checkpointAllowed() {
+        State current = state;
+        return !nativeMaintenance && current != null && "OPEN".equals(current.phase())
+                && !ServerMaintenanceGate.paused();
+    }
+
+    private void checkpointSafely() {
+        if (!checkpointAllowed()) return;
+        long started = System.nanoTime();
+        if (!checkpointDatabaseAvailable()) {
+            recordDatabaseUnavailable();
+            return;
+        }
+        ServerMaintenanceGate.Freeze barrier = null;
+        try {
+            barrier = ServerMaintenanceGate.tryCheckpointFreeze(Duration.ofMillis(250));
+            if (barrier == null) {
+                lastCheckpointSummary = "deferred: gameplay barrier busy; prior checkpoint retained";
+                System.out.println("[Checkpoint] deferred: gameplay barrier busy");
+                return;
+            }
+            if (!checkpointAllowed()) return;
+            int saved = 0, skipped = 0, failed = 0;
+            Set<Long> onlineIds = new HashSet<>();
+            boolean databaseUnavailable = false;
+            for (Player player : new ArrayList<>(Client.gI().getPlayers())) {
+                if (player == null) continue;
+                onlineIds.add(player.id);
+                String issue;
+                if (databaseUnavailable) {
+                    CheckpointRecord previous = checkpoints.get(player.id);
+                    checkpoints.put(player.id, new CheckpointRecord(player.name,
+                            previous == null ? 0 : previous.savedAt(), "database-unavailable"));
+                    failed++;
+                    continue;
+                }
+                try {
+                    synchronized (player) {
+                        if (player.beforeDispose || player.isOffline || !player.isPl()
+                                || player.inventory == null || player.idMark == null
+                                || !player.idMark.isLoadedAllDataPlayer()) {
+                            issue = "not-ready";
+                        } else if (PlayerDAO.hasPendingLogoutOperation(player)) {
+                            issue = "pending-operation";
+                        } else {
+                            PlayerDAO.CheckedSaveResult result = PlayerDAO.saveCheckedDetailed(player);
+                            if (!result.saved()) {
+                                issue = result.failure() == null ? "save-not-confirmed" : "save-failed";
+                                if (isDatabaseConnectionFailure(result.failure())) databaseUnavailable = true;
+                            } else {
+                                checkpoints.put(player.id, new CheckpointRecord(player.name,
+                                        System.currentTimeMillis(), null));
+                                saved++;
+                                continue;
+                            }
+                        }
+                    }
+                } catch (Exception playerFailure) {
+                    issue = "exception:" + playerFailure.getClass().getSimpleName();
+                }
+                CheckpointRecord previous = checkpoints.get(player.id);
+                checkpoints.put(player.id, new CheckpointRecord(player.name,
+                        previous == null ? 0 : previous.savedAt(), issue));
+                if ("save-not-confirmed".equals(issue) || "save-failed".equals(issue)
+                        || "database-unavailable".equals(issue) || issue.startsWith("exception:")) failed++;
+                else skipped++;
+                if (failed + skipped > 0) {
+                    System.err.println("[Checkpoint] player=" + player.name + " issue=" + issue
+                            + ", lastSavedAt=" + (previous == null || previous.savedAt() == 0
+                                    ? "never" : previous.savedAt()));
+                }
+            }
+            checkpoints.keySet().retainAll(onlineIds);
+            long elapsedMs = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - started);
+            lastCheckpointSummary = "saved=" + saved + ", skipped=" + skipped + ", failed=" + failed
+                    + ", duration=" + elapsedMs + "ms";
+            System.out.println("[Checkpoint] " + lastCheckpointSummary);
+        } catch (InterruptedException interrupted) {
+            Thread.currentThread().interrupt();
+        } catch (Exception failure) {
+            System.err.println("[Checkpoint] Cycle failed: " + failure);
+            failure.printStackTrace(System.err);
+        } finally {
+            if (barrier != null) barrier.close();
+        }
+    }
+
+    public String checkpointSummary() {
+        StringBuilder summary = new StringBuilder(lastCheckpointSummary);
+        int count = 0;
+        for (CheckpointRecord record : checkpoints.values()) {
+            if (record.savedAt() == 0 || record.issue() != null) count++;
+        }
+        summary.append(", attention=").append(count);
+        int remaining = count;
+        for (CheckpointRecord record : checkpoints.values()) {
+            if (record.savedAt() == 0 || record.issue() != null) {
+                String name = record.name() == null ? "?" : record.name();
+                if (summary.length() + name.length() + 2 > 220) break;
+                summary.append(summary.toString().contains(" [") ? "," : " [").append(name);
+                remaining--;
+            }
+        }
+        if (remaining > 0) summary.append(" +").append(remaining).append(" more");
+        if (summary.length() > 255) return summary.substring(0, 252) + "...";
+        return summary.toString();
+    }
+
+    private boolean checkpointDatabaseAvailable() {
+        try (Connection connection = LocalManager.getConnection();
+             Statement statement = connection.createStatement();
+             var result = statement.executeQuery("SELECT 1")) {
+            return result.next();
+        } catch (Exception failure) {
+            System.err.println("[Checkpoint] deferred: database unavailable: " + failure);
+            return false;
+        }
+    }
+
+    private void recordDatabaseUnavailable() {
+        lastCheckpointSummary = "deferred: database unavailable";
+        Set<Long> onlineIds = new HashSet<>();
+        for (Player player : Client.gI().getPlayers()) {
+            if (player == null) continue;
+            onlineIds.add(player.id);
+            CheckpointRecord previous = checkpoints.get(player.id);
+            checkpoints.put(player.id, new CheckpointRecord(player.name,
+                    previous == null ? 0 : previous.savedAt(), "database-unavailable"));
+        }
+        checkpoints.keySet().retainAll(onlineIds);
+    }
+
+    private static boolean isDatabaseConnectionFailure(Throwable failure) {
+        for (Throwable current = failure; current != null; current = current.getCause()) {
+            if (current instanceof SocketException) return true;
+            if (current instanceof SQLException sql) {
+                String state = sql.getSQLState();
+                if (state != null && state.startsWith("08")) return true;
+            }
+        }
+        return false;
     }
     private void tickSafely() {
         try { tick(); }

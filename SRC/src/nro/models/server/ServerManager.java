@@ -18,6 +18,7 @@ import nro.models.interfaces.ISession;
 import nro.models.network.Network;
 import nro.models.network.MyKeyHandler;
 import nro.models.network.MySession;
+import nro.models.network.SessionManager;
 import nro.models.services_dungeon.NgocRongNamecService;
 import nro.models.utils.Logger;
 import nro.models.utils.TimeUtil;
@@ -25,6 +26,7 @@ import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ConcurrentHashMap;
 import nro.models.matches.giai_dau.The23rdMartialArtCongressManager;
 import nro.models.matches.giai_dau.DeathOrAliveArenaManager;
 import nro.models.matches.giai_dau.WorldMartialArtsTournamentManager;
@@ -55,7 +57,7 @@ import nro.models.shop_ky_gui.ConsignShopManager;
 public class ServerManager {
 
     public static String timeStart;
-    public static final Map<Object, Object> CLIENTS = new HashMap<>();
+    public static final Map<String, Integer> CLIENTS = new ConcurrentHashMap<>();
     public static String NAME_SERVER = "Ngọc Rồng Onlime";
     public static String DOMAIN = "Server 1";
     public static String NAME = "Ngọc Rồng Online";
@@ -148,6 +150,7 @@ public class ServerManager {
             startTopUpdater();
             nro.models.services.LiveSyncService.gI().start();
             nro.models.services.ServerMaintenanceService.gI().start();
+            ServerHealthWatchdog.start();
         } catch (Exception e) {
             Logger.logException(this.getClass(), e);
         }
@@ -231,6 +234,10 @@ public class ServerManager {
                 @Override
                 public void sessionInit(ISession is) {
                     if(nro.models.services.ServerMaintenanceGate.paused()) { is.disconnect();return; }
+                    if (SessionManager.gI().getNumSession() >= Manager.MAX_CONNECTIONS) {
+                        is.disconnect();
+                        return;
+                    }
                     if (!canConnectWithIp(is.getIP())) {
                         is.disconnect();
                         return;
@@ -258,32 +265,20 @@ public class ServerManager {
     }
 
     private boolean canConnectWithIp(String ipAddress) {
-        Object o = CLIENTS.get(ipAddress);
-        if (o == null) {
-            CLIENTS.put(ipAddress, 1);
-            return true;
-        } else {
-            int n = Integer.parseInt(String.valueOf(o));
-            if (n < Manager.MAX_PER_IP) {
-                n++;
-                CLIENTS.put(ipAddress, n);
-                return true;
-            } else {
-                return false;
+        final boolean[] accepted = {false};
+        CLIENTS.compute(ipAddress, (ip, count) -> {
+            int current = count == null ? 0 : count;
+            if (current < Manager.MAX_PER_IP) {
+                accepted[0] = true;
+                return current + 1;
             }
-        }
+            return current;
+        });
+        return accepted[0];
     }
 
     public void disconnect(MySession session) {
-        Object o = CLIENTS.get(session.getIP());
-        if (o != null) {
-            int n = Integer.parseInt(String.valueOf(o));
-            n--;
-            if (n < 0) {
-                n = 0;
-            }
-            CLIENTS.put(session.getIP(), n);
-        }
+        CLIENTS.computeIfPresent(session.getIP(), (ip, count) -> count <= 1 ? null : count - 1);
     }
 
     public void resetNhanQuaHangNgay() {
@@ -307,44 +302,37 @@ public class ServerManager {
     }
 
     public void close() {
-        try {
-            nro.models.services.LiveSyncService.gI().stop();
-            if (!nro.models.services.AchievementService.gI().drainPending()) throw new IllegalStateException("Achievement claims still awaiting reconciliation");
-            if(!nro.models.services.GiftCodeService.gI().drainPending())throw new IllegalStateException("Gift claims still awaiting reconciliation");
-            if(!nro.models.services.shenron.SummonDragonNamek.reconcilePendingForMaintenance())throw new IllegalStateException("Namek wish still awaiting reconciliation");
-            nro.models.event.EventCleanupService.drainOnline();
-            nro.models.event.EventCleanupLogoutService.drain();
-            if(!nro.models.event.EventCleanupLogoutService.empty())throw new IllegalStateException("Event cleanup logout saves must drain before maintenance");
-        } catch (Exception failure) {
-            Logger.logException(ServerManager.class,failure);
-            nro.models.services.LiveSyncService.gI().start();
-            Maintenance.cancelFailedMaintenance();
-            return;
+        nro.models.services.ServerMaintenanceService maintenance =
+                nro.models.services.ServerMaintenanceService.gI();
+        boolean eventRuntimeStopped = false;
+        boolean workersStopped = false;
+        boolean questSupportStopped = false;
+        while (true) {
+            try {
+                maintenance.beginNativeMaintenance();
+                if (!eventRuntimeStopped) {
+                    nro.models.event.EventRuntimeService.gI().stop();
+                    eventRuntimeStopped = true;
+                }
+                if (!questSupportStopped) {
+                    nro.models.services.QuestSupportService.gI().shutdown();
+                    questSupportStopped = true;
+                }
+                if (!workersStopped) {
+                    nro.models.services.LiveSyncService.gI().stop();
+                    workersStopped = true;
+                }
+                maintenance.drainForNativeMaintenance();
+                Logger.success("Native maintenance drain complete; " + maintenance.checkpointSummary());
+                break;
+            } catch (Exception failure) {
+                Logger.logException(ServerManager.class, failure,
+                        "Native maintenance save incomplete; admission remains closed; retrying in 5s");
+                try { Thread.sleep(5000); }
+                catch (InterruptedException interrupted) { Thread.currentThread().interrupt(); return; }
+            }
         }
         isRunning = false;
-        nro.models.event.EventRuntimeService.gI().stop();
-        try { nro.models.services.QuestSupportService.gI().shutdown(); }
-        catch (Exception failure) { Logger.logException(ServerManager.class, failure, "Quest support shutdown"); }
-        try {
-            ClanService.gI().close();
-        } catch (Exception e) {
-            Logger.error("Lỗi save clan!\n");
-        }
-        try {
-            ConsignShopManager.gI().save();
-        } catch (Exception e) {
-            Logger.error("Lỗi save shop ký gửi!\n");
-        }
-        try {
-            Client.gI().close();
-            nro.models.event.EventCleanupLogoutService.drain();
-            if(!nro.models.event.EventCleanupLogoutService.empty())throw new IllegalStateException("Event logout saves incomplete");
-            nro.models.event.EventCleanupService.maintenance();
-        }
-        catch(Exception cleanupFailure) {
-            Logger.logException(ServerManager.class,cleanupFailure,"Event maintenance cleanup incomplete; do not reopen");
-            return;
-        }
         Logger.success("SUCCESSFULLY MAINTENANCE!\n");
 
         try {
@@ -354,7 +342,6 @@ public class ServerManager {
         }
         System.exit(0);
     }
-
     private static void activeCommandLine() {
         Scanner sc = new Scanner(System.in);
         while (true) {

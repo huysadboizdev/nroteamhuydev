@@ -15,6 +15,9 @@ import org.apache.commons.lang.ArrayUtils;
 import java.time.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 import nro.models.map.ItemMap;
 import nro.models.map.Zone;
 import nro.models.services.Service;
@@ -25,6 +28,15 @@ import nro.models.services.Service;
  *
  */
 public class Util {
+
+    private static final ScheduledExecutorService TIMEOUTS = Executors.newScheduledThreadPool(2, new ThreadFactory() {
+        private int nextId;
+        @Override public synchronized Thread newThread(Runnable task) {
+            Thread thread = new Thread(task, "Util timeout " + (++nextId));
+            thread.setDaemon(true);
+            return thread;
+        }
+    });
 
     private static final Random rand;
     private static final SimpleDateFormat dateFormat;
@@ -421,13 +433,8 @@ public class Util {
     }
 
     public static void setTimeout(Runnable runnable, int delay) {
-        Executors.newSingleThreadExecutor().submit(() -> {
-            try {
-                Thread.sleep(delay);
-                runnable.run();
-            } catch (InterruptedException e) {
-            }
-        });
+        if (runnable == null) return;
+        TIMEOUTS.schedule(runnable, Math.max(0, delay), TimeUnit.MILLISECONDS);
     }
 
     public static String addSlashes(String input) {

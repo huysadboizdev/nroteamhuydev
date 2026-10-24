@@ -43,8 +43,9 @@ public class Session implements ISession {
         this.connected = true;
 
         try {
-            this.socket.setSendBufferSize(0x100000);
-            this.socket.setReceiveBufferSize(0x100000);
+            // Keep per-connection native socket memory bounded under connection floods.
+            this.socket.setSendBufferSize(64 * 1024);
+            this.socket.setReceiveBufferSize(64 * 1024);
         } catch (SocketException ignored) {
         }
 

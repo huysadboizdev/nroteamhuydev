@@ -95,15 +95,26 @@ public class PlayerDAO {
 
     /** Observe the regular full save, without bypassing any pending-operation guards. */
     public static boolean saveChecked(Player player) {
-        if (player == null || CHECKED_SAVE.get() != null || player.isOffline || player.beforeDispose) return false;
+        return saveCheckedDetailed(player).saved();
+    }
+    public record CheckedSaveResult(boolean saved, Exception failure) {}
+    public static CheckedSaveResult saveCheckedDetailed(Player player) {
+        if (player == null || CHECKED_SAVE.get() != null || player.isOffline || player.beforeDispose)
+            return new CheckedSaveResult(false, null);
         DeferredRubySave context = new DeferredRubySave(player);
         CHECKED_SAVE.set(context);
-        try { updatePlayer(player); return context.saved; }
+        try {
+            updatePlayer(player);
+            return new CheckedSaveResult(context.saved, context.failure);
+        } catch (Exception failure) {
+            return new CheckedSaveResult(context.saved, failure);
+        }
         finally { CHECKED_SAVE.remove(); }
     }
     private static final class DeferredRubySave {
         final Player player;
         boolean saved;
+        Exception failure;
         DeferredRubySave(Player player) { this.player = player; }
     }
     private static final ThreadLocal<DeferredRubySave> RUBY_LOGOUT_SAVE = new ThreadLocal<>();
@@ -544,7 +555,8 @@ public class PlayerDAO {
                 String inventory = dataArray.toJSONString();
                 dataArray.clear();
 
-                int mapId = player.mapIdBeforeLogout;
+                int mapId = !player.beforeDispose && player.zone != null
+                        ? player.zone.map.mapId : player.mapIdBeforeLogout;
                 int x = player.location.x;
                 int y = player.location.y;
                 long hp = player.nPoint.hp;
@@ -1198,6 +1210,9 @@ public class PlayerDAO {
                     Logger.success(Logger.PURPLE + TimeUtil.getCurrHour() + "h" + TimeUtil.getCurrMin() + "m: Player " + player.name + " save successfully! " + (System.currentTimeMillis() - st) + "ms\n");
                 }
             } catch (Exception e) {
+                DeferredRubySave checkedSave = CHECKED_SAVE.get();
+                if (checkedSave != null && checkedSave.player == player && !checkedSave.saved)
+                    checkedSave.failure = e;
                 if (finalizingRuby) rubySave.saved = false;
                 if (finalizingKol) kolSave.saved = false;
                 if (finalizingRename) renameSave.saved = false;

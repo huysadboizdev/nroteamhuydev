@@ -74,6 +74,7 @@ public final class Manager {
     public static byte SECOND_WAIT_LOGIN = 5;
     public static int MAX_PER_IP = 1000;
     public static int MAX_PLAYER = 2000;
+    public static int MAX_CONNECTIONS = 1200;
     public static volatile byte RATE_EXP_SERVER = 1;
     public static boolean LOCAL = false;
     public static boolean TEST = false;
@@ -258,6 +259,8 @@ public final class Manager {
 
             } catch (Exception e) {
                 e.printStackTrace();
+            } finally {
+                ServerHealthWatchdog.mapTickCompleted();
             }
         }, 0, 1, TimeUnit.SECONDS);
 
@@ -1065,6 +1068,9 @@ public final class Manager {
         }
         if ((value = properties.get("server.maxplayer")) != null) {
             MAX_PLAYER = Integer.parseInt(String.valueOf(value));
+        }
+        if ((value = properties.get("server.maxconnections")) != null) {
+            MAX_CONNECTIONS = Math.max(1, Integer.parseInt(String.valueOf(value)));
         }
         if ((value = properties.get("server.expserver")) != null) {
             RATE_EXP_SERVER = Byte.parseByte(String.valueOf(value));

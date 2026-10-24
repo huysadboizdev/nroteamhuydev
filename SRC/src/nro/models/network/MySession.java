@@ -16,13 +16,19 @@ import nro.models.player_system.AntiLogin;
 import nro.models.services.Service;
 import nro.models.utils.Logger;
 import nro.models.utils.TimeUtil;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 public class MySession extends Session {
 
-    private static final Map<String, AntiLogin> ANTILOGIN = new HashMap<>();
+    private static final int MAX_ANTI_LOGIN_IPS = 4096;
+    private static final Map<String, AntiLogin> ANTILOGIN = java.util.Collections.synchronizedMap(
+            new LinkedHashMap<String, AntiLogin>(256, 0.75f, true) {
+                @Override protected boolean removeEldestEntry(Map.Entry<String, AntiLogin> eldest) {
+                    return size() > MAX_ANTI_LOGIN_IPS;
+                }
+            });
     public Player player;
 
     public byte timeWait = 100;
@@ -138,10 +144,9 @@ public class MySession extends Session {
             Service.gI().sendThongBaoOK(this, "Vui lòng cập nhật client mới để sử dụng 200 ô hành trang và rương nhà.");
             return;
         }
-        AntiLogin al = ANTILOGIN.get(this.ipAddress);
-        if (al == null) {
-            al = new AntiLogin();
-            ANTILOGIN.put(this.ipAddress, al);
+        AntiLogin al;
+        synchronized (ANTILOGIN) {
+            al = ANTILOGIN.computeIfAbsent(this.ipAddress, ip -> new AntiLogin());
         }
         if (!al.canLogin()) {
             Service.gI().sendThongBaoOK(this, al.getNotifyCannotLogin());
